@@ -1,0 +1,16 @@
+# Local data. The archive is rebuildable from upstream git history, so it is
+# never committed - and the duckdb file is far too large for a repo.
+data/
+
+# Secrets. .env.example IS tracked; .env never is.
+.env
+.env.local
+
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/
+build/
+dist/

@@ -1,0 +1,7 @@
+# Overrides for zoltar_ranks.config.Config. Anything omitted uses the dataclass
+# default. Secrets do NOT go here - use .env (see .env.example).
+price_provider: robin_stocks
+baseline_top_x: 5
+baseline_risk_bucket: low
+baseline_gain_threshold: 0.02
+baseline_loss_threshold: -0.01
