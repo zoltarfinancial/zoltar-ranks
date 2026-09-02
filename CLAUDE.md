@@ -85,8 +85,12 @@ never change the JSON schema without updating `docs/DASHBOARD.md` first.
 .\scripts\setup.ps1                  # first time: venv, deps, tests, backfill
 .\scripts\schedule_harvest.ps1       # first time, elevated: the 30-min task
 pytest tests -q -m "not network"     # fast loop while developing
-pytest tests -q                      # full, includes upstream contract tests
+pytest tests -q --json-report --json-report-file=data/results/pytest_report.json
+                                     # full; ALSO feeds the build monitor's gates.
+                                     # A plain `pytest tests -q` leaves the report
+                                     # stale and every gate reads not_built.
 python scripts\daily.py              # the scheduled loop
+python dashboard\emit_build_status.py --check   # the sync point: 0 blocking = green
 ```
 
 ## Before you finish any task

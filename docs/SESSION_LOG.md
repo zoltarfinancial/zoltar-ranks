@@ -6,6 +6,124 @@ decisions, surprises, and anything you had to work around; not routine progress.
 
 ---
 
+## 2026-09-02 (evening) — build monitor synced; 10 blocking -> 2
+
+Worked `docs/HANDOFF_CLAUDE_CODE.md`. `emit_build_status.py --check` went from
+**10 blocking / 3 warning / 4 ok** to **2 blocking / 1 warning / 15 ok**.
+
+- **T1 `scripts/daily.py` rewritten.** `derive_mode()` stamps a real window from
+  the wall clock (premarket <09:00 / intraday <15:30 / evening / weekend) instead
+  of `daily`, which had made an intraday re-score and the evening retrain capture
+  indistinguishable in the record. `--mode` overrides the RECORDED mode only; the
+  harvesters still receive `backfill`/`daily`, which is all they understand.
+  `run_history.jsonl` is appended in a `finally` block with offset-aware
+  timestamps.
+
+- **T1b row counts are measured from the DATABASE, not reported by the
+  harvesters.** A before/after count over each step's tables (`_STEP_TABLES`)
+  cannot drift from what the harvester actually did and needed no change to five
+  harvesters. **Unknown is `null`, never `0`** -- a zero row count on the intraday
+  job is a real alarm, and producing one from a locked DB would be a fabricated
+  one, which is as bad as a hidden one.
+
+- **T2 the emitter runs from `daily.py` -- deliberately NOT as a `STEPS` entry.**
+  It must run *after* the status write or it reports the previous run, so it is
+  called at the end of the `finally` block. Every failure in it is logged and
+  swallowed: a monitor that can fail a harvest is worse than a stale monitor.
+  `.git/hooks/post-commit` installed (not versioned -- re-create after a clone).
+
+- **T3 `pytest-json-report` pinned and added to the documented test command in
+  `CLAUDE.md`**, so the way the suite is normally run also feeds the gates. A
+  plain `pytest tests -q` leaves the report stale and every gate reads not_built.
+
+- **T4 partial, on purpose.** `no_latest_pkl` is real: it checks the config
+  paths, proves `PROD_RE` rejects the rankings filenames, and asserts **by AST**
+  that the one module allowed to NAME those files (`harvest_sessions`, filenames
+  only) never calls a blob reader. **`no_same_bar` and `no_run_ts_execution` were
+  NOT written.** There is no execution engine to guard, so a test today would
+  pass because the code does not exist -- a green light that means nothing, which
+  is the same failure the handoff warns about in the other direction. They land
+  with `analysis/backtest.py`. B2 stays open and §10 keeps showing them
+  `not_built`, which is the honest state.
+
+- **T5 manifest paths corrected to the names the plan actually commits to** --
+  `analysis/backtest.py`, `metrics.py`, `stats.py` (PLAN 4a/4b), not the invented
+  `baselines.py`/`fdr.py`/`random_control.py`. Two judgement calls worth knowing:
+  the "emitter wired into daily.py" deliverable now points at
+  `tests/test_daily.py`, because **path existence cannot prove wiring** -- the
+  emitter file exists whether or not anything calls it; and `prices.py` carries
+  `state_override: wip`, because all three providers raise `NotImplementedError`
+  and `path.exists()` would have read `done` for an unbuilt layer. That is the
+  override used to make a tile LESS green, which is the only honest direction.
+
+- **T6 NOT DONE.** `rm -rf monitoring/` was blocked by the sandbox's safety
+  classifier, twice. The folder holds only pointer stubs and is untracked, so
+  `git rm` does not apply. **Andrew: run `Remove-Item -Recurse -Force monitoring`.**
+
+- **B1 closed enough to be useful: `analysis/export_dashboard_data.py` exists**
+  and is a `STEPS` entry, so `dashboard_data.json` refreshes every run. Only
+  `archive_health`, `hypotheses` and `shap_drift` are emitted;
+  `signal_health`, `benchmarks` and `timing` are **absent with a stated reason**
+  in `sections_absent`, never zero-filled.
+
+- **🔴 The exporter caught the forward-stamp trap a third time.** Freshness must
+  NOT be computed from `run_ts`: the newest `run_ts` in the archive is
+  `2026-09-03 00:00:00` while it is 2026-09-02, so `hours_since` would be
+  **negative**, the dashboard's ~24h staleness alarm would never fire, and a dead
+  harvester would render as perfectly healthy. Computed from `available_at`
+  (rule 5); `freshness_basis` records which, and both timestamps are emitted so
+  the gap is visible. Same defect class as the `-Once` trigger and the exit-0
+  bug -- third instance, which is why it is now a regression test.
+
+- **The register parser refuses to invent numbers.** `mde` is numeric only when
+  the cell LEADS with a number (`0.157%/run (n=63, ...)` -> `0.157`); a loose
+  search would read `TBD (n~64 paired days)` as an MDE of **64**. That is not a
+  missing value but a fabricated one, and it would render as evidence.
+  `mde_raw` keeps the cell verbatim. Rejected rows are always emitted -- the row
+  count is the FDR denominator (rule 7).
+
+- **`data/` was entirely gitignored, so `data/build/manifest.yaml` could not be
+  committed** -- yet the handoff makes it mine and requires it to change in the
+  same commit as `docs/PLAN.md`. Fixed with per-level re-inclusion. A second
+  rule, an unanchored `build/` meant for Python artifacts, was also matching
+  `data/build/` at any depth; anchored to `/build/`. Everything else in `data/`
+  stays ignored.
+
+### The 2 remaining blocking rows clear themselves, and must NOT be forced
+
+`harvest_premarket` and `harvest_evening` declare modes that do not yet appear in
+`run_history.jsonl`, because the history only started at 12:27 CDT -- inside the
+intraday window. The scheduled task runs 07:00-21:30 without `--mode`, so an
+`evening` beat lands tonight after 15:30 and a `premarket` beat tomorrow before
+09:00.
+
+**Do not run `daily.py --mode premarket` to clear them.** That writes a heartbeat
+claiming a premarket run happened at midday -- fabricating precisely the evidence
+the monitor exists to check. This is the handoff's real acceptance test and it is
+a clock, not a code change.
+
+### Reporting back to Cowork
+
+- `--check`: **2 blocking, 1 warning, 15 ok** (both blockers are the clock, above).
+- emitter line: `dataesultsuild_status.json  gate=AMBER  Running, but not yet
+  trustworthy - 2 blocker gate(s) never run or stale; 2 high-priority job(s) late
+  or failed.`
+- Manifest corrections: Phase 3/4 module names, Phase 2 anchor deliverables,
+  `prices.py` -> `state_override: wip`, the wiring deliverable -> `tests/test_daily.py`,
+  B1 downgraded to `normal`, B2 narrowed to two gates.
+- **One question for Cowork:** `dashboard/BUILD_MONITOR.md` asks the exporter to
+  also write `dashboard/dashboard_data.js` (`window.__ZOLTAR_DATA__`) for
+  `file://`. That path is in Cowork's lane and `CLAUDE.md` forbids the backend
+  writing under `dashboard/`, so **it was left unwritten**. `emit_build_status.py`
+  already writes `dashboard/build_status.js` itself; the same one line beside it
+  would cover the research feed. Say which side should own it.
+
+- Suite: **120 passed, 5 skipped, 1 failed.** The failure is still the stamp
+  canary from earlier today, left failing per rule 9. Full `daily.py` run is
+  **12 s**.
+
+---
+
 ## 2026-09-02 (later still) — harvest_daily_ranks re-read 4.8 GB every 30 min
 
 - **🔴 DEFECT CONFIRMED (Andrew's diagnosis, verified).** `harvest_daily_ranks.main()`

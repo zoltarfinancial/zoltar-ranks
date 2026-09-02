@@ -1,0 +1,353 @@
+# data/build/manifest.yaml — the ONLY hand-maintained input to the build monitor.
+#
+# It declares what SHOULD exist: the phases, deliverables, jobs, gates, feeds and
+# blockers of docs/PLAN.md. It never declares status. Everything the console shows
+# — job health, phase percentages, gate colours, the top-line gate — is derived by
+# dashboard/emit_build_status.py from the run history, the pytest report, the
+# filesystem and git.
+#
+# OWNER: Claude Code. Update it in the same commit that changes docs/PLAN.md.
+# Seeded by the Cowork session 2026-09-02 from docs/PLAN.md + docs/FINDINGS.md.
+#
+# Two fields are the only escape hatches, and both are visible in review:
+#   status_override  — pin a job or gate (use only for a deliberately paused job)
+#   state_override   — pin a deliverable
+# If you find yourself reaching for either to make the page look better, the
+# answer is to fix the thing, not the manifest.
+
+repo_name: zoltar-ranks
+
+# ---------------------------------------------------------------------- jobs
+# `modes` matches the `mode` field that scripts/daily.py writes into
+# data/results/run_history.jsonl. daily.py derives the mode from the wall clock
+# (CDT) using the run-type boundaries in docs/FINDINGS.md F4, with --mode as an
+# override. If a mode listed here never appears in the history, the job reads
+# not_built forever — `emit_build_status.py --check` catches exactly that.
+
+jobs:
+  - id: harvest_intraday
+    name: Intraday harvest
+    why: >-
+      Pulls all_*_PROD_latest.pkl before the 200-timestamp rolling buffer discards
+      it. Upstream lost 137 timestamps in two weeks. This is the only irreversible
+      job on the board: a window missed here is history that no longer exists.
+    schedule: "*/30 09:00-15:30 CDT, Mon-Fri"
+    cadence_minutes: 30
+    start_hour: 9
+    end_hour: 15.5
+    days: [0, 1, 2, 3, 4]
+    modes: [intraday]
+    criticality: critical
+    built: true
+
+  - id: harvest_premarket
+    name: Pre-market harvest
+    why: >-
+      Captures the 05:30-08:30 morning model build — the rank vintage the
+      baseline strategy actually trades from.
+    schedule: "*/30 07:00-09:00 CDT, Mon-Fri"
+    cadence_minutes: 30
+    start_hour: 7
+    end_hour: 9
+    days: [0, 1, 2, 3, 4]
+    modes: [premarket]
+    criticality: high
+    built: true
+
+  - id: harvest_evening
+    name: Evening / after-close harvest
+    why: >-
+      Captures the AFTERCLOSE UPDATE full retrain (finishes 20:00-21:00 CDT).
+      Treated as a tradable vintage, not a placeholder — H11 depends on it, and
+      the 2026-09-02 stamp-convention cutover makes this window load-bearing.
+    schedule: "*/30 15:30-21:30 CDT, Mon-Fri"
+    cadence_minutes: 30
+    start_hour: 15.5
+    end_hour: 21.5
+    days: [0, 1, 2, 3, 4]
+    modes: [evening]
+    criticality: high
+    built: true
+
+# -------------------------------------------------------------------- phases
+# `pct` is derived from deliverable states, which are derived from the
+# filesystem and the pytest report. Add a deliverable with a real path or it
+# cannot be measured.
+
+phases:
+  - id: "1"
+    name: Point-in-time rank archive
+    subtitle: DuckDB + Parquet, coverage-walk backfill, idempotent daily harvest
+    status: done
+    owner: claude-code
+    critical_path: true
+    completed_at: "2026-09-01"
+    note: >-
+      Built and validated. 185,880 overlapping rows identical between HEAD and the
+      2026-08-18 blob — scores are never restated, so a backtest on the union of
+      snapshots is honest.
+    deliverables:
+      - {name: DuckDB schema, path: src/zoltar_ranks/db/schema.sql, kind: data}
+      - {name: Rank harvester, path: src/zoltar_ranks/ingest/harvest_ranks.py, kind: code}
+      - {name: Coverage-walk git archive reader, path: src/zoltar_ranks/sources/git_archive.py, kind: code}
+      - {name: Point-in-time immutability test, path: tests/test_db.py, kind: test, test: test_db}
+
+  - id: 1a
+    name: ER / SHAP / fundamentals ingestion + 30-min harvest schedule
+    subtitle: urgent — intraday history is destroyed continuously
+    status: in_progress
+    owner: claude-code
+    critical_path: true
+    started_at: "2026-09-01"
+    eta: "2026-09-03"
+    note: >-
+      Scheduling the harvest is the highest-value action on the board and depends
+      on nothing else. Phase 1a does not close when schedule_harvest.ps1 exists —
+      it closes when section 08 has shown one full trading session of green beats.
+    deliverables:
+      - {name: Scheduled 30-min harvest task, path: scripts/schedule_harvest.ps1, kind: job}
+      - {name: daily_ranks harvester, path: src/zoltar_ranks/ingest/harvest_daily_ranks.py, kind: code}
+      - {name: Expected-returns harvester, path: src/zoltar_ranks/ingest/harvest_er.py, kind: code}
+      - {name: SHAP harvester, path: src/zoltar_ranks/ingest/harvest_shap.py, kind: code}
+      - {name: Session-label harvester, path: src/zoltar_ranks/ingest/harvest_sessions.py, kind: code}
+      - {name: Work-idempotency manifest guard, path: tests/test_manifest.py, kind: test, test: test_manifest}
+      - {name: Run heartbeat (run_history.jsonl), path: data/results/run_history.jsonl, kind: data}
+      # Path existence cannot prove WIRING -- dashboard/emit_build_status.py exists
+      # whether or not daily.py ever calls it. The test can, so the gate is the test.
+      - {name: Heartbeat + emitter wired into daily.py, path: tests/test_daily.py, kind: test, test: test_daily}
+      - {name: Build manifest mirrors PLAN.md, path: data/build/manifest.yaml, kind: doc}
+
+  - id: "2"
+    name: Market data layer
+    subtitle: robin_stocks / Alpaca / yfinance adapters, corporate actions, reconciliation
+    status: queued
+    owner: claude-code
+    critical_path: true
+    note: >-
+      Blocks Phase 3. Close_Price appears unadjusted for splits, so an adjustment
+      path and a reconciliation test come before any benchmark number is quoted.
+    deliverables:
+      # prices.py EXISTS but all three providers raise NotImplementedError, so
+      # path-existence would read `done` for an unbuilt layer. Overridden DOWN.
+      - {name: Price source adapters, path: src/zoltar_ranks/sources/prices.py, kind: code, state_override: wip}
+      - {name: Clock-alignment anchor spec, path: docs/ALIGNMENT_ANCHOR.md, kind: doc}
+      - {name: Clock-alignment anchor, path: src/zoltar_ranks/analysis/alignment_anchor.py, kind: code}
+      - {name: Price reconciliation test, path: tests/test_prices.py, kind: test, test: test_prices}
+
+  - id: "3"
+    name: Benchmarks
+    subtitle: BASELINE_ASIS, BASELINE_HONEST, RANDOM_5, SPY/QQQ
+    status: queued
+    owner: claude-code
+    critical_path: true
+    note: >-
+      BASELINE_ASIS replicates the Streamlit engine faithfully, biases included,
+      so the gap to BASELINE_HONEST is measurable. Do not build this before the
+      three missing blocker gates exist — a gate written after the result it
+      should have guarded tends to get written to pass.
+    deliverables:
+      - {name: Baseline engine (ASIS + HONEST) + passive controls, path: src/zoltar_ranks/analysis/backtest.py, kind: code}
+      - {name: Benchmark runner, path: scripts/run_benchmarks.py, kind: job}
+      - {name: Execution gates (no_same_bar, no_run_ts_execution), path: tests/test_contracts.py, kind: test, test: test_contracts}
+
+  - id: "4"
+    name: Statistics framework
+    subtitle: block bootstrap, purged/embargoed CV, deflated Sharpe, BH-FDR, MDE
+    status: queued
+    owner: claude-code
+    note: Every result on the console ships with an uncertainty interval or it does not ship.
+    deliverables:
+      - {name: Metrics (PLAN 4a), path: src/zoltar_ranks/analysis/metrics.py, kind: code}
+      - {name: Resampling, CV, deflated Sharpe, BH-FDR (PLAN 4b), path: src/zoltar_ranks/analysis/stats.py, kind: code}
+
+  - id: "5"
+    name: Bias diagnostics
+    subtitle: IC by horizon/segment/sector/liquidity, calibration, rank stability, SHAP drift
+    status: queued
+    owner: claude-code
+    deliverables:
+      - {name: Diagnostic suite, path: src/zoltar_ranks/analysis/diagnostics.py, kind: code}
+
+  - id: "6"
+    name: Execution timing study
+    subtitle: primary objective — entry time x rank vintage x exit rule x order type
+    status: queued
+    owner: claude-code
+    critical_path: true
+    note: >-
+      The question the project exists to answer. Meaningless until no_same_bar and
+      no_run_ts_execution are green.
+    deliverables:
+      - {name: Timing grid, path: src/zoltar_ranks/analysis/timing_grid.py, kind: code}
+      - {name: Timing report, path: data/results/timing_report.html, kind: data}
+
+  - id: "7"
+    name: Hypothesis register and testing loop
+    subtitle: pre-registration, FDR accounting
+    status: in_progress
+    owner: shared
+    note: H9 and H10 are pre-registered and unrun. Nothing is counted toward FDR yet.
+    deliverables:
+      - {name: Register, path: docs/HYPOTHESES.md, kind: doc}
+      - {name: Register exporter into the console, path: src/zoltar_ranks/analysis/export_dashboard_data.py, kind: code}
+
+  - id: "8"
+    name: Research console + automated daily job
+    subtitle: SS01-SS07 research feed, SS08-SS11 build monitor
+    status: in_progress
+    owner: shared
+    started_at: "2026-09-02"
+    note: >-
+      The build half is wired end to end: daily.py stamps a real window mode,
+      appends run_history.jsonl in a finally block and calls the emitter. The
+      research half now has a real feed too, but only archive_health, hypotheses
+      and shap_drift are measured — signal_health, benchmarks and timing stay
+      ABSENT (with a stated reason in sections_absent) until Phases 3-6 exist.
+    deliverables:
+      - {name: Research console page, path: dashboard/index.html, kind: code}
+      - {name: Build monitor emitter, path: dashboard/emit_build_status.py, kind: code}
+      - {name: Build monitor contract, path: dashboard/BUILD_MONITOR.md, kind: doc}
+      - {name: Research feed exporter, path: src/zoltar_ranks/analysis/export_dashboard_data.py, kind: code}
+      - {name: Research feed output, path: data/results/dashboard_data.json, kind: data}
+      - {name: Build monitor output, path: data/results/build_status.json, kind: data}
+
+# ------------------------------------------------------------- contract tests
+# `test` is a substring matched against pytest nodeids in
+# data/results/pytest_report.json. No report -> every gate reads not_built, which
+# holds the top-line gate at amber. That is the honest default.
+
+contract_tests:
+  - id: pit_immutability
+    name: Archive is point-in-time
+    severity: blocker
+    test: test_db
+    detail: >-
+      Asserts that a score written under a run timestamp is never restated by a
+      later harvest — HEAD and an older blob agree on every overlapping row.
+    guards: the premise that a backtest over the union of snapshots is honest at all
+
+  - id: work_idempotency
+    name: Re-running reads zero blobs
+    severity: blocker
+    test: test_manifest
+    detail: >-
+      Asserts the harvest_manifest is consulted BEFORE reading, so a repeat tick
+      reads 0 blobs rather than 228. Asserts on the blob-read count, not row counts —
+      row-idempotency is not work-idempotency.
+    guards: >-
+      a 290s/309s tick on the machine that is simultaneously running the live
+      model re-scores
+
+  - id: stamp_cutover
+    name: Stamp conventions are never pooled
+    severity: warning
+    test: test_stamp_cutover
+    detail: >-
+      Asserts evening retrains are grouped by stamp_convention across the
+      2026-09-02 cutover, so forward-stamped and honest-stamped rows are never
+      aggregated together.
+    guards: H11's extended-hours advantage, which was derived from the forward stamp
+
+  - id: incomplete_guard
+    name: Incomplete snapshots are excluded
+    severity: warning
+    test: test_incomplete
+    detail: Asserts partially written snapshots never reach a backtest input path.
+    guards: silent truncation of a trading day
+
+  - id: no_same_bar
+    name: No same-bar execution
+    severity: blocker
+    test: test_no_same_bar_execution
+    detail: >-
+      Asserts no simulated fill uses a price at or before the timestamp the rank
+      was computed from; latency strictly greater than zero.
+    guards: the single largest source of fake edge (H9)
+
+  - id: no_run_ts_execution
+    name: Decisions key off available_at, never run_ts
+    severity: blocker
+    test: test_no_run_ts_execution
+    detail: >-
+      Asserts every decision point uses the moment the rank became visible in the
+      PROD files, not the moment the model stamped it.
+    guards: >-
+      lookahead of up to the full re-score duration, and the next-day 00:00:00
+      placeholder trap
+
+  - id: no_latest_pkl
+    name: No backtest on *_rankings_latest.pkl
+    severity: blocker
+    test: test_no_latest_pkl
+    detail: >-
+      Asserts no backtest input path resolves to a *_rankings_latest.pkl file,
+      which contains in-sample rows.
+    guards: in-sample contamination that would inflate every result silently
+
+# --------------------------------------------------------------------- feeds
+feeds:
+  - path: data/results/dashboard_data.json
+    consumed_by: "SS01 - SS03 - SS04 - SS05 - SS06"
+    max_age_hours: 30
+    note: >-
+      The one file the two workstreams meet at. Written by
+      src/zoltar_ranks/analysis/export_dashboard_data.py, which does not exist yet —
+      so SS01-SS07 render illustrative data. See blocker B1.
+
+  - path: data/results/run_history.jsonl
+    consumed_by: "SS08"
+    max_age_hours: 24
+    note: >-
+      The heartbeat. One appended JSON line per run of scripts/daily.py, success
+      and failure. Without it the monitor cannot distinguish a job that is running
+      from a job that ran once.
+
+  - path: data/results/pytest_report.json
+    consumed_by: "SS10"
+    max_age_hours: 36
+    note: >-
+      pytest --json-report output. Gate status is read from it, never asserted.
+
+  - path: data/zoltar.duckdb
+    consumed_by: everything upstream
+    max_age_hours: 30
+    note: System of record.
+
+# ------------------------------------------------------------------ blockers
+blockers:
+  - id: B1
+    title: Research feed covers only 3 of 6 sections
+    severity: normal
+    needs: claude-code
+    since: "2026-09-02"
+    detail: >-
+      export_dashboard_data.py now writes data/results/dashboard_data.json on
+      every run, so archive_health, hypotheses and shap_drift are real.
+      signal_health, benchmarks and timing are deliberately ABSENT rather than
+      zero-filled — they need Phases 4, 3 and 6. sections_absent carries the
+      reason for each so the page can say why instead of showing a gap.
+
+  - id: B2
+    title: Two blocker gates do not exist
+    severity: critical
+    needs: claude-code
+    since: "2026-09-02"
+    detail: >-
+      no_latest_pkl is now real (tests/test_contracts.py): it checks the config
+      paths, proves PROD_RE rejects the rankings filenames, and asserts by AST
+      that the one module allowed to NAME those files never calls a blob reader.
+      no_same_bar and no_run_ts_execution are still unwritten, deliberately —
+      there is no execution engine to guard, so a test today would pass because
+      the code does not exist, which is a green light that means nothing. They
+      land with analysis/backtest.py, before Phase 3 produces a number.
+
+  - id: B3
+    title: Local hard-drive data not yet accessible
+    severity: normal
+    needs: andrew
+    since: "2026-09-02"
+    detail: >-
+      Additional data on the local drive is to be organised and given access to in
+      a later phase. Scope and location still to be decided.
+
+activity: []

@@ -21,6 +21,10 @@ matplotlib>=3.8,<4
 jinja2>=3.1,<4
 
 pytest>=8.0,<9
+# Writes data/results/pytest_report.json, which the build monitor reads to
+# derive contract-gate status. Without it every gate reads not_built and the
+# top-line gate is pinned amber.
+pytest-json-report>=1.5,<2
 
 # Price providers - install the ones you actually use (Phase 2).
 robin-stocks>=3.0,<4

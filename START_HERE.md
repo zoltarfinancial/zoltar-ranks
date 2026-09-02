@@ -167,6 +167,32 @@ Audit of the others: `harvest_er` and `harvest_shap` were already correct;
 `harvest_sessions` ignores `--mode` too but opens no blob at all. Detail and the
 per-tick cost table are in `docs/SESSION_LOG.md`.
 
+### ✅ The build monitor is wired: `--check` is 2 blocking, was 10
+
+`docs/HANDOFF_CLAUDE_CODE.md` is the task list; `dashboard/emit_build_status.py
+--check` is the sync point between you, Andrew and the Cowork session. Run it
+instead of writing a status update.
+
+```powershell
+python dashboard\emit_build_status.py --check     # 2 blocking, 1 warning, 15 ok
+```
+
+Done: `daily.py` stamps a real window mode and appends `run_history.jsonl` in a
+`finally` block; the emitter runs from `daily.py` and from `.git/hooks/post-commit`;
+`pytest_report.json` feeds the gates; the manifest's paths match the plan;
+`analysis/export_dashboard_data.py` writes the research feed every run.
+
+**The 2 remaining blockers are a CLOCK, not a code change.** `harvest_premarket`
+and `harvest_evening` have no beat yet because the history began at 12:27, inside
+the intraday window. The scheduled task fills them tonight and tomorrow morning.
+**Do not run `daily.py --mode premarket` to clear them** -- that fabricates the
+exact evidence the monitor exists to check.
+
+Two things deliberately left undone, both recorded in `docs/SESSION_LOG.md`:
+`no_same_bar` and `no_run_ts_execution` (no execution engine to guard, so a test
+today would pass because the code does not exist), and `monitoring/`, whose
+deletion the sandbox blocked -- **Andrew: `Remove-Item -Recurse -Force monitoring`**.
+
 ### 🔴 STOP -- a canary is failing, and it must not be silenced
 
 `tests/test_stamp_cutover.py::test_no_third_stamping_convention` **FAILS** as of

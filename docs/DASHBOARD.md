@@ -114,6 +114,33 @@ overconfidence the plan exists to prevent.
 }
 ```
 
+### Schema addenda — 2026-09-02, when the exporter was first built
+
+Four additive changes. No existing field changed shape.
+
+- **`archive_health.hours_since_last_run_ts` is computed from `available_at`,
+  not from `run_ts`**, and `freshness_basis` records that. This is not a
+  preference — upstream forward-stamps the evening retrain, so the newest
+  `run_ts` in the archive is routinely in the **future** (`2026-09-03 00:00:00`
+  observed while it was 2026-09-02). Computed from `run_ts` this field goes
+  **negative**, the ~24h staleness alarm never fires, and a dead harvester
+  renders as perfectly healthy. Rule 5, and measured.
+- **`archive_health.last_run_ts` and `.last_available_at`** are both emitted, so
+  the gap between them is visible rather than implied.
+- **`sections_absent`** — an object mapping each unbuilt section
+  (`signal_health`, `benchmarks`, `timing`) to the reason it is missing. The
+  contract already said the dashboard renders "not yet measured"; this lets it
+  say *why* instead of just showing a gap.
+- **`hypotheses[].mde_raw`** — the register's MDE cell verbatim. `mde` is
+  numeric only when the cell **leads** with a number (`0.157%/run (n=63, ...)`
+  → `0.157`). A loose numeric search would read `TBD (n~64 paired days)` as an
+  MDE of `64` — not a missing value but a fabricated one, which is worse,
+  because it renders as a real number.
+
+Currently emitted: `archive_health`, `hypotheses`, `shap_drift`.
+`shap_drift` is capped at the newest 60 snapshots x top 10 features per segment
+(~1,100 rows, ~200 KB); uncapped it is multi-megabyte for no extra signal.
+
 Notes on fields that are easy to get wrong:
 
 - `ic_by_horizon.n_obs` is the **cross-sectional** count (symbols × days), which
