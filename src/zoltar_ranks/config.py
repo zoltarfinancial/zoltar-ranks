@@ -67,6 +67,20 @@ class Config:
     baseline_loss_threshold: float = -0.01   # -1%
     baseline_ranking_metric: str = "score"
 
+    # --- execution (rule 3) ---
+    # The latency between the decision and the fill. NEVER 0: a zero-latency
+    # fill uses the price the rank was computed from, which is the single
+    # largest source of fake edge (H9, FINDINGS F5).
+    #
+    # 15 minutes is not arbitrary. A floor of merely "strictly after" is not
+    # enough: measured 2026-09-02 on H11, 27 of 138 evening runs pair a
+    # forward-stamped retrain with the SAME evening's other build pushed 13-15
+    # SECONDS later in the same commit -- a different run_ts, a different file,
+    # a return of exactly 0.000%. That passes any positive-latency test while
+    # being same-bar in every way that matters, and it biases in the flattering
+    # direction. `analysis.execution.latency_floor` rejects <= 0 outright.
+    execution_latency_minutes: float = 15.0
+
     @classmethod
     def load(cls, path: str | os.PathLike | None = None) -> "Config":
         path = Path(path or DEFAULT_CONFIG)

@@ -154,7 +154,8 @@ phases:
     deliverables:
       - {name: Baseline engine (ASIS + HONEST) + passive controls, path: src/zoltar_ranks/analysis/backtest.py, kind: code}
       - {name: Benchmark runner, path: scripts/run_benchmarks.py, kind: job}
-      - {name: Execution gates (no_same_bar, no_run_ts_execution), path: tests/test_contracts.py, kind: test, test: test_contracts}
+      - {name: Execution primitives + latency floor, path: src/zoltar_ranks/analysis/execution.py, kind: code}
+      - {name: Execution gates (no_same_bar, no_run_ts_execution), path: tests/test_execution_gates.py, kind: test, test: test_execution_gates}
 
   - id: "4"
     name: Statistics framework
@@ -340,18 +341,22 @@ blockers:
       reason for each so the page can say why instead of showing a gap.
 
   - id: B2
-    title: Two blocker gates do not exist
-    severity: critical
+    title: All five blocker gates exist and pass
+    severity: normal
     needs: claude-code
     since: "2026-09-02"
     detail: >-
-      no_latest_pkl is now real (tests/test_contracts.py): it checks the config
-      paths, proves PROD_RE rejects the rankings filenames, and asserts by AST
-      that the one module allowed to NAME those files never calls a blob reader.
-      no_same_bar and no_run_ts_execution are still unwritten, deliberately —
-      there is no execution engine to guard, so a test today would pass because
-      the code does not exist, which is a green light that means nothing. They
-      land with analysis/backtest.py, before Phase 3 produces a number.
+      CLOSED 2026-09-02 (c-0001.3). no_same_bar and no_run_ts_execution are real
+      without waiting for the engine: tests/test_execution_gates.py ships the
+      violating engines and proves, in the same run, that each gate FAILS against
+      them and PASSES against a compliant one. The violators are the ones this
+      archive actually produces — a fill at the decision price (FINDINGS F5) and
+      the 13-second twin commit that satisfies rule 5 and the letter of rule 3
+      while being same-bar (27 of 138 evening runs). no_latest_pkl checks the
+      config paths, proves PROD_RE rejects the rankings filenames, and asserts by
+      AST that the one module allowed to NAME those files never opens one.
+      Remaining work is to make analysis/backtest.py emit Fill records these
+      gates can read.
 
   - id: B3
     title: Local hard-drive data not yet accessible
