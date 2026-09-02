@@ -18,7 +18,8 @@ Status: `proposed` | `powered` | `underpowered` | `running` | `confirmed` | `rej
 | H6 | 2026-09-01 | The -1%/+2% bracket is asymmetric in the wrong direction given observed skew | exit rule | grid over stop x target, walk-forward validated | TBD | proposed | | | |
 | H7 | 2026-09-01 | omit_first > 0 improves returns (top name is crowded or already moved) | selection | omit_first in 0..3 | TBD | proposed | | | |
 | H8 | 2026-09-01 | SHAP feature drift predicts IC decay and is usable as a live risk-off signal | monitoring | rolling feature-importance distance vs forward 20d IC | TBD | proposed | | | |
-| H12 | 2026-09-01 | The nightly retrained model's top-5 differs materially from that morning's top-5, and the disagreement is informative rather than noise | model vintage | overlap and rank correlation between morning and nightly top-N on the same date; then paired-by-date forward return of nightly-only names vs morning-only names | TBD (n~64 paired days) | proposed | | | |
+| H12a | 2026-09-01 | **Data advance, model held fixed.** The last intraday re-score's top-5 differs materially from that morning's, and the disagreement is informative rather than noise | data advance | overlap and rank correlation, morning vs last-intraday top-N same date; then paired-by-date forward return of intraday-only vs morning-only names | TBD - **compute before building** | proposed | | | |
+| H12b | 2026-09-01 | **Retrain value, data roughly fixed.** The nightly RETRAINED model's top-5 differs materially from the last intraday re-score's, and the disagreement is informative rather than noise | model retrain | overlap and rank correlation, last-intraday vs nightly-retrain top-N same date; then paired-by-date forward return of nightly-only vs intraday-only names. **Late-mode AFTERCLOSE only** (t>=18:00, F4) | TBD (n~64 paired days) | proposed | | | |
 | H11 | 2026-09-01 | A portfolio entered in extended hours on the nightly-build ranks, on extended-hours-eligible tickers only, beats the same selection entered at the next regular open, net of a widened extended-hours spread assumption | entry timing x venue | nightly-vintage top-5, `available_at` + latency fills in extended hours with an EH cost model, vs. the same selection filled at the next regular open | **0.157%/run** (n=63, ~9.9%/yr) | proposed | | | |
 
 ## Notes
@@ -80,3 +81,34 @@ Three caveats that could each move the MDE:
    realistic question is whether edge-minus-spread clears 0.157% — a materially
    harder test than edge alone. Recompute the MDE with the cost model attached
    before moving H11 to `running`.
+
+
+### H12a / H12b — why the split, and the power warning
+
+FINDINGS F4 records the run-type 2x2. The two hypotheses isolate one factor each:
+
+| run | model | data |
+|---|---|---|
+| morning | fresh build | prior close |
+| intraday | **morning's models, UNCHANGED** | partial-day, extrapolated |
+| nightly | **fully retrained** | complete day |
+
+So **morning -> intraday isolates the data advance with the model held exactly
+fixed** (H12a), and **last-intraday -> nightly isolates the retrain with data
+roughly fixed** (H12b). Together they decompose the morning-vs-nightly
+difference, which a single H12 would have measured only as a blend.
+
+**⚠️ H12a is probably underpowered, and its MDE must be computed before anyone
+builds machinery for it** — same discipline as H11. It needs *multiple intraday
+decision points per day*, and those exist densely only from **2026-08-19**
+(before that: median 1 session/day across 149 days; after: median 15/day across
+9 days -- F4 session census). That is ~9 usable days unless the FINDINGS F2
+mechanism question resolves in favour of collapse, in which case the sparse era
+may hold more decision points than the panel retains. **Do not build H12a until
+F2 is resolved and its MDE is computed.**
+
+**H12b must use late-mode AFTERCLOSE only.** AFTERCLOSE is bimodal (F4): an early
+post-close re-score (n=7, 15:27-17:04) and the full retrain (n=146, 19:00-21:18).
+Only the late mode is the model-vintage event. Including the early mode would
+measure a blend of two processes and make the result uninterpretable -- the exact
+failure the H12 split exists to prevent.

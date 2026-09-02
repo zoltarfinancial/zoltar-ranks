@@ -33,6 +33,28 @@ a single snapshot as complete; the archive is the **union** of snapshots.
 The `all_*` buffer had reached back to **2026-05-22** on 2026-08-18 and only to
 2026-07-01 by 2026-09-01 — **137 intraday run timestamps destroyed in two weeks.**
 
+⚠️ **The MECHANISM is UNRESOLVED (2026-09-01). Do not assert either reading.**
+The observed density — ~1 run/day before 2026-08-19, 9–16/day after — is equally
+consistent with:
+
+- **(a) rolling-buffer collapse.** `all_*` retains each day's live runs only
+  within a recent window and collapses older days to one survivor. If so the
+  sparse era under-represents decision points that really existed, *and* the
+  survivor is systematically the day's best-informed run — an **upward bias** on
+  any backtest spanning it.
+- **(b) a genuine cadence change at 2026-08-19.** Andrew simply began running
+  many more intraday sessions then. If so the sparse era is faithful and there is
+  no bias.
+
+Evidence currently favours neither. Notably the same 1/day → 15/day break appears
+in the **source `*_rankings_*` filenames** (149 days at median 1/day before
+2026-08-19; 9 days at median 15/day after), which is what (b) predicts — but it
+is not decisive, because the filename census only covers what upstream kept.
+
+**A local archive Andrew holds will settle this definitively**, and no amount of
+blob-reading can settle it better than the source. Phase 6's valid date range is
+**deliberately undecided** until then.
+
 **This is a running clock.** Every day without a harvest permanently loses
 intraday snapshots, which are exactly the observations the fill-timing study
 needs. Run the backfill first, then schedule the daily harvest.
@@ -57,12 +79,62 @@ that commit do not contain is gone for good.
 
 ## F4. Run timestamps encode the run type
 
-| pattern | meaning |
-|---|---|
-| `HH:MM:SS` between 01:00–09:00 CDT | morning model build (the primary product) |
-| between 09:00–15:30 CDT | live intraday re-score, ~17/day, every ~30 min |
-| after 17:00 CDT | **nightly retrain — a full model training routine run after the close** |
-| exactly `00:00:00`, dated the **next** day | the same nightly retrain, stamped forward |
+**Session boundaries, MEASURED 2026-09-01** from 513 labelled build stamps in
+`daily_ranks/*_rankings_*` FILENAMES (filenames only — no blob was read, so Rule 4
+is untouched). These supersede the earlier guessed cutoffs:
+
+| upstream label | n | time-of-day min / median / max |
+|---|---|---|
+| PREMARKET | 10 | 08:14:43 / 08:34:00 / 08:50:52 |
+| AFTEROPEN | 54 | 08:57:57 / 09:30:23 / 09:59:38 |
+| MORNING | 100 | 10:00:38 / 10:59:15 / 11:58:18 |
+| AFTERNOON | 146 | 12:01:25 / 13:14:24 / 14:34:00 |
+| PRECLOSE | 50 | 14:37:39 / 15:00:12 / 15:24:56 |
+| AFTERCLOSE | 153 | **15:27:35** / 20:11:39 / 21:18:33 |
+
+⚠️ **The old "after 17:00 CDT = nightly" rule was wrong.** AFTERCLOSE is observed
+from **15:27:35**, and PRECLOSE ends at 15:24:56 — the true boundary is **~15:26**.
+`classify_run()`'s 15:30 cutoff was *closer to the truth than the documented rule*:
+the code was right and the doc was wrong.
+
+**`classify_run()` accuracy: 5 disagreements in 513 stamps (1.0%).** Known,
+accepted, and all within ±4 minutes of a boundary. **Do not "fix" these** — the
+cost of re-labelling every downstream decision point exceeds the benefit:
+
+| observed | classify_run says | n | error |
+|---|---|---|---|
+| AFTEROPEN 08:57–08:59 | `morning` | 2 | cutoff 9.0 is ~3 min late |
+| AFTERCLOSE 15:27–15:31 | `intraday` | 3 | cutoff 15.5 is ~4 min late |
+
+### AFTERCLOSE is two events, not one (measured 2026-09-01)
+
+The 153 AFTERCLOSE stamps are **strongly bimodal** — 2-component vs 1-component
+Gaussian BIC favours two by **ΔBIC = 179.4**, with a 1.96h dead zone between
+17:04 and 19:00 (zero observations 16:00–17:00):
+
+| mode | n | range | mean | reading |
+|---|---|---|---|---|
+| early | 7 | 15:27–17:04 | 15.72h | quick post-close re-score |
+| late | **146** | 19:00–21:18 | 20.16h | the **full model retrain** |
+
+Only the late mode is the model-vintage event **H12b** tests. The early mode is
+4.6% of AFTERCLOSE and sporadic (7 events, 2026-02-25 → 2026-08-13), so the
+contamination is small but real, and it would be misattributed as a retrain.
+**Proposed, not implemented:** split `nightly` into `postclose_rescore`
+(15:26 ≤ t < 18:00) and `nightly_retrain` (t ≥ 18:00), split point 18:01 from the
+largest observed gap.
+
+### Nightly uses TWO stamping conventions
+
+Both push roughly +24h, and which one applies varies run to run:
+
+- **Date-only forward:** filename is honest, `Date` is +24h.
+  `low_risk_PROD_20260811_201524.pkl` → newest `Date` `2026-08-12 20:13:03`.
+- **Both forward:** filename *and* `Date` are +24h.
+  `all_low_risk_PROD_20260902_193449.pkl` was committed `2026-09-01 19:36:25`.
+
+This is exactly why `available_at` takes **`min(filename_build_stamp,
+committed_at)`** — either source alone is wrong for one of the two conventions.
 
 **Corrected 2026-09-01 (Andrew).** An earlier version of this section called the
 nightly build a "placeholder" / "moving-window refresh". That was wrong and the

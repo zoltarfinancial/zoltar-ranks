@@ -89,7 +89,8 @@ def normalize(df: pd.DataFrame, risk_bucket: str, feed: str, sha: str) -> pd.Dat
 
 
 def coverage_walk(mirror: UpstreamMirror, file_path: str, snaps: list[Snapshot],
-                  risk_bucket: str, feed: str, max_fetches: int = 20):
+                  risk_bucket: str, feed: str, max_fetches: int = 20,
+                  path_of=None):
     """Yield (snapshot, normalized_df) covering all recoverable history, cheaply.
 
     Each blob is 20-24 MB and already carries up to 200 run timestamps, so
@@ -104,7 +105,13 @@ def coverage_walk(mirror: UpstreamMirror, file_path: str, snaps: list[Snapshot],
 
     `snaps` must be newest-first. Blobs are cached locally by git after the first
     read, so probe re-reads cost no network.
+
+    `path_of` maps a Snapshot to the path to read, for sources where the path
+    varies per snapshot instead of the commit. `daily_ranks/` is exactly that
+    shape: one file per build rather than one file rewritten across commits.
+    Defaults to the fixed `file_path`, so existing callers are unaffected.
     """
+    resolve = path_of or (lambda _snap: file_path)
     if not snaps:
         return
     n = len(snaps)
@@ -112,7 +119,7 @@ def coverage_walk(mirror: UpstreamMirror, file_path: str, snaps: list[Snapshot],
 
     def load(idx: int):
         snap = snaps[idx]
-        return normalize(mirror.read_pickle(snap.sha, file_path), risk_bucket, feed, snap.sha)
+        return normalize(mirror.read_pickle(snap.sha, resolve(snap)), risk_bucket, feed, snap.sha)
 
     def span(idx: int) -> tuple:
         """(min_run_ts, max_run_ts) of the blob at snaps[idx]; None if unreadable."""
@@ -121,7 +128,8 @@ def coverage_walk(mirror: UpstreamMirror, file_path: str, snaps: list[Snapshot],
                 df = load(idx)
                 span_cache[idx] = (df["run_ts"].min(), df["run_ts"].max())
             except Exception as exc:
-                log.warning("unreadable %s@%s: %s", file_path, snaps[idx].sha[:8], str(exc)[:140])
+                log.warning("unreadable %s@%s: %s", resolve(snaps[idx]),
+                            snaps[idx].sha[:8], str(exc)[:140])
                 span_cache[idx] = None
         return span_cache[idx]
 

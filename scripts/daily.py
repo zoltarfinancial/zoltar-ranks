@@ -19,13 +19,17 @@ import traceback
 from datetime import datetime
 
 from zoltar_ranks.config import Config
-from zoltar_ranks.ingest import harvest_er, harvest_ranks, harvest_shap
+from zoltar_ranks.ingest import (harvest_daily_ranks, harvest_er, harvest_ranks,
+                                 harvest_shap)
 
 log = logging.getLogger("daily")
 
 
 STEPS = [
     ("ranks", harvest_ranks.main),
+    # daily_ranks/ keeps one PROD file per build, so it preserves snapshots of the
+    # rolling `all_*` buffer that production/*_latest.pkl has already dropped.
+    ("daily_ranks", harvest_daily_ranks.main),
     ("expected_returns", harvest_er.main),
     ("shap", harvest_shap.main),
     # Later phases append here:

@@ -9,8 +9,13 @@ CREATE TABLE IF NOT EXISTS harvest_manifest (
     rows_seen      BIGINT,
     rows_inserted  BIGINT,
     harvested_at   TIMESTAMP DEFAULT current_timestamp,
+    build_stamp    TIMESTAMP,          -- from the FILENAME, where the source has
+                                       -- one file per build (daily_ranks/). NULL
+                                       -- for production/*_latest.pkl, which is
+                                       -- rewritten in place and carries no stamp.
     PRIMARY KEY (file_path, commit_sha)
 );
+ALTER TABLE harvest_manifest ADD COLUMN IF NOT EXISTS build_stamp TIMESTAMP;
 
 -- One row per (run timestamp, symbol, risk bucket).
 CREATE TABLE IF NOT EXISTS ranks (
@@ -132,31 +137,58 @@ SELECT * FROM (
 --
 -- This is a VIEW, not columns on `ranks`, because populating a new column on
 -- 1.25M existing rows would be an UPDATE and rule 2 forbids that. Derived from
--- ranks.first_seen_sha JOIN harvest_manifest.committed_at, so it cannot drift
--- from the manifest and costs nothing to recompute.
+-- ranks.first_seen_sha JOIN harvest_manifest, so it cannot drift.
 --
---   stamp_is_forward = run_ts > committed_at. Upstream stamps some builds with
---   a time LATER than it published them (FINDINGS F4). Those rows are not a
---   trap to exclude -- a rank published at 19:36 CT is actionable in extended
---   hours ~13h before the next regular open (see H11). The flag flags; it does
---   not forbid.
+--   available_at = min(build_stamp, committed_at, run_ts)
 --
---   availability_source says how much to trust available_at:
---     'committed_at'  forward-stamped: committed_at IS the availability, exact.
---     'run_ts'        normal row: run_ts is the build time and upstream
---                     publishes promptly, so run_ts is the estimate and
---                     committed_at is only a (possibly months-late) upper bound
---                     because the coverage walk reads 2-4 blobs, not all 405.
---                     `harvest_lag_days` exposes how loose that bound is.
+-- Each is an UPPER BOUND on when the run was public, so the earliest is the
+-- tightest truth, and min() needs no fallback chain and no special-casing.
+-- run_ts joins the min() on the strength of the step-2 audit: for morning,
+-- intraday and placeholder the newest `Date` equals the filename build stamp
+-- EXACTLY (delta 0.00h), so on those rows run_ts IS the build stamp. Dropping it
+-- would fall back to committed_at for every production-sourced row, which the
+-- 2-blob coverage walk pins 21-292 days late.
+-- Neither source alone is safe, because nightly uses two stamping conventions
+-- (FINDINGS F4):
+--   * filename honest, Date +24h  -> build_stamp is right, and it beats
+--     committed_at, which carries push lag.
+--   * filename AND Date +24h      -> build_stamp is ~4.4h LATE (it would date
+--     all_low_risk_PROD_20260902_000000 to 09-02 00:00, after the extended-hours
+--     session closes, silently deleting the window H11 exists to test).
+--     committed_at (09-01 19:36) is right and wins.
+-- min() resolves all four observed cases without a special case.
+--
+--   stamp_is_forward = run_ts > available_at. Flags the nightly retrain; it does
+--   NOT forbid the row. A rank published 19:36 CT is actionable in extended
+--   hours ~13h before the next regular open (H11).
+--
+--   availability_source records WHICH bound won, so the distribution is
+--   inspectable rather than buried: 'build_stamp' | 'committed_at' | 'run_ts'
+--   (the last where no manifest row matches).
 CREATE OR REPLACE VIEW ranks_pit AS
+WITH prov AS (
+    SELECT commit_sha,
+           min(build_stamp)  AS build_stamp,
+           min(committed_at) AS committed_at
+    FROM harvest_manifest GROUP BY commit_sha
+)
 SELECT r.*,
-       m.committed_at,
-       (r.run_ts > m.committed_at)                      AS stamp_is_forward,
-       CASE WHEN r.run_ts > m.committed_at
-            THEN m.committed_at ELSE r.run_ts END       AS available_at,
-       CASE WHEN r.run_ts > m.committed_at
-            THEN 'committed_at' ELSE 'run_ts' END       AS availability_source,
-       date_diff('day', r.run_ts, m.committed_at)       AS harvest_lag_days
+       p.committed_at,
+       p.build_stamp,
+       least(coalesce(p.build_stamp,  r.run_ts),
+             coalesce(p.committed_at, r.run_ts),
+             r.run_ts)                                       AS available_at,
+       CASE
+         WHEN p.build_stamp IS NOT NULL
+              AND p.build_stamp <= coalesce(p.committed_at, p.build_stamp)
+              AND p.build_stamp <= r.run_ts               THEN 'build_stamp'
+         WHEN p.committed_at IS NOT NULL
+              AND p.committed_at <= r.run_ts              THEN 'committed_at'
+         ELSE 'run_ts'
+       END                                                   AS availability_source,
+       r.run_ts > least(coalesce(p.build_stamp,  r.run_ts),
+                        coalesce(p.committed_at, r.run_ts),
+                        r.run_ts)                            AS stamp_is_forward,
+       date_diff('day', r.run_ts, p.committed_at)            AS harvest_lag_days
 FROM ranks r
-LEFT JOIN (SELECT DISTINCT commit_sha, committed_at FROM harvest_manifest) m
-       ON m.commit_sha = r.first_seen_sha;
+LEFT JOIN prov p ON p.commit_sha = r.first_seen_sha;

@@ -269,15 +269,30 @@ class YFinanceProvider(PriceProvider):
         """
         import yfinance as yf
 
+        wanted = sorted(set(symbols))
         out = []
-        for chunk in _chunks(sorted(set(symbols)), self.CHUNK):
+        for chunk in _chunks(wanted, self.CHUNK):
             raw = yf.download(chunk, start=start, end=end + timedelta(days=1),
                               auto_adjust=True, actions=False, group_by="ticker",
                               progress=False, threads=True)
             out.extend(_unstack_yf(raw, chunk))
+
+        # yfinance reports transport failures by returning an empty frame, so an
+        # outage and a delisted ticker look identical. They are not: one means
+        # "no data exists", the other means "we do not know". Serving zero rows
+        # for every symbol is never a legitimate answer to a live request.
         if not out:
-            return pd.DataFrame(columns=DAILY_COLUMNS)
+            raise ProviderUnavailable(
+                f"yfinance returned no daily bars for any of {len(wanted)} symbols "
+                f"({start}..{end}). Treating this as an outage, not as an empty "
+                f"market: returning an empty frame here would silently shorten "
+                f"every downstream return series.")
         df = pd.concat(out, ignore_index=True)
+        served = set(df["symbol"].unique())
+        if missing := sorted(set(wanted) - served):
+            # Partial misses are legitimate (delistings), but must never be silent.
+            log.warning("yfinance served %d/%d symbols for %s..%s; missing: %s",
+                        len(served), len(wanted), start, end, missing[:20])
         df["adjusted"] = True
         df["provider"] = self.name
         return df

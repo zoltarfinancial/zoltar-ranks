@@ -46,17 +46,25 @@ Do not re-do these. A previous session already ran them.
 
 ### What the archive actually holds
 
-| feed | bucket | run ts | rows | first | last |
-|---|---|---|---|---|---|
-| `daily` | low / high | **233** each | 276,666 each | 2025-10-01 07:46:57 | 2026-09-02 19:34:49 |
-| `all` | low / high | **300** each | 350,672 each | 2026-05-18 15:09:29 | 2026-09-01 15:17:16 |
+| feed | run ts | rows | first | last |
+|---|---|---|---|---|
+| `daily` | 233 | 553,332 | 2025-10-01 07:46:57 | 2026-09-02 19:34:49 |
+| `all` | 300 | 701,344 | 2026-05-18 15:09:29 | 2026-09-01 15:17:16 |
+| `daily_ranks` | **338** | 772,921 | **2026-03-03 20:18:25** | 2026-09-02 00:00:00 |
 
-533 distinct run timestamps in union. By class: 214 morning, 255 intraday,
-64 nightly, **0 placeholder**. `expected_returns`: 43 as-of dates (32 `daily`,
-43 `live`), 14 horizons, 1.23M rows. `shap_summary`: 322 snapshots across
-Large/Mid/Small, 3.73M rows.
+**871 distinct run timestamps** in union (was 533 before the daily_ranks
+backfill), floor 2025-10-01, ceiling 2026-09-02. By class: 482 intraday,
+218 morning, 141 nightly, 30 placeholder. `expected_returns` 43 as-of dates;
+`shap_summary` 322 snapshots.
 
-`daily` starting at 2025-10-01 (not 2026-01-01) confirms the coverage walk ran.
+Runs/day: 244 days before 2026-08-19 at median **1**; 13 days from it at median
+**15** (max 19). Whether that is collapse or a real cadence change is
+**unresolved** -- see FINDINGS F2, and do not assert either.
+
+⚠️ **The daily_ranks backfill is INCOMPLETE by 8 of 228 files** -- GitHub became
+unreachable mid-run. Re-run `python -m zoltar_ranks.ingest.harvest_daily_ranks
+--mode backfill` when connectivity is back; it is idempotent and will fill only
+the gap. The step now exits non-zero while incomplete.
 
 ### Two things the next session must not discover the hard way
 

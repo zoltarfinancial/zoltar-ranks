@@ -6,6 +6,48 @@ decisions, surprises, and anything you had to work around; not routine progress.
 
 ---
 
+## 2026-09-01 (step 3) — daily_ranks backfilled; coverage_walk proven unsound
+
+- **`coverage_walk()` is UNSOUND for `daily_ranks/`.** It assumes an older commit
+  reaches further back. True for `production/*_latest.pkl`; false here, because
+  the `all_*` buffer holds ~200 **runs**, not 200 days -- 200 runs span ~200 days
+  in the sparse era and ~16 in the dense one, so reach is non-monotonic in build
+  time (build 07-22 reaches 03-12; build 08-31 only 06-10). The walk fetched
+  **2 of 114 builds and inserted 0 rows**; Andrew's 5-random-skipped-snapshot
+  check then found **205 run timestamps it had missed**, reaching 2 months
+  further back. Escalated to the full read, which is now the default for this
+  source with the measurement recorded in `_read_all`'s docstring.
+
+- **Result: 633,743 rows inserted; distinct run timestamps 533 -> 871.**
+  `daily_ranks` feed: 338 runs, 772,921 rows, floor **2026-03-03** (vs `all`'s
+  2026-05-18). Intraday runs 255 -> **482**; nightly 64 -> **141**; placeholder
+  0 -> **30**.
+
+- **⚠️ The backfill is INCOMPLETE by 8 of 228 files.** GitHub became unreachable
+  mid-run, and those 8 blobs were not yet local. `_read_all` logs and continues
+  (one bad blob must not abandon 227) -- but the run still **exited 0**, which was
+  a defect: a silently short backfill is a silently short archive. Now returns
+  non-zero with a loud INCOMPLETE line. **Re-run `harvest_daily_ranks --mode
+  backfill` when GitHub is reachable.**
+
+- **`available_at` distribution: `run_ts` 817 runs / `committed_at` 54 /
+  `build_stamp` 0.** The build_stamp branch is wired and reachable (29 commits
+  have build_stamp < committed_at) but never wins on this data: wherever
+  build_stamp precedes run_ts, committed_at precedes it in turn -- many
+  daily_ranks files are committed *days before* their own forward-dated filename
+  stamp. min() is picking the correct bound in every case; the branch is inert,
+  not wrong.
+
+- Blob fetching is **round-trip bound, not bandwidth bound**. GitHub refuses
+  arbitrary-OID batch fetches, so 228 serial lazy fetches would take hours; 8
+  parallel workers did the outstanding ones in **0.7 min**. Note that
+  `git cat-file -e` on a missing object **triggers a fetch** -- use
+  `GIT_NO_LAZY_FETCH=1` for existence checks or the check costs what it was
+  meant to avoid.
+
+- Added `--no-sync` (explicit, warns loudly) so a backfill can run from cached
+  blobs during an outage without silently skipping the mirror refresh.
+
 ## 2026-09-01 (later still) — steps 1-2 recon; yfinance blocked by local AV
 
 - **`classify_run()` validated against ground truth for the first time.** 513
