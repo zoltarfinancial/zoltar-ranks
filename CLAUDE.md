@@ -28,8 +28,14 @@ happen?** Phase 1 (archive) is built and validated. Work starts at Phase 2.
 4. **Never backtest on `*_rankings_latest.pkl`.** It contains `source='train'`
    rows scored by the current model. Diagnostics only. The archive built from
    `*_PROD_*` is the only honest source.
-5. **`run_kind='placeholder'` rows are not tradable at their timestamp.**
-   Upstream stamps the previous evening's build with the next day at 00:00:00.
+5. **No execution decision may key off `run_ts`.** `available_at` is the
+   information timestamp, and the only one rule 3's latency requirement may be
+   measured from. `run_ts` is descriptive metadata: upstream sometimes stamps a
+   build with a time *later* than the moment it was published, so `run_ts` is
+   not a lower bound on when the information was knowable. `run_kind` keeps its
+   four values but is descriptive only — `placeholder` carries no tradability
+   verdict, and a forward-stamped nightly build is a legitimate strategy
+   vintage, not a row to exclude.
 6. **Every result reports an uncertainty interval.** Use
    `analysis/stats.compare_strategies`, never a bare t-test on daily returns.
    With ~230 trading days, a difference smaller than its bootstrap CI is not a

@@ -18,6 +18,7 @@ Status: `proposed` | `powered` | `underpowered` | `running` | `confirmed` | `rej
 | H6 | 2026-09-01 | The -1%/+2% bracket is asymmetric in the wrong direction given observed skew | exit rule | grid over stop x target, walk-forward validated | TBD | proposed | | | |
 | H7 | 2026-09-01 | omit_first > 0 improves returns (top name is crowded or already moved) | selection | omit_first in 0..3 | TBD | proposed | | | |
 | H8 | 2026-09-01 | SHAP feature drift predicts IC decay and is usable as a live risk-off signal | monitoring | rolling feature-importance distance vs forward 20d IC | TBD | proposed | | | |
+| H11 | 2026-09-01 | A portfolio entered in extended hours on the nightly-build ranks, on extended-hours-eligible tickers only, beats the same selection entered at the next regular open, net of a widened extended-hours spread assumption | entry timing x venue | nightly-vintage top-5, `available_at` + latency fills in extended hours with an EH cost model, vs. the same selection filled at the next regular open | **0.157%/run** (n=63, ~9.9%/yr) | proposed | | | |
 
 ## Notes
 
@@ -27,3 +28,37 @@ Status: `proposed` | `powered` | `underpowered` | `running` | `confirmed` | `rej
 - "MDE" = minimum detectable effect at 80% power given the available sample.
   Fill it in before moving a row to `running`. If the MDE exceeds the effect
   size worth acting on, mark `underpowered` and do not run the test.
+
+### H11 — MDE derivation and the power call (computed 2026-09-01)
+
+Reported before any Phase 6 nightly machinery is written, as instructed.
+
+- **n = 63** of 64 nightly runs are usable (all five names priced at the nightly
+  print and at the next observation). One run has no successor yet.
+- **sd of the per-run paired difference = 0.445%** (0.422% winsorized at 1/99).
+  H11's paired difference *is* the overnight gap on the selected basket, so this
+  was estimated directly: equal-weight top-5 (`baseline_risk_bucket=low`,
+  `baseline_top_x=5`) move from the nightly `close_price` to the next available
+  `close_price`.
+- **MDE = (1.96 + 0.84) x sd / sqrt(n) = 0.157% per run**, 80% power, two-sided
+  alpha = 0.05. Winsorized: 0.149%. Cumulatively ~9.9%/yr over 63 nightly runs.
+
+**The power call is Andrew's threshold, not a fact.** MDE ~9.9%/yr means:
+if an edge worth acting on is >=10%/yr, H11 is `powered`; if the bar is 3-5%/yr,
+it is `underpowered` and should not be run at this n. Left at `proposed` pending
+that call.
+
+Three caveats that could each move the MDE:
+
+1. `close_price`'s split-adjustment status is unverified (FINDINGS F7), so the
+   sd above may carry split artifacts. Winsorizing barely moved it (0.445% ->
+   0.422%), which argues against gross contamination, but this is provisional
+   until `corporate_actions` exists.
+2. The proxy for "next regular open" is the next *rank observation*, not a real
+   opening print. Phase 2 replaces it with an actual open, which will change sd.
+3. The EH cost model adds variance the estimate above does not contain, so the
+   real MDE is **at least** 0.157% and probably higher. Extended-hours spreads
+   on thin names plausibly cost more per round trip than the entire MDE, so the
+   realistic question is whether edge-minus-spread clears 0.157% — a materially
+   harder test than edge alone. Recompute the MDE with the cost model attached
+   before moving H11 to `running`.

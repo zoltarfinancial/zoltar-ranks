@@ -22,7 +22,7 @@ great and loses money.
 | R2 | **Never UPDATE a row in `ranks`.** The archive is append-only. A changed score is a finding, not a correction. |
 | R3 | **No same-bar execution.** Every simulated fill must occur strictly after the timestamp of the information that triggered it, with an explicit, configurable latency. Default 0 is forbidden. |
 | R4 | **Never backtest on `*_rankings_latest.pkl`.** It contains `source='train'` rows scored by the current model. Use `ranks` (built from `*_PROD_*`) only, and only rows with `src_split='validate_oot'`. |
-| R5 | **`run_kind='placeholder'` rows are not tradable at their timestamp.** They are stamped with the *next* day at 00:00:00. Map them to their real availability time (previous evening) or exclude them. |
+| R5 | **No execution decision may key off `run_ts`.** `available_at` is the information timestamp for R3's latency requirement. `run_ts` is descriptive metadata — upstream sometimes stamps a build *later* than it published it, so `run_ts` is not a lower bound on knowability. `run_kind` stays four-valued but descriptive; `placeholder` carries no tradability verdict, and a forward-stamped nightly build is a strategy vintage (see H11), not a row to exclude. |
 | R6 | **Every result reports an uncertainty interval**, not a point estimate. With ~230 trading days of history, a strategy difference smaller than its bootstrap CI is not a finding. |
 | R7 | **Log every hypothesis before testing it** in `docs/HYPOTHESES.md`, including the pre-registered success criterion. Count every test for multiple-comparison correction. |
 | R8 | **No look-ahead in universe construction.** Only symbols present in the archive *as of* the decision timestamp are eligible. |
@@ -120,6 +120,29 @@ study.
 
 Cache every response to `data/cache/prices/` keyed by
 `(provider, symbol, interval, date)` so a re-run costs nothing.
+
+### 2a-bis. Extended hours (added 2026-09-01, required by H11)
+
+The nightly build publishes ~19:36 CT, which is actionable in extended hours
+roughly 13 hours before the next regular open. That makes the nightly vintage a
+first-class strategy candidate, not a row to exclude — see rule 5 and H11. Three
+things are in Phase 2 scope because H11 is unrunnable without them:
+
+- **`prices_intraday.session`** — `'pre' | 'regular' | 'post'`. Without a session
+  label a 19:45 print is indistinguishable from a 10:45 one, and every
+  extended-hours result is uninterpretable. Derive it at the provider boundary
+  in `prices.py`, where the tz conversion already happens.
+- **Extended-hours bars** from whichever provider actually returns them. Do not
+  assume: Alpaca's `feed`/`extended_hours` behaviour and Robinhood's
+  `get_stock_historicals` differ, and yfinance's `prepost` flag is unreliable
+  for thin names. Record which provider served EH bars per symbol in `Coverage`.
+- **`symbol_venue.extended_hours_eligible`** — per ticker, per provider. An EH
+  strategy on an ineligible ticker is not a strategy, it is a fill that never
+  happens. H11 selects on this flag.
+
+Reconciliation for EH bars is weaker than for regular-session bars (no
+consolidated tape), so treat EH coverage below 95% as a finding to report rather
+than a threshold to relax.
 
 ### 2b. Corporate actions
 

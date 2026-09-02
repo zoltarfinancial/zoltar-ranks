@@ -82,12 +82,27 @@ CREATE TABLE IF NOT EXISTS prices_daily (
 
 -- Intraday bars, used for fill-timing experiments.
 CREATE TABLE IF NOT EXISTS prices_intraday (
-    ts        TIMESTAMP NOT NULL,   -- bar OPEN time, America/New_York, tz-naive
+    ts        TIMESTAMP NOT NULL,   -- bar OPEN time, America/Chicago, tz-naive
     symbol    VARCHAR   NOT NULL,
     interval  VARCHAR   NOT NULL,   -- '1min' | '5min' | '1hour'
     open DOUBLE, high DOUBLE, low DOUBLE, close DOUBLE, volume DOUBLE,
+    session   VARCHAR,              -- 'pre' | 'regular' | 'post'. Without this a
+                                    -- 19:45 print is indistinguishable from a
+                                    -- 10:45 one and H11 is unrunnable.
     provider  VARCHAR NOT NULL,
     PRIMARY KEY (ts, symbol, interval, provider)
+);
+ALTER TABLE prices_intraday ADD COLUMN IF NOT EXISTS session VARCHAR;
+
+-- Which tickers can actually be traded outside regular hours, per provider.
+-- H11 selects on this: an extended-hours strategy on an ineligible ticker is
+-- not a strategy, it is a fill that never happens.
+CREATE TABLE IF NOT EXISTS symbol_venue (
+    symbol                  VARCHAR NOT NULL,
+    extended_hours_eligible BOOLEAN,
+    provider                VARCHAR NOT NULL,
+    as_of                   DATE    NOT NULL,
+    PRIMARY KEY (symbol, provider, as_of)
 );
 
 -- Corporate actions, so a 10:1 split never shows up as a -90% "return".
@@ -111,3 +126,37 @@ SELECT * FROM (
     FROM ranks
     WHERE run_kind = 'morning'
 ) WHERE rn = 1;
+
+-- The information timestamp. RULE 5: execution and backtest logic keys off
+-- `available_at`, never `run_ts`.
+--
+-- This is a VIEW, not columns on `ranks`, because populating a new column on
+-- 1.25M existing rows would be an UPDATE and rule 2 forbids that. Derived from
+-- ranks.first_seen_sha JOIN harvest_manifest.committed_at, so it cannot drift
+-- from the manifest and costs nothing to recompute.
+--
+--   stamp_is_forward = run_ts > committed_at. Upstream stamps some builds with
+--   a time LATER than it published them (FINDINGS F4). Those rows are not a
+--   trap to exclude -- a rank published at 19:36 CT is actionable in extended
+--   hours ~13h before the next regular open (see H11). The flag flags; it does
+--   not forbid.
+--
+--   availability_source says how much to trust available_at:
+--     'committed_at'  forward-stamped: committed_at IS the availability, exact.
+--     'run_ts'        normal row: run_ts is the build time and upstream
+--                     publishes promptly, so run_ts is the estimate and
+--                     committed_at is only a (possibly months-late) upper bound
+--                     because the coverage walk reads 2-4 blobs, not all 405.
+--                     `harvest_lag_days` exposes how loose that bound is.
+CREATE OR REPLACE VIEW ranks_pit AS
+SELECT r.*,
+       m.committed_at,
+       (r.run_ts > m.committed_at)                      AS stamp_is_forward,
+       CASE WHEN r.run_ts > m.committed_at
+            THEN m.committed_at ELSE r.run_ts END       AS available_at,
+       CASE WHEN r.run_ts > m.committed_at
+            THEN 'committed_at' ELSE 'run_ts' END       AS availability_source,
+       date_diff('day', r.run_ts, m.committed_at)       AS harvest_lag_days
+FROM ranks r
+LEFT JOIN (SELECT DISTINCT commit_sha, committed_at FROM harvest_manifest) m
+       ON m.commit_sha = r.first_seen_sha;

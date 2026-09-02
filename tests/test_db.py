@@ -71,7 +71,7 @@ def test_schema_sql_splits_into_parseable_statements_pure():
     assert stmts, "schema.sql produced no statements"
     for s in stmts:
         assert s.count("(") == s.count(")"), f"unbalanced parens, statement truncated:\n{s}"
-        assert s.upper().startswith("CREATE"), f"not a complete statement:\n{s}"
+        assert s.upper().startswith(("CREATE", "ALTER")), f"not a complete statement:\n{s}"
 
 
 # --------------------------- schema.sql executes ---------------------------
@@ -129,3 +129,60 @@ def test_upsert_new_rows_is_append_only_and_idempotent_pure(tmp_path):
         assert [r[0] for r in kept] == [1.0, 2.0], "an existing score was restated"
     finally:
         con.close()
+
+
+# ------------------- rule 5: available_at, not run_ts -------------------
+
+def test_ranks_pit_exposes_availability_columns_pure(tmp_path):
+    con = duckdb_io.connect(tmp_path / "t.duckdb")
+    try:
+        cols = {r[0] for r in con.execute("DESCRIBE ranks_pit").fetchall()}
+    finally:
+        con.close()
+    for c in ("available_at", "stamp_is_forward", "availability_source", "harvest_lag_days"):
+        assert c in cols, f"ranks_pit missing {c}"
+
+
+def test_forward_stamped_row_is_available_before_its_run_ts_pure(tmp_path):
+    """FINDINGS F4: upstream stamps some builds LATER than it published them.
+
+    Rule 5's whole point -- a rank published at 19:36 is actionable in extended
+    hours, ~13h before the next regular open, even though run_ts says tomorrow.
+    available_at must reflect publication, not the stamp.
+    """
+    pd = pytest.importorskip("pandas")
+    con = duckdb_io.connect(tmp_path / "t.duckdb")
+    try:
+        con.execute("""INSERT INTO harvest_manifest (file_path, commit_sha, committed_at)
+                       VALUES ('f.pkl', 'sha_fwd', TIMESTAMP '2026-09-01 19:36:25'),
+                              ('f.pkl', 'sha_nrm', TIMESTAMP '2026-09-01 08:00:00')""")
+        df = pd.DataFrame({
+            "run_ts": pd.to_datetime(["2026-09-02 19:34:49", "2026-09-01 07:46:57"]),
+            "symbol": ["FWD", "NRM"],
+            "risk_bucket": ["low", "low"],
+            "first_seen_sha": ["sha_fwd", "sha_nrm"],
+        })
+        duckdb_io.upsert_new_rows(con, "ranks", df, ["run_ts", "symbol", "risk_bucket"])
+        got = {r[0]: r[1:] for r in con.execute(
+            "SELECT symbol, available_at, stamp_is_forward, availability_source FROM ranks_pit").fetchall()}
+    finally:
+        con.close()
+
+    fwd_at, fwd_flag, fwd_src = got["FWD"]
+    assert fwd_flag is True, "forward-stamped row not flagged"
+    assert fwd_src == "committed_at"
+    assert str(fwd_at) == "2026-09-01 19:36:25", "available_at must be the publication time"
+    assert fwd_at < pd.Timestamp("2026-09-02 19:34:49"), "available_at must precede run_ts here"
+
+    nrm_at, nrm_flag, nrm_src = got["NRM"]
+    assert nrm_flag is False
+    assert nrm_src == "run_ts"
+    assert str(nrm_at) == "2026-09-01 07:46:57"
+
+
+def test_placeholder_carries_no_tradability_verdict_pure():
+    """Rule 5 was rewritten: `placeholder` is descriptive, not an exclusion."""
+    import pathlib
+    text = pathlib.Path("CLAUDE.md").read_text(encoding="utf-8")
+    assert "No execution decision may key off `run_ts`" in text
+    assert "not tradable at their timestamp" not in text, "old rule 5 still present"

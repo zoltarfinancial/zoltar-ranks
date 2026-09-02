@@ -11,9 +11,9 @@ Andrew runs a quant ranking pipeline that publishes stock ranks to
 that history sits in a rolling buffer that **permanently deletes old snapshots
 every ~10 trading days**. This repo captures that history into a local
 point-in-time archive, then uses it to answer one question: *given a rank
-produced at time T, when should the buy actually happen?* The archive **code**
-is built and validated against live upstream — but it has never been **run**, so
-the archive itself is empty. Populate it first, then start Phase 2.
+produced at time T, when should the buy actually happen?* The archive is
+**built, populated and harvesting on a 30-minute schedule**. Work starts at
+Phase 2 (market data). Read the two warnings below before you touch anything.
 
 ## Read these, in this order
 
@@ -37,7 +37,7 @@ Do not re-do these. A previous session already ran them.
 |---|---|
 | ✅ Repo initialised, pushed | `origin` = `github.com/zoltarfinancial/zoltar-ranks`, branch `main`. Pushing works. |
 | ✅ venv + dependencies | `.venv` on **Python 3.14.7** (the only interpreter on this box), `pip install -e .` done. The pins resolve on 3.14 — nothing loosened. |
-| ✅ **All tests pass, network included** | 27 passed, 4 skipped. All four upstream contract tests green, `test_upstream_is_point_in_time` among them. The 4 skips are the Phase 2 `test_reconcile_*`. |
+| ✅ **All tests pass, network included** | 30 passed, 4 skipped. All four upstream contract tests green, `test_upstream_is_point_in_time` among them. The 4 skips are the Phase 2 `test_reconcile_*`. |
 | ✅ **The archive is POPULATED** | `data/zoltar.duckdb`, 1.25M rank rows. Numbers below. |
 | ✅ **The 30-min harvester is scheduled and proven** | `ZoltarRanksHarvest`, 07:00–21:30 every 30 min. Triggered a live run: `LastTaskResult 0`. |
 | ✅ Idempotency verified | Manual re-run and scheduled run both: `staged=866402 inserted=0`, all table counts unchanged. |
@@ -67,48 +67,65 @@ Large/Mid/Small, 3.73M rows.
    Phase 6 timing study is built on. Everything before 2026-08-19 is one
    snapshot per day and will never improve. **The harvester lapsing for a day
    costs a day of the primary objective's raw material.**
-2. **`classify_run` is not catching FINDINGS F4's forward-stamped build.** Run
-   `2026-09-02 19:34:49` was committed `2026-09-01 19:36:25` — 24h forward, but
-   not at `00:00:00`, so it is labelled `nightly` and CLAUDE.md rule 5 (which
-   only guards `placeholder`) does not apply. Zero rows archive-wide are
-   `placeholder`. `harvest_manifest.committed_at` exists, so `run_ts >
-   committed_at` is the available invariant. **Ask Andrew before changing it** —
-   re-labelling a run class re-labels every downstream decision point.
+2. **Rule 5 changed: never key execution off `run_ts`.** Use the **`ranks_pit`**
+   view, which carries `available_at` — the information timestamp, and the only
+   one rule 3's latency may be measured from. Upstream stamps some builds
+   *later* than it published them (run `2026-09-02 19:34:49` was committed
+   `2026-09-01 19:36:25`), so `run_ts` is not a lower bound on knowability.
+   `run_kind` is now purely descriptive: `placeholder` carries **no** tradability
+   verdict, and the forward-stamped nightly build is a first-class strategy
+   vintage (H11), not a row to exclude.
+   `ranks_pit.available_at` = `committed_at` where `stamp_is_forward` (2,330
+   rows, exact), else `run_ts` (1,252,346 rows). It is a **view**, not columns on
+   `ranks`, because populating 1.25M rows would be an `UPDATE` (rule 2) — and
+   because `committed_at` alone would be 21–292 days stale for backfilled rows,
+   `first_seen_sha` being the first commit *harvested*, not the first that
+   carried the row. Check `availability_source` and `harvest_lag_days` before
+   trusting it on historical rows.
 
-| Open question | Blocks |
+### Answered by Andrew 2026-09-01
+
+- **`Cap_Size` is a model segment label, not literal market cap.** Use it to join
+  SHAP segments. It is **not** valid as a size control variable in Phase 5.
+- **Intraday tz is America/Chicago**; the schema comment was stale and is fixed.
+- **Rule 5 rewritten** as above — see `docs/SESSION_LOG.md`.
+
+| Still open | Blocks |
 |---|---|
-| `schema.sql` says `prices_intraday.ts` is `America/New_York`; `prices.py`, CLAUDE.md and AGENTS.md all say `America/Chicago` | Phase 2 — a comment only, but on the column the timing study keys off |
-| The three FINDINGS §F7 items (`Cap_Size`, `Close_Price` adjustment, live Streamlit engine) | Phases 2, 3, 5 |
+| **`Close_Price` split-adjusted?** Unknown. Proceeding on the conservative assumption that it is **unadjusted**: build `corporate_actions` first, join it before computing any return, and report what the reconciliation shows. | Phase 2 — and every return in the repo |
+| **Which `Strategy_Play_v*.py` is the live Streamlit engine?** (~40 candidates) | Phase 3 — `BASELINE_ASIS` cannot be a faithful replica without it |
+| Is a ~9.9%/yr MDE (H11) above the effect worth acting on? | Whether H11 is `powered` or `underpowered` |
 
-## Do this first, in this order
+## Do this first
+
+Setup and backfill are **done** — do not re-run them expecting work. Confirm the
+machine is still healthy, then start Phase 2:
 
 ```powershell
 cd C:\Shared\ClaudeWork\zoltar-ranks
 .\.venv\Scripts\Activate.ps1
 
-pytest tests -q                  # ALL of them, including the 8 network tests
-.\scripts\setup.ps1              # idempotent; its real job now is the backfill
-.\scripts\schedule_harvest.ps1   # elevated PowerShell
+pytest tests -q                                              # expect 30 passed, 4 skipped
+Get-ScheduledTask -TaskName ZoltarRanksHarvest | Get-ScheduledTaskInfo   # LastTaskResult must be 0
+python scripts\daily.py                                      # must insert ZERO rows
 ```
 
-Three things that will come up:
+If the harvester ever inserts rows on a repeat run, stop and fix idempotency
+before building on the archive. If `LastTaskResult` is non-zero or
+`NumberOfMissedRuns` is climbing, the intraday clock is running again — fix that
+first, it is the most perishable thing in the project.
 
-1. **`requirements.txt` is now version-pinned with upper bounds.** If a pin will
-   not resolve on Python 3.14, loosen **that one line**, note it in
-   `docs/SESSION_LOG.md`, and carry on. Do not strip the pins wholesale — in a
-   research repo a silent dependency major bump changes results without failing a
-   test. (pandas 3.0.2 / numpy 2.4.4 were verified to read every upstream pickle
-   correctly; Python 3.14 specifically has not been verified.)
-2. **The backfill bulk-fetches small blobs.** The ER and SHAP harvesters read
-   ~1,000 distinct blobs, and fetching them lazily costs ~0.45 s each (~8 min).
-   `--mode backfill` therefore does one bulk fetch first: 10-15 s, after which
-   reads take ~7 ms — a 63× speedup, measured. The cost is disk: the mirror under
-   `data/cache/` grows from ~1 MB to ~328 MB. That directory is gitignored. Pass
-   `--no-prefetch` if you would rather trade the 8 minutes for the disk.
-3. **`setup.ps1` stops at the first failure on purpose.** If the network contract
-   tests fail, stop and report. That means upstream changed shape or started
-   restating historical scores, and every downstream conclusion becomes suspect.
-   Do not loosen the assertion.
+Two things that will come up:
+
+1. **`requirements.txt` is version-pinned with upper bounds, and the pins hold on
+   Python 3.14** (verified: they resolve, forcing `pytest` 8.4.2 and `yfinance`
+   0.2.66, and the full suite passes). If a future pin will not resolve, loosen
+   **that one line**, note it in `docs/SESSION_LOG.md`, and carry on. Do not
+   strip the pins wholesale.
+2. **A re-backfill bulk-fetches small blobs.** `--mode backfill` does one bulk
+   fetch (10-15 s) instead of ~1,000 lazy reads at ~0.45 s each — a 63x speedup,
+   measured. The gitignored mirror under `data/cache/` grows to ~328 MB.
+   `--no-prefetch` opts out.
 
 ## Then: Phase 2, and the order of the work
 

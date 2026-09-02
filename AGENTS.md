@@ -13,8 +13,9 @@ Read `START_HERE.md` first, then these, in order:
   PR, never write a file into a clone of it.
 - **The archive is append-only.** No `UPDATE` on `ranks`. If upstream restates a
   score, that is a finding — write it up, do not overwrite.
-- **No same-bar execution in any simulation.** Fills happen strictly after the
-  information timestamp plus a configured latency. A latency of 0 is a bug.
+- **No same-bar execution in any simulation.** Fills happen strictly after
+  `available_at` (never `run_ts` — see rule 5) plus a configured latency. A
+  latency of 0 is a bug. Use the `ranks_pit` view, which carries `available_at`.
 - **Pre-register before you test.** Add the hypothesis and its success criterion
   to `docs/HYPOTHESES.md` *before* running the experiment, and count it toward
   the multiple-comparison correction. Do not delete rejected hypotheses.
