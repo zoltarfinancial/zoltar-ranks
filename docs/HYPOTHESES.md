@@ -18,6 +18,7 @@ Status: `proposed` | `powered` | `underpowered` | `running` | `confirmed` | `rej
 | H6 | 2026-09-01 | The -1%/+2% bracket is asymmetric in the wrong direction given observed skew | exit rule | grid over stop x target, walk-forward validated | TBD | proposed | | | |
 | H7 | 2026-09-01 | omit_first > 0 improves returns (top name is crowded or already moved) | selection | omit_first in 0..3 | TBD | proposed | | | |
 | H8 | 2026-09-01 | SHAP feature drift predicts IC decay and is usable as a live risk-off signal | monitoring | rolling feature-importance distance vs forward 20d IC | TBD | proposed | | | |
+| H12 | 2026-09-01 | The nightly retrained model's top-5 differs materially from that morning's top-5, and the disagreement is informative rather than noise | model vintage | overlap and rank correlation between morning and nightly top-N on the same date; then paired-by-date forward return of nightly-only names vs morning-only names | TBD (n~64 paired days) | proposed | | | |
 | H11 | 2026-09-01 | A portfolio entered in extended hours on the nightly-build ranks, on extended-hours-eligible tickers only, beats the same selection entered at the next regular open, net of a widened extended-hours spread assumption | entry timing x venue | nightly-vintage top-5, `available_at` + latency fills in extended hours with an EH cost model, vs. the same selection filled at the next regular open | **0.157%/run** (n=63, ~9.9%/yr) | proposed | | | |
 
 ## Notes
@@ -42,6 +43,23 @@ Reported before any Phase 6 nightly machinery is written, as instructed.
   `close_price`.
 - **MDE = (1.96 + 0.84) x sd / sqrt(n) = 0.157% per run**, 80% power, two-sided
   alpha = 0.05. Winsorized: 0.149%. Cumulatively ~9.9%/yr over 63 nightly runs.
+
+### H11 work order — the spread survey is a GATE, not a follow-up
+
+**Do this before building any Phase 6 nightly machinery.** Survey observed
+extended-hours bid-ask spreads on the extended-hours-eligible subset of the
+nightly top-5. **If the median spread exceeds the 0.157% MDE, H11 is dead on
+cost alone** — mark it `rejected (cost)` and save the ~4 days of machinery.
+
+The survey needs a price provider, so it waits on credentials. It does not wait
+on anything else, and nothing in Phase 6's nightly path should be built until it
+returns. Sequence:
+
+1. Credentials land -> implement a provider that serves EH quotes.
+2. Populate `symbol_venue.extended_hours_eligible`.
+3. Survey median EH spread on the eligible nightly top-5 names.
+4. **Gate:** median spread vs. 0.157%. Above it, stop and record the rejection.
+5. Only if it clears: recompute the MDE with the cost model, then build.
 
 **The power call is Andrew's threshold, not a fact.** MDE ~9.9%/yr means:
 if an edge worth acting on is >=10%/yr, H11 is `powered`; if the bar is 3-5%/yr,

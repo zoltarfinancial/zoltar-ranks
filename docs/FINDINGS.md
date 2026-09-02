@@ -61,13 +61,32 @@ that commit do not contain is gone for good.
 |---|---|
 | `HH:MM:SS` between 01:00–09:00 CDT | morning model build (the primary product) |
 | between 09:00–15:30 CDT | live intraday re-score, ~17/day, every ~30 min |
-| after 17:00 CDT | nightly placeholder build (moving-window refresh) |
-| exactly `00:00:00`, dated the **next** day | nightly placeholder stamped forward |
+| after 17:00 CDT | **nightly retrain — a full model training routine run after the close** |
+| exactly `00:00:00`, dated the **next** day | the same nightly retrain, stamped forward |
 
-The `00:00:00` stamps are a trap: they look like a midnight run you could have
-traded on. They are the previous evening's build. `classify_run()` labels them
-`placeholder` — **never** use them as a tradable decision point without shifting
-them back to their true availability time.
+**Corrected 2026-09-01 (Andrew).** An earlier version of this section called the
+nightly build a "placeholder" / "moving-window refresh". That was wrong and the
+error was load-bearing, so it is recorded rather than quietly edited.
+
+The nightly build is a **full model training routine** that Andrew runs after the
+close. It can produce **materially different results from that morning's model** —
+it is a different model, not a restamped copy of the morning one. The
+next-day `000000` suffix is a **deliberate naming convention Andrew applies**, not
+upstream flakiness or a clock bug.
+
+Two consequences:
+
+1. **`stamp_is_forward` (`run_ts > committed_at`) is a fully reliable
+   nightly-retrain detector.** It is not a data-quality wart to be tolerated; it
+   is the cleanest signal available for "this row came from the retrained model".
+2. **Morning-vs-nightly is a MODEL comparison, not a vintage comparison.**
+   H3 ("the latest intraday re-score beats the morning score") does *not* cover
+   it: H3 compares the same model scored at different times, whereas
+   morning-vs-nightly compares two separately trained models. That gap is why
+   H12 exists.
+
+The rows are tradable — see rule 5 and H11. Nothing is excluded on the basis of
+`run_kind`.
 
 ## F5. The baseline engine has three built-in execution biases
 
@@ -104,9 +123,10 @@ genuinely two models, not one relabelled.
 
 ## F7. Data-quality flags to resolve before trusting returns
 
-- `Cap_Size` looks like a **model segment label, not literal market cap**
-  (LITE at $870 and BE at $210 are both tagged `Small`). Confirm the definition
-  before using it as a control variable.
+- ✅ **RESOLVED 2026-09-01 (Andrew): `Cap_Size` is a model segment label, not
+  literal market cap** (LITE at $870 and BE at $210 are both tagged `Small`).
+  Use it to join the SHAP segments. It is **not** valid as a size control
+  variable in Phase 5 — use `fundamentals_df_latest.pkl` market cap for that.
 - `Close_Price` for `SFTBY` reads 28.68 on 2026-06-01 and 15.88 on 2026-09-01.
   Either a split or an unadjusted-price inconsistency. Every return computed
   from `Close_Price` is suspect until corporate actions are joined in — hence

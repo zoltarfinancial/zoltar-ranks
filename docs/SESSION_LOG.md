@@ -6,6 +6,30 @@ decisions, surprises, and anything you had to work around; not routine progress.
 
 ---
 
+## 2026-09-01 (later) — Claude Code session: F4 corrected, H12, daily_ranks recon
+
+- **FINDINGS F4 was wrong and it was load-bearing.** The nightly build is not a
+  "placeholder" or moving-window refresh — Andrew runs a **full model training
+  routine after the close**, and it can produce materially different results from
+  that morning's model. The next-day `000000` suffix is his deliberate naming
+  convention, not upstream flakiness. Corrected in place, with the error recorded
+  rather than quietly edited. Two consequences now written into F4:
+  `stamp_is_forward` is a **fully reliable nightly-retrain detector**, and
+  **morning-vs-nightly is a model comparison, not a vintage comparison** — H3
+  does not cover it, which is why H12 exists.
+
+- **H12 pre-registered** (not run): the nightly retrained model's top-5 differs
+  materially from that morning's, and the disagreement is informative rather than
+  noise. n~64 paired days, MDE TBD.
+
+- **H11 resequenced: the EH spread survey is now a GATE.** Before any Phase 6
+  nightly machinery, survey observed extended-hours spreads on the eligible
+  nightly top-5. If the median spread exceeds the 0.157% MDE, H11 is dead on cost
+  alone and ~4 days are saved. Needs credentials; blocks nothing else.
+
+- `Cap_Size` marked RESOLVED in F7 (model segment label; not valid as a Phase 5
+  size control — use `fundamentals_df_latest.pkl` market cap instead).
+
 ## 2026-09-01 — Claude Code session: archive populated, scheduler live
 
 (Machine clock and upstream commit timestamps both read 2026-09-01; the two

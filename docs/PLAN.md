@@ -294,7 +294,7 @@ of candidate entry times:
 | axis | values |
 |---|---|
 | entry time | market open (08:30 CDT), +5, +15, +30, +60 min, 11:00, 13:00, close (15:00), next-day open |
-| rank vintage | previous nightly placeholder, morning build, each intraday re-score, latest available at entry |
+| rank vintage | previous **nightly retrain** (a different model - see F4 and H12, not merely an earlier vintage), morning build, each intraday re-score, latest available at entry |
 | exit rule | fixed horizon 1/2/3/5/7/10/14d, `Score_HoldPeriod`, and the -1%/+2% bracket |
 | order type | market, limit at last close, limit at −0.25% |
 
