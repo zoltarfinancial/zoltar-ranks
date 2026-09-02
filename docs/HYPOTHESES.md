@@ -19,7 +19,7 @@ Status: `proposed` | `powered` | `underpowered` | `running` | `confirmed` | `rej
 | H7 | 2026-09-01 | omit_first > 0 improves returns (top name is crowded or already moved) | selection | omit_first in 0..3 | TBD | proposed | | | |
 | H8 | 2026-09-01 | SHAP feature drift predicts IC decay and is usable as a live risk-off signal | monitoring | rolling feature-importance distance vs forward 20d IC | TBD | proposed | | | |
 | H12a | 2026-09-01 | **Data advance, model held fixed.** The last intraday re-score's top-5 differs materially from that morning's, and the disagreement is informative rather than noise | data advance | overlap and rank correlation, morning vs last-intraday top-N same date; then paired-by-date forward return of intraday-only vs morning-only names | TBD - **compute before building** | proposed | | | |
-| H12b | 2026-09-01 | **Retrain value, data roughly fixed.** The nightly RETRAINED model's top-5 differs materially from the last intraday re-score's, and the disagreement is informative rather than noise | model retrain | overlap and rank correlation, last-intraday vs nightly-retrain top-N same date; then paired-by-date forward return of nightly-only vs intraday-only names. **Late-mode AFTERCLOSE only** (t>=18:00, F4) | TBD (n~64 paired days) | proposed | | | |
+| H12b | 2026-09-01 | **Retrain value, data roughly fixed.** The nightly RETRAINED model's top-5 differs materially from the last intraday re-score's, and the disagreement is informative rather than noise | model retrain | overlap and rank correlation, last-intraday vs nightly-retrain top-N same date; then paired-by-date forward return of nightly-only vs intraday-only names. **defined against the `evening_retrains` view** (F4), which excludes the day's final intraday re-score | TBD (n~64 paired days) | proposed | | | |
 | H11 | 2026-09-01 | A portfolio entered in extended hours on the nightly-build ranks, on extended-hours-eligible tickers only, beats the same selection entered at the next regular open, net of a widened extended-hours spread assumption | entry timing x venue | nightly-vintage top-5, `available_at` + latency fills in extended hours with an EH cost model, vs. the same selection filled at the next regular open | **0.157%/run** (n=63, ~9.9%/yr) | proposed | | | |
 
 ## Notes
@@ -98,17 +98,25 @@ fixed** (H12a), and **last-intraday -> nightly isolates the retrain with data
 roughly fixed** (H12b). Together they decompose the morning-vs-nightly
 difference, which a single H12 would have measured only as a blend.
 
-**⚠️ H12a is probably underpowered, and its MDE must be computed before anyone
-builds machinery for it** — same discipline as H11. It needs *multiple intraday
-decision points per day*, and those exist densely only from **2026-08-19**
-(before that: median 1 session/day across 149 days; after: median 15/day across
-9 days -- F4 session census). That is ~9 usable days unless the FINDINGS F2
-mechanism question resolves in favour of collapse, in which case the sparse era
-may hold more decision points than the panel retains. **Do not build H12a until
-F2 is resolved and its MDE is computed.**
+**⚠️ H12a is underpowered TODAY but expected to improve.** It needs *multiple
+intraday decision points per day*, which in git exist densely only from
+**2026-08-19** (~13 days). That is **not** a permanent ceiling: FINDINGS F2 is
+resolved -- the earlier intraday files were moved to offline SSD storage and
+never committed, so the history exists and is captured-live. Once that archive is
+ingested (a later phase), H12a's n grows substantially.
 
-**H12b must use late-mode AFTERCLOSE only.** AFTERCLOSE is bimodal (F4): an early
-post-close re-score (n=7, 15:27-17:04) and the full retrain (n=146, 19:00-21:18).
-Only the late mode is the model-vintage event. Including the early mode would
-measure a blend of two processes and make the result uninterpretable -- the exact
-failure the H12 split exists to prevent.
+So: **compute H12a's MDE before building any machinery for it** -- same
+discipline as H11 -- but treat a `underpowered` verdict as provisional and
+re-compute after the offline archive lands, rather than abandoning the
+hypothesis.
+
+**H12b is defined against the `evening_retrains` view**, which already excludes
+the early AFTERCLOSE mode. Those 7 runs at 15:27-15:31 are the day's **final
+intraday re-score**, not a retrain -- 5 of them share a day with a real evening
+retrain, arriving ~35 min after a PRECLOSE in the ordinary 30-minute cadence
+(F4). They belong with H12a's population, not H12b's.
+
+⚠️ **H12b must group by `stamp_convention`.** The 2026-09-02 cutover means
+pre- and post-cutover evening rows encode availability two different ways, and
+H11's extended-hours advantage was derived from the forward stamp. Pooling them
+mixes conventions silently.

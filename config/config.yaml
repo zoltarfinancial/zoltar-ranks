@@ -5,3 +5,7 @@ baseline_top_x: 5
 baseline_risk_bucket: low
 baseline_gain_threshold: 0.02
 baseline_loss_threshold: -0.01
+
+# Evening-retrain stamping convention changed here: 'forward' before, 'honest' from.
+# See FINDINGS F4. Changing this silently re-labels every evening row.
+stamp_cutover_date: "2026-09-02"

@@ -25,6 +25,7 @@ import pandas as pd
 
 from zoltar_ranks.config import Config
 from zoltar_ranks.db import duckdb_io
+from zoltar_ranks.ingest.incomplete import Incomplete
 from zoltar_ranks.sources.git_archive import Snapshot, UpstreamMirror
 
 log = logging.getLogger("harvest_ranks")
@@ -112,6 +113,9 @@ def coverage_walk(mirror: UpstreamMirror, file_path: str, snaps: list[Snapshot],
     Defaults to the fixed `file_path`, so existing callers are unaffected.
     """
     resolve = path_of or (lambda _snap: file_path)
+    # A bad blob must not abandon the walk, but it must not vanish either --
+    # the caller turns these into a nonzero exit. See ingest/incomplete.py.
+    report = on_unreadable or (lambda _path, _exc: None)
     if not snaps:
         return
     n = len(snaps)
@@ -128,8 +132,7 @@ def coverage_walk(mirror: UpstreamMirror, file_path: str, snaps: list[Snapshot],
                 df = load(idx)
                 span_cache[idx] = (df["run_ts"].min(), df["run_ts"].max())
             except Exception as exc:
-                log.warning("unreadable %s@%s: %s", resolve(snaps[idx]),
-                            snaps[idx].sha[:8], str(exc)[:140])
+                report(f"{resolve(snaps[idx])}@{snaps[idx].sha[:8]}", exc)
                 span_cache[idx] = None
         return span_cache[idx]
 
@@ -194,7 +197,8 @@ def _record(con, file_path: str, snap: Snapshot, df: pd.DataFrame) -> tuple[int,
 
 
 def harvest_file(con, mirror: UpstreamMirror, file_path: str, risk_bucket: str,
-                 feed: str, snaps: list[Snapshot], strategy: str = "explicit") -> tuple[int, int]:
+                 feed: str, snaps: list[Snapshot], strategy: str = "explicit",
+                 on_unreadable=None) -> tuple[int, int]:
     """`snaps` newest-first. strategy='coverage' walks history cheaply; anything
     else fetches exactly the snapshots given."""
     done = already_done(con, file_path)
@@ -236,6 +240,7 @@ def main(argv: list[str] | None = None) -> int:
     log.info("syncing upstream mirror at %s", cfg.mirror_dir)
     mirror.ensure()
 
+    incomplete = Incomplete('harvest_ranks', log)
     con = duckdb_io.connect(cfg.duckdb_path)
     grand_seen = grand_ins = 0
     for file_path, (risk_bucket, feed) in cfg.rank_files.items():
@@ -246,7 +251,8 @@ def main(argv: list[str] | None = None) -> int:
         if args.mode == "backfill":
             log.info("%s: %d commits in history -> coverage walk", file_path, len(snaps))
             seen, ins = harvest_file(con, mirror, file_path, risk_bucket, feed,
-                                     snaps, strategy="coverage")
+                                     snaps, strategy="coverage",
+                                     on_unreadable=incomplete.record)
         else:
             # Daily mode: HEAD alone normally suffices. The daily feed is
             # append-only (HEAD holds everything) and the `all` feed's HEAD blob
@@ -262,7 +268,8 @@ def main(argv: list[str] | None = None) -> int:
                 log.warning("%s: gap detected (HEAD reaches back only to %s, archive ends %s)"
                             " -> coverage walk", file_path, df["run_ts"].min(), have_max)
                 s2, i2 = harvest_file(con, mirror, file_path, risk_bucket, feed,
-                                      snaps[1:], strategy="coverage")
+                                      snaps[1:], strategy="coverage",
+                                      on_unreadable=incomplete.record)
                 seen += s2
                 ins += i2
         grand_seen += seen
@@ -281,7 +288,7 @@ def main(argv: list[str] | None = None) -> int:
                                        partition_expr="strftime(run_ts, '%Y-%m')")
         log.info("exported parquet to %s", out)
     con.close()
-    return 0
+    return incomplete.exit_code()
 
 
 if __name__ == "__main__":

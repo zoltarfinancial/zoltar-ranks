@@ -119,6 +119,22 @@ change in the market.
 
 ---
 
+## 3a. Partly answered already (Andrew, 2026-09-02)
+
+The offline SSD archive is the intraday history missing from git before
+2026-08-19 (FINDINGS F2). Two of §4's questions are already settled:
+
+- **Q4 (regenerated?) — NO.** The files were written by the pipeline at the time
+  and then *moved*, not regenerated or re-exported. That is captured-live, so the
+  point-in-time guarantee holds and rule 4's in-sample contamination risk does
+  not apply. **This was the highest-risk answer and it came back clean.**
+- **Q3 (mtimes?) — assume NOT original.** The move may have reset them.
+  `available_at` must therefore **never** be derived from mtime. The run
+  timestamp is in the filename, which puts these files at **tier B**, not tier D.
+
+Tier B still requires validating the filename convention on the git overlap
+before trusting it at scale (§2).
+
 ## 4. What I need from Andrew before ingesting
 
 1. **Directory layout.** One flat directory or nested by date? Are the two risk

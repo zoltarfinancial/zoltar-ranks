@@ -64,7 +64,7 @@ def connect(db_path: Path, read_only: bool = False) -> duckdb.DuckDBPyConnection
     Path(db_path).parent.mkdir(parents=True, exist_ok=True)
     con = duckdb.connect(str(db_path), read_only=read_only)
     if not read_only:
-        for stmt in split_statements(SCHEMA_SQL.read_text()):
+        for stmt in split_statements(SCHEMA_SQL.read_text(encoding="utf-8")):
             con.execute(stmt)
     return con
 

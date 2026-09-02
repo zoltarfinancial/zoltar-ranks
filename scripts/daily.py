@@ -20,7 +20,7 @@ from datetime import datetime
 
 from zoltar_ranks.config import Config
 from zoltar_ranks.ingest import (harvest_daily_ranks, harvest_er, harvest_ranks,
-                                 harvest_shap)
+                                 harvest_sessions, harvest_shap)
 
 log = logging.getLogger("daily")
 
@@ -30,6 +30,9 @@ STEPS = [
     # daily_ranks/ keeps one PROD file per build, so it preserves snapshots of the
     # rolling `all_*` buffer that production/*_latest.pkl has already dropped.
     ("daily_ranks", harvest_daily_ranks.main),
+    # Ground-truth session labels from filenames only (Rule 4 safe). The only
+    # external check on classify_run(), and the canary tests depend on it.
+    ("run_sessions", harvest_sessions.main),
     ("expected_returns", harvest_er.main),
     ("shap", harvest_shap.main),
     # Later phases append here:

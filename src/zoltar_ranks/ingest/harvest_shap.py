@@ -22,6 +22,7 @@ import pandas as pd
 
 from zoltar_ranks.config import Config
 from zoltar_ranks.db import duckdb_io
+from zoltar_ranks.ingest.incomplete import Incomplete
 from zoltar_ranks.sources.git_archive import UpstreamMirror
 
 log = logging.getLogger("harvest_shap")
@@ -86,6 +87,7 @@ def main(argv: list[str] | None = None) -> int:
         log.info("bulk-fetching blobs under %s (one time, grows the mirror cache "
                  "to a few hundred MB under data/cache/)", args.prefetch_limit)
         mirror.prefetch_small_blobs(args.prefetch_limit)
+    incomplete = Incomplete('harvest_shap', log)
     con = duckdb_io.connect(cfg.duckdb_path)
 
     total_new = 0
@@ -107,7 +109,7 @@ def main(argv: list[str] | None = None) -> int:
                 values, labels = normalize(
                     mirror.read_pickle(snap.sha, file_path), segment, ts, snap.sha)
             except Exception as exc:
-                log.warning("skip %s@%s: %s", file_path, snap.sha[:8], str(exc)[:160])
+                incomplete.record(f"{file_path}@{snap.sha[:8]}", exc)
                 continue
             seen, ins = duckdb_io.upsert_new_rows(con, "shap_summary", values, SHAP_KEYS)
             if not labels.empty:
@@ -130,7 +132,7 @@ def main(argv: list[str] | None = None) -> int:
     log.info("shap_summary:\n%s", summary.to_string(index=False))
     log.info("new rows: %d", total_new)
     con.close()
-    return 0
+    return incomplete.exit_code()
 
 
 if __name__ == "__main__":

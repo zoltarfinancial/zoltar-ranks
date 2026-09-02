@@ -74,6 +74,21 @@ CREATE TABLE IF NOT EXISTS shap_labels (
     PRIMARY KEY (snapshot_ts, segment, symbol, label_name)
 );
 
+-- Ground-truth session labels, parsed from `daily_ranks/*_rankings_*` FILENAMES.
+-- RULE 4: the filenames only. Those files hold in-sample `source='train'` rows and
+-- are never opened. A filename is metadata, not a row.
+-- This is the only independent check on `classify_run()`, which is otherwise
+-- unfalsifiable -- see FINDINGS F4 and tests/test_stamp_cutover.py.
+CREATE TABLE IF NOT EXISTS run_sessions (
+    build_stamp     TIMESTAMP NOT NULL,
+    session_label   VARCHAR   NOT NULL,  -- PREMARKET|AFTEROPEN|MORNING|AFTERNOON|PRECLOSE|AFTERCLOSE
+    risk_bucket     VARCHAR   NOT NULL,
+    source_filename VARCHAR   NOT NULL,
+    commit_sha      VARCHAR,
+    committed_at    TIMESTAMP,
+    PRIMARY KEY (build_stamp, session_label, risk_bucket)
+);
+
 -- Daily OHLCV, whatever provider we are on. Adjusted flags kept explicit so a
 -- provider swap can never silently mix adjusted and raw prices.
 CREATE TABLE IF NOT EXISTS prices_daily (
@@ -189,6 +204,36 @@ SELECT r.*,
        r.run_ts > least(coalesce(p.build_stamp,  r.run_ts),
                         coalesce(p.committed_at, r.run_ts),
                         r.run_ts)                            AS stamp_is_forward,
-       date_diff('day', r.run_ts, p.committed_at)            AS harvest_lag_days
+       date_diff('day', r.run_ts, p.committed_at)            AS harvest_lag_days,
+       -- Keyed on AVAILABLE_AT (when the run was produced), never on run_ts.
+       -- run_ts is the thing the convention shifts, so using it mislabels the
+       -- last forward-stamped runs as 'honest': the run stamped 2026-09-02
+       -- 19:34:49 was built 2026-09-01 19:36:25 and is forward by construction.
+       CASE WHEN least(coalesce(p.build_stamp,  r.run_ts),
+                       coalesce(p.committed_at, r.run_ts),
+                       r.run_ts) < TIMESTAMP '2026-09-02 00:00:00'
+            THEN 'forward' ELSE 'honest' END                 AS stamp_convention
 FROM ranks r
 LEFT JOIN prov p ON p.commit_sha = r.first_seen_sha;
+
+-- The evening full retrain -- ONE event with three historical names.
+-- FINDINGS F4 fixes the canonical name as EVENING RETRAIN. `run_kind='nightly'`,
+-- `run_kind='placeholder'` and the upstream session label `AFTERCLOSE UPDATE` all
+-- denote it; `placeholder` is purely an artifact of the forward stamp landing on
+-- 00:00:00 and carries no tradability verdict.
+--
+-- EXCLUDES the early mode. AFTERCLOSE is bimodal, and the 15:27-15:31 cluster is
+-- the day's FINAL INTRADAY RE-SCORE (morning's models on extrapolated data),
+-- not a retrain -- measured: 5 of those 7 runs occur on a day that also has a
+-- late retrain, ~35 min after a PRECLOSE, in the ordinary 30-min cadence.
+-- Including them would make H12b a blend of two processes.
+--
+-- !! NEVER aggregate this view without grouping by `stamp_convention`. Pre- and
+-- post-2026-09-02 rows encode the same physical fact two different ways, and
+-- H11's ~13h extended-hours advantage was derived from the forward stamp.
+-- A view cannot enforce that; tests/test_stamp_cutover.py is what fails loudly.
+CREATE OR REPLACE VIEW evening_retrains AS
+SELECT * FROM ranks_pit
+WHERE (run_kind IN ('nightly', 'placeholder'))
+  AND (CAST(run_ts AS TIME) = TIME '00:00:00'          -- forward-stamped midnight
+       OR hour(run_ts) >= 18);                          -- late mode (>=18:00)

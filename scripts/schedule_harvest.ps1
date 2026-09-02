@@ -14,9 +14,17 @@ $taskName = "ZoltarRanksHarvest"
 if (-not (Test-Path $python)) { throw "venv not found - run .\scripts\setup.ps1 first" }
 
 $action  = New-ScheduledTaskAction -Execute $python -Argument "`"$script`"" -WorkingDirectory $repo
-$trigger = New-ScheduledTaskTrigger -Once -At 7:00AM `
+
+# DAILY, not Once. A `-Once` trigger with a RepetitionDuration repeats for that
+# duration on ONE day and then expires: NextRunTime goes empty, the task still
+# reports State=Ready, and the harvester silently stops forever. That happened on
+# 2026-09-01 -- it ran 07:00-21:30, then never scheduled again, and only
+# NumberOfMissedRuns=1 with a blank NextRunTime gave it away.
+# The daily trigger carries the 30-minute repetition via its Repetition property.
+$trigger = New-ScheduledTaskTrigger -Daily -At 7:00AM
+$trigger.Repetition = (New-ScheduledTaskTrigger -Once -At 7:00AM `
              -RepetitionInterval (New-TimeSpan -Minutes 30) `
-             -RepetitionDuration (New-TimeSpan -Hours 14 -Minutes 30)
+             -RepetitionDuration (New-TimeSpan -Hours 14 -Minutes 30)).Repetition
 $settings = New-ScheduledTaskSettingsSet -StartWhenAvailable `
              -DontStopIfGoingOnBatteries -AllowStartIfOnBatteries `
              -ExecutionTimeLimit (New-TimeSpan -Minutes 20)

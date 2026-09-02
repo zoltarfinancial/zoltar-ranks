@@ -39,6 +39,7 @@ from datetime import datetime
 
 from zoltar_ranks.config import Config
 from zoltar_ranks.db import duckdb_io
+from zoltar_ranks.ingest.incomplete import Incomplete
 from zoltar_ranks.ingest.harvest_ranks import RANK_KEYS, coverage_walk, normalize
 from zoltar_ranks.sources.git_archive import Snapshot, UpstreamMirror, _run
 
@@ -79,7 +80,7 @@ def added_prod_files(mirror: UpstreamMirror) -> list[tuple[str, Snapshot, dateti
 
 
 
-def _read_all(mirror: UpstreamMirror, snaps, bucket: str, unreadable: list):
+def _read_all(mirror: UpstreamMirror, snaps, bucket: str, unreadable: Incomplete):
     """Read every build. The default, because coverage_walk is UNSOUND here.
 
     MEASURED 2026-09-01. coverage_walk assumes an older commit's blob reaches
@@ -106,8 +107,7 @@ def _read_all(mirror: UpstreamMirror, snaps, bucket: str, unreadable: list):
             # mistaken for success either: the caller counts these and exits
             # non-zero, because a silently short backfill is a silently short
             # archive, and nothing downstream can tell the difference.
-            log.warning("unreadable %s@%s: %s", snap.path, snap.sha[:8], str(exc)[:140])
-            unreadable.append(snap.path)
+            unreadable.record(f"{snap.path}@{snap.sha[:8]}", exc)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -137,14 +137,19 @@ def main(argv: list[str] | None = None) -> int:
 
     files = added_prod_files(mirror)
     if not files:
-        log.warning("no daily_ranks/all_*_PROD_* files found upstream")
-        return 0
+        # Not a quiet no-op. Upstream has had 228 of these since 2026-07-18, so
+        # zero means the directory moved, the naming changed, or PROD_RE stopped
+        # matching -- each of which silently freezes this feed forever.
+        log.error("no daily_ranks/all_*_PROD_* files found upstream: the source "
+                  "moved, was renamed, or PROD_RE no longer matches. Not treating "
+                  "an empty source as success.")
+        return 1
     log.info("daily_ranks: %d PROD files, %d distinct build stamps",
              len(files), len({b for _, _, b in files}))
 
     con = duckdb_io.connect(cfg.duckdb_path)
     grand_seen = grand_ins = 0
-    unreadable: list[str] = []
+    unreadable = Incomplete('harvest_daily_ranks', log)
 
     for bucket in ("low", "high"):
         sel = [(s, b) for bk, s, b in files if bk == bucket]
@@ -190,13 +195,7 @@ def main(argv: list[str] | None = None) -> int:
 
     log.info("daily_ranks rows staged=%d inserted=%d", grand_seen, grand_ins)
     con.close()
-    if unreadable:
-        log.error("INCOMPLETE: %d of %d files could not be read -- the archive is "
-                  "SHORT by whatever they held. Re-run when the cause is fixed "
-                  "(usually a missing blob plus an unreachable remote). Files: %s",
-                  len(unreadable), len(files), unreadable[:10])
-        return 1
-    return 0
+    return unreadable.exit_code(intended=len(files))
 
 
 if __name__ == "__main__":

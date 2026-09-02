@@ -6,6 +6,64 @@ decisions, surprises, and anything you had to work around; not routine progress.
 
 ---
 
+## 2026-09-02 — stamp cutover, vocabulary, exit-0 invariant; SCHEDULER WAS DEAD
+
+- **🔴 The scheduled task had silently stopped, and it was not the network.**
+  `NextRunTime` was **empty** with `NumberOfMissedRuns: 1`, while `State` still
+  read `Ready`. Cause: `schedule_harvest.ps1` used
+  `New-ScheduledTaskTrigger -Once -At 7:00AM` with a 14h30m `RepetitionDuration`.
+  A `-Once` trigger repeats for that duration **on one day** and then expires --
+  so it ran 2026-09-01 07:00-21:30 and never scheduled again. Fixed to `-Daily`
+  carrying the repetition via `$trigger.Repetition`; `NextRunTime` is now
+  populated. **A task reporting `Ready` with a blank `NextRunTime` is dead** --
+  that is the thing to check, not `State`.
+
+- **F2 RESOLVED (Andrew, pending SSD confirmation).** The pre-2026-08-19 sparsity
+  is operational, not a buffer cap: the intraday files grew too large for the app
+  and were moved to offline SSD, never committed. Recorded as explanation, not
+  measurement. Consequence: Phase 6's intraday range is **not** permanently
+  capped at 2026-08-19, and H12a's underpowered verdict is provisional.
+
+- **Identified the early AFTERCLOSE mode.** Of the 7 runs at 15:27-15:31, **5
+  share a day with a real evening retrain**, arriving ~35 min after a PRECLOSE in
+  the ordinary 30-min cadence. So they are the day's **final intraday re-score**,
+  not a retrain. `evening_retrains` excludes them; H12b is defined against that
+  view, not `run_kind`.
+
+- **Canonical name fixed: EVENING RETRAIN.** `run_kind='nightly'`,
+  `run_kind='placeholder'` and label `AFTERCLOSE UPDATE` are one event.
+  `placeholder` is an artifact of the forward stamp, never a tradability verdict.
+
+- **Stamp cutover (2026-09-02) handled before the first new file.**
+  `stamp_convention` on `ranks_pit`, keyed on **`available_at`, not `run_ts`** --
+  a bug I caught mid-build: keying on `run_ts` labelled the last two
+  forward-stamped runs (2026-09-02 00:00:00 and 19:34:49, both built 09-01) as
+  'honest', which is exactly the contamination the column exists to prevent.
+  Archive is currently 871 forward / 0 honest.
+  Three canary tests in `tests/test_stamp_cutover.py` FAIL rather than warn.
+
+- **Exit-0-on-incomplete is now a repo-wide invariant** (`ingest/incomplete.py`).
+  All four harvesters were affected, not just daily_ranks -- `harvest_er`,
+  `harvest_shap` and `harvest_ranks` all did `log.warning(...); continue` and then
+  `return 0`. `tests/test_incomplete.py` enforces it structurally and
+  behaviourally, and immediately caught a second instance: `harvest_daily_ranks`
+  returned 0 when it found **zero** PROD files upstream, which would silently
+  freeze the feed if the directory moved.
+
+- **`run_sessions` table built** from `*_rankings_*` FILENAMES only (Rule 4
+  untouched -- 1,026 rows, 513 build stamps). It is the only external check on
+  `classify_run()`, which is otherwise unfalsifiable.
+
+- **Blob fetching is round-trip bound, not bandwidth bound.** GitHub refuses
+  arbitrary-OID batch fetches (`fatal: bad revision` / "did not send all
+  necessary objects"), so 228 serial lazy fetches take **hours**; 8 parallel
+  workers cleared the outstanding ones in **0.7 min**. And `git cat-file -e` on a
+  missing object **triggers a lazy fetch** -- existence checks need
+  `GIT_NO_LAZY_FETCH=1` or the check costs exactly what it was meant to avoid.
+
+- `schema.sql` must be read with `encoding="utf-8"` -- a non-ASCII character in a
+  comment crashed `connect()` under Windows' cp1252 default.
+
 ## 2026-09-01 (step 3) — daily_ranks backfilled; coverage_walk proven unsound
 
 - **`coverage_walk()` is UNSOUND for `daily_ranks/`.** It assumes an older commit

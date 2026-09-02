@@ -42,6 +42,19 @@ class Config:
         "production/combined_SHAP_summary_Small_latest.pkl": "Small",
     })
 
+    # --- stamping convention cutover (FINDINGS F4) ---
+    # Andrew's evening retrain changed how it is STAMPED on 2026-09-02. Before:
+    # the next calendar day, usually 00:00:00 or +24h ("forward"). From the
+    # cutover: today's date with a real time ("honest"). The session LABEL
+    # (AFTERCLOSE UPDATE) is unchanged, so nothing in run_sessions moves.
+    #
+    # This matters because H11's ~13-hour extended-hours advantage was DERIVED
+    # from the forward stamp. Pre- and post-cutover evening rows encode the same
+    # physical fact two different ways, so pooling them silently mixes
+    # conventions. Never aggregate evening retrains without grouping by
+    # `stamp_convention` -- see the ranks_pit view and tests/test_stamp_cutover.py.
+    stamp_cutover_date: str = "2026-09-02"
+
     # --- market data ---
     price_provider: str = "robin_stocks"   # robin_stocks | alpaca | yfinance
     price_cache_dir: Path = REPO_ROOT / "data" / "cache" / "prices"

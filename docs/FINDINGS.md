@@ -33,35 +33,28 @@ a single snapshot as complete; the archive is the **union** of snapshots.
 The `all_*` buffer had reached back to **2026-05-22** on 2026-08-18 and only to
 2026-07-01 by 2026-09-01 — **137 intraday run timestamps destroyed in two weeks.**
 
-⚠️ **The MECHANISM is UNRESOLVED (2026-09-01). Do not assert either reading.**
-The observed density — ~1 run/day before 2026-08-19, 9–16/day after — is equally
-consistent with:
+**MECHANISM: RESOLVED 2026-09-02 (Andrew), pending confirmation.** The ~1 run/day
+pattern in git before 2026-08-19 is **not** a rolling-buffer cap, not a collapse,
+and not a cadence change. It is **operational**: the intraday files grew too large
+for Andrew's app to keep, so he moved them to **offline SSD storage**. They were
+never committed. The history is intact -- just not in git.
 
-- **(a) rolling-buffer collapse.** `all_*` retains each day's live runs only
-  within a recent window and collapses older days to one survivor. If so the
-  sparse era under-represents decision points that really existed, *and* the
-  survivor is systematically the day's best-informed run — an **upward bias** on
-  any backtest spanning it.
-- **(b) a genuine cadence change at 2026-08-19.** Andrew simply began running
-  many more intraday sessions then. If so the sparse era is faithful and there is
-  no bias.
+Recorded as Andrew's explanation, **not as a measurement**; confirmation waits on
+the SSD being connected. Do not spend further effort investigating the mechanism;
+the question is closed.
 
-Evidence currently favours neither. Notably the same 1/day → 15/day break appears
-in the **source `*_rankings_*` filenames** (149 days at median 1/day before
-2026-08-19; 9 days at median 15/day after), which is what (b) predicts — but it
-is not decisive, because the filename census only covers what upstream kept.
+Two consequences that change planning:
 
-**A local archive Andrew holds will settle this definitively**, and no amount of
-blob-reading can settle it better than the source. Phase 6's valid date range is
-**deliberately undecided** until then.
-
-**This is a running clock.** Every day without a harvest permanently loses
-intraday snapshots, which are exactly the observations the fill-timing study
-needs. Run the backfill first, then schedule the daily harvest.
-
-The two feeds agree exactly where they overlap (46 shared run timestamps,
-53,731 rows, 100% identical `Score` and `Close_Price`), so a plain union on
-`(run_ts, symbol, risk_bucket)` is safe.
+- **Phase 6's intraday range is NOT permanently limited to 2026-08-19 forward.**
+  It is limited *until the offline archive is ingested*. H12a is underpowered
+  today and **expected to improve** -- scope its power warning that way rather
+  than treating ~9 dense days as the ceiling.
+- Those files were **written by the pipeline at the time and then moved**, not
+  regenerated or re-exported. That is captured-live, so the point-in-time
+  guarantee holds. **But the move may have reset mtimes**, so `available_at` must
+  never be derived from mtime -- the run timestamp is in the filename. See
+  `docs/LOCAL_ARCHIVE_GATE.md` §2, where this makes tier D unusable and tier B
+  the operative path.
 
 ## F3. Git history reaches further back than HEAD does
 
@@ -78,6 +71,59 @@ history itself begins 2026-07-20 ("Fresh start" commit) — anything the blobs a
 that commit do not contain is gone for good.
 
 ## F4. Run timestamps encode the run type
+
+### The canonical daily cycle (Andrew, 2026-09-02)
+
+```
+morning model build (full training)
+  -> 30-min re-scores through the trading session, using THAT MORNING'S models
+     with extrapolated partial-day data
+  -> evening model build (full training, fresh data) = AFTERCLOSE UPDATE
+  -> repeat
+```
+
+### One event, three names -- canonical name: EVENING RETRAIN
+
+The docs accumulated three names for Andrew's evening full retrain. They are the
+same event:
+
+| name | where it comes from |
+|---|---|
+| `run_kind = 'nightly'` | `classify_run()`, time-of-day heuristic |
+| `run_kind = 'placeholder'` | `classify_run()`, when the forward stamp lands on 00:00:00 |
+| session label `AFTERCLOSE UPDATE` | upstream's own filename suffix |
+
+**Canonical name: EVENING RETRAIN.** `placeholder` is an artifact of the forward
+stamp, never a tradability verdict (rule 5). The `evening_retrains` view in
+`schema.sql` is the one definition downstream code should use, and **H12b is
+defined against that view**, not against `run_kind`.
+
+⚠️ **The view deliberately EXCLUDES the early AFTERCLOSE mode.** Measured
+2026-09-02: of the 7 AFTERCLOSE runs at 15:27-15:31, **5 occur on a day that also
+has a late retrain**, arriving ~35 min after a PRECLOSE in the ordinary 30-minute
+cadence -- e.g. 2026-07-23: `14:20 AFTERNOON, 14:53 PRECLOSE, 15:27 AFTERCLOSE,
+20:27 AFTERCLOSE`. So the early mode is the **day's final intraday re-score**
+(morning's models on extrapolated data), labelled AFTERCLOSE only because it
+lands after the 15:00 close. It is not a retrain and does not belong in H12b.
+The 2 exceptions (2026-02-25, 2026-07-20) are days with no evening build at all.
+
+### Stamping convention cutover: 2026-09-02
+
+Andrew changed how the evening retrain is **stamped**. The session LABEL is
+unchanged, so nothing in `run_sessions` moves.
+
+| | before 2026-09-02 | from 2026-09-02 |
+|---|---|---|
+| `stamp_convention` | `forward` | `honest` |
+| `Date` | next calendar day, 00:00:00 or +24h | today's date, real time |
+
+⚠️ **H11's ~13-hour extended-hours advantage was DERIVED from the forward stamp.**
+Pre- and post-cutover evening rows encode the same physical fact two different
+ways, so pooling them silently mixes conventions. `ranks_pit.stamp_convention`
+exposes it, keyed on **`available_at`** (when the run was produced) and never on
+`run_ts` -- `run_ts` is the thing the convention shifts, so keying on it
+mislabels the last forward-stamped runs as honest. A view cannot forbid pooling;
+`tests/test_stamp_cutover.py` is what fails loudly.
 
 **Session boundaries, MEASURED 2026-09-01** from 513 labelled build stamps in
 `daily_ranks/*_rankings_*` FILENAMES (filenames only — no blob was read, so Rule 4
