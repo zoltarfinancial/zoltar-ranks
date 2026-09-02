@@ -20,7 +20,7 @@ Status: `proposed` | `powered` | `underpowered` | `running` | `confirmed` | `rej
 | H8 | 2026-09-01 | SHAP feature drift predicts IC decay and is usable as a live risk-off signal | monitoring | rolling feature-importance distance vs forward 20d IC | TBD | proposed | | | |
 | H12a | 2026-09-01 | **Data advance, model held fixed.** The last intraday re-score's top-5 differs materially from that morning's, and the disagreement is informative rather than noise | data advance | overlap and rank correlation, morning vs last-intraday top-N same date; then paired-by-date forward return of intraday-only vs morning-only names | TBD - **compute before building** | proposed | | | |
 | H12b | 2026-09-01 | **Retrain value, data roughly fixed.** The nightly RETRAINED model's top-5 differs materially from the last intraday re-score's, and the disagreement is informative rather than noise | model retrain | overlap and rank correlation, last-intraday vs nightly-retrain top-N same date; then paired-by-date forward return of nightly-only vs intraday-only names. **defined against the `evening_retrains` view** (F4), which excludes the day's final intraday re-score | TBD (n~64 paired days) | proposed | | | |
-| H11 | 2026-09-01 | A portfolio entered in extended hours on the nightly-build ranks, on extended-hours-eligible tickers only, beats the same selection entered at the next regular open, net of a widened extended-hours spread assumption | entry timing x venue | nightly-vintage top-5, `available_at` + latency fills in extended hours with an EH cost model, vs. the same selection filled at the next regular open | **0.157%/run** (n=63, ~9.9%/yr) | proposed | | | |
+| H11 | 2026-09-01 | A portfolio entered in extended hours on the nightly-build ranks, on extended-hours-eligible tickers only, beats the same selection entered at the next regular open, net of a widened extended-hours spread assumption | entry timing x venue | nightly-vintage top-5, `available_at` + latency fills in extended hours with an EH cost model, vs. the same selection filled at the next regular open | **0.0948%/run** 95% CI [0.068, 0.120] (n=109, recomputed 2026-09-02) | proposed | | | |
 
 ## Notes
 
@@ -31,19 +31,89 @@ Status: `proposed` | `powered` | `underpowered` | `running` | `confirmed` | `rej
   Fill it in before moving a row to `running`. If the MDE exceeds the effect
   size worth acting on, mark `underpowered` and do not run the test.
 
-### H11 — MDE derivation and the power call (computed 2026-09-01)
+### H11 — MDE derivation and the power call (RECOMPUTED 2026-09-02, `c-0001.1`)
 
-Reported before any Phase 6 nightly machinery is written, as instructed.
+**Reproduce with `python -m zoltar_ranks.analysis.h11_power`.** The number below
+is derived by that script, not typed here; a power figure that cannot be
+re-derived is a claim.
 
-- **n = 63** of 64 nightly runs are usable (all five names priced at the nightly
-  print and at the next observation). One run has no successor yet.
-- **sd of the per-run paired difference = 0.445%** (0.422% winsorized at 1/99).
-  H11's paired difference *is* the overnight gap on the selected basket, so this
-  was estimated directly: equal-weight top-5 (`baseline_risk_bucket=low`,
-  `baseline_top_x=5`) move from the nightly `close_price` to the next available
-  `close_price`.
-- **MDE = (1.96 + 0.84) x sd / sqrt(n) = 0.157% per run**, 80% power, two-sided
-  alpha = 0.05. Winsorized: 0.149%. Cumulatively ~9.9%/yr over 63 nightly runs.
+#### What was withdrawn, and what was not
+
+The prior figure — **MDE 0.157%/run at n=63, "~9.9%/yr"** — is **withdrawn and
+superseded**. Three corrections, because the reason it was withdrawn matters:
+
+1. **It was not contaminated by the placeholder pointer.** It was written in
+   commit `4023006` at 2026-09-01 21:41, and the `daily_ranks` backfill that
+   first put placeholders in the archive is `7791216` at 23:49 — two hours
+   later. It was computed on ~64 `nightly` runs when the archive held
+   essentially none.
+2. **There was no *result* to withdraw.** H11's `Result`, `95% CI` and `FDR p`
+   were and remain empty; its status is `proposed`. What existed was a power
+   calculation. **The FDR denominator is therefore untouched** — nothing has
+   been tested, the register still has 13 rows, and this recompute adds no test
+   to the count.
+3. **The real reason it is stale: the population changed.** The backfill took
+   genuine evening retrains from ~64 to **138**, and the view now excludes the
+   placeholder pointer and the four early-mode (<18:00) runs.
+
+#### The recomputed figure
+
+| | value |
+|---|---|
+| runs in `evening_retrains` | 138 |
+| dropped — **same bar, rule 3** (hold < 1 h) | **27** |
+| dropped — stale mark (hold > 96 h) | 2 |
+| **usable** | **109** |
+| window | 2026-03-03 → 2026-09-01 (182 days, ~219 runs/yr) |
+| median hold to first mark | 12.36 h |
+| mean return / run | −0.0796% |
+| sd / run | 0.3532% (winsorized 0.3329%) |
+| **MDE / run, 80% power, two-sided α=0.05** | **0.0948%** |
+| **95% CI (moving-block bootstrap, 10k draws)** | **[0.0675%, 0.1200%]** |
+| MDE cumulative over the 182-day window | 10.33% [7.36%, 13.08%] |
+| MDE per year *if the per-run edge persists* | 20.7% |
+
+#### Two exclusions that changed the answer, both found by looking
+
+**27 of 138 runs were same-bar execution (rule 3), and they biased the result in
+the flattering direction.** A forward-stamped evening retrain has
+`available_at = committed_at`, and its next observation is the *same evening's
+other build*, pushed **13–15 seconds later in the same commit**. Those pairs
+return exactly **0.000%**. Twenty-seven zero-variance observations shrink the sd,
+shrink the MDE, and make the study look better powered than it is. The p25 hold
+is 11.9 h, so a 1 h minimum separates the artifact from every real overnight gap
+without touching one.
+
+**Two runs marked 66 and 105 days later**, not overnight — a sparse-era symbol's
+next observation can be months away. Those two alone moved the sd from 0.32% to
+0.80%. The hold distribution breaks cleanly (p98 = 15.6 h, p99 = 1013 h), so any
+cap between 24 h and 336 h selects the same 136 runs.
+
+Net: the naive sd was **0.8006%** and the correct one is **0.3532%**. The two
+filters push in opposite directions, which is why neither alone would have done.
+
+#### "~9.9%/yr" was an arithmetic conflation, and it is not repeated
+
+The old note multiplied the per-run MDE by the sample size and called it a year,
+which was roughly right when the sample *was* roughly a year. This window is
+**182 days**, so the same arithmetic would overstate a year by ~2×. Both figures
+are now reported with the window that produced them, and the per-year line is
+labelled as *the per-run MDE at the observed run rate*, not a measured annual
+effect.
+
+#### The power call is still Andrew's, and it has moved
+
+Per run the study is **better powered than before** (0.0948% vs 0.157%). In
+annual terms it looks worse (20.7%/yr vs the old "9.9%/yr") — but that comparison
+is between a corrected figure and a conflated one, so it is not a real
+regression. The decision rule is unchanged:
+
+- if an edge worth acting on is **≥ 20%/yr**, H11 is `powered` at today's n;
+- if the bar is 3–10%/yr, it is `underpowered` and should not be run yet.
+
+n grows every evening, and MDE falls as 1/√n, so this improves without any work.
+Left at `proposed` pending Andrew's threshold.
+
 
 ### H11 work order — the spread survey is a GATE, not a follow-up
 
