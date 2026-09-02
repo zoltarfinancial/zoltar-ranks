@@ -1,0 +1,104 @@
+{
+ "cycle_id": "c-0001",
+ "opened_by": "cowork",
+ "quiet": false,
+ "state_snapshot": {
+  "head_sha": "c294faa",
+  "gate": "amber",
+  "blocking": 2,
+  "phase": "1a",
+  "phase_pct": 95,
+  "note": "Snapshot as read by Cowork when this cycle was written; the live values are in SS08."
+ },
+ "assessment": "The instrumentation is finished and honest: the pipeline reports itself, the console degrades section by section rather than lying, and the two remaining blocking rows are the clock rather than missing work. The build now has a bigger problem than plumbing — the placeholder-pointer finding means H11 was measured on a rewritten latest-pointer rather than the evening retrain, so the first hypothesis result this project produced has to be withdrawn and re-run. That is the right kind of problem: the gates caught it before it reached a decision. The critical path is unchanged (1a → 2 → 3 → 6) and Phase 2 is now the thing standing between us and the first honest benchmark.",
+ "items": [
+  {
+   "id": "c-0001.1",
+   "kind": "work_order",
+   "for": "claude-code",
+   "priority": "now",
+   "title": "Re-run H11 against the 138 genuine evening retrains and restate the result",
+   "why": "H11's extended-hours advantage was derived from the midnight placeholder, which is a forward-stamped latest-pointer that upstream rewrites every ~30 minutes — not a model output. The result as published is an artefact of the pointer. It is the only hypothesis result on the board, so leaving it standing contaminates the priority ordering of everything after it.",
+   "acceptance": "docs/HYPOTHESES.md carries H11 restated over the 138 genuine evening runs, with a point estimate AND an uncertainty interval, and an explicit note that the prior result is withdrawn and why. The FDR count reflects the re-run rather than double-counting it.",
+   "depends_on": [],
+   "estimate": "2h",
+   "refs": [
+    "docs/HYPOTHESES.md",
+    "docs/FINDINGS.md"
+   ]
+  },
+  {
+   "id": "c-0001.2",
+   "kind": "work_order",
+   "for": "claude-code",
+   "priority": "now",
+   "title": "Phase 2 market data layer — corporate actions and a reconciliation test",
+   "why": "Phase 2 is the only thing between the archive and the first honest benchmark, and it is on the critical path. Close_Price appears unadjusted for splits, so any return computed today is silently wrong on every symbol that split. Building Phase 3 on an unadjusted price series would produce a benchmark number that looks authoritative and is not.",
+   "acceptance": "src/zoltar_ranks/sources/corporate_actions.py exists and is used by the price path; tests/test_prices.py asserts a known split reconciles between providers to within a stated tolerance; scripts/daily.py has a prices step that appends rows to the heartbeat; SS09 shows Phase 2 above 60%.",
+   "depends_on": [],
+   "estimate": "2-3d",
+   "refs": [
+    "docs/PLAN.md",
+    "src/zoltar_ranks/sources/prices.py",
+    "docs/ALIGNMENT_ANCHOR.md"
+   ]
+  },
+  {
+   "id": "c-0001.3",
+   "kind": "work_order",
+   "for": "claude-code",
+   "priority": "next",
+   "title": "Write no_same_bar and no_run_ts_execution against a deliberately-wrong stub",
+   "why": "You were right that a gate passing because the code under test does not exist is a green light meaning nothing. The way out is not to wait for the engine — it is to write the stub that violates the rule first. A gate proven to catch the violation before the real engine exists cannot be quietly written to pass afterwards, which is the failure mode the plan warns about.",
+   "acceptance": "tests/test_execution_gates.py contains both assertions plus a fixture engine that fills same-bar and a fixture that keys off run_ts. Both gates FAIL against those fixtures and PASS against a correct fixture, demonstrated in the same test run. SS10 shows both as pass, and the pytest report proves they executed rather than skipped.",
+   "depends_on": [],
+   "estimate": "3h",
+   "refs": [
+    "dashboard/BUILD_MONITOR.md",
+    "docs/PLAN.md"
+   ]
+  },
+  {
+   "id": "c-0001.4",
+   "kind": "question",
+   "for": "andrew",
+   "priority": "now",
+   "title": "Do you trade the top-5 low-risk list mechanically, or with discretion?",
+   "why": "It decides what BASELINE_ASIS has to replicate and what 'improve returns' is measured against. If you skip names, size differently, or override on judgement, then the Streamlit engine is not your actual baseline — it is a strategy nobody trades — and beating it proves nothing about your returns. This changes the target of the whole project, so it is worth answering before Phase 3 rather than after.",
+   "acceptance": "An answer in this thread. If there is discretion, a second answer on what the rules-of-thumb are, so they can be encoded as BASELINE_ANDREW alongside BASELINE_ASIS.",
+   "depends_on": [],
+   "estimate": null,
+   "refs": [
+    "docs/PLAN.md"
+   ]
+  },
+  {
+   "id": "c-0001.5",
+   "kind": "decision",
+   "for": "andrew",
+   "priority": "later",
+   "title": "Scope and location of the local hard-drive data (blocker B3)",
+   "why": "It has been an open blocker since the plan was written and nothing downstream depends on it yet, so it is not urgent — but it stays on the board until it is either scoped or closed. If it holds fundamentals or execution history it could matter a great deal to Phase 5; if it is archival, it can be dropped.",
+   "acceptance": "Either a path and a one-line description of what is there, or a decision to close B3 as out of scope.",
+   "depends_on": [],
+   "estimate": null,
+   "refs": []
+  },
+  {
+   "id": "c-0001.6",
+   "kind": "work_order",
+   "for": "claude-code",
+   "priority": "now",
+   "title": "Wire review.py into the session loop and the emitters",
+   "why": "The review board only works if reporting is cheaper than not reporting. One command at session start and one per event is the whole cost; hand-editing the log would break the append-only guarantee that item status is derived from.",
+   "acceptance": "review.py emit runs after emit_build_status.py in scripts/daily.py and in .git/hooks/post-commit; review.py check runs as part of the test suite; data/review/ is tracked in git while data/results/review_state.json* stays ignored; a done event posted through the CLI appears in SS12 without a page reload beyond refresh.",
+   "depends_on": [],
+   "estimate": "45m",
+   "refs": [
+    "dashboard/review.py",
+    "dashboard/review_protocol.md"
+   ]
+  }
+ ],
+ "opened_at": "2026-09-02T14:54:47-05:00"
+}

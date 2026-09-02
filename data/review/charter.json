@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "end_goal": "Given a rank produced at time T, determine when the buy should actually happen — with a defensible, uncertainty-quantified answer that produces an execution change measurably better than the current baseline.",
+ "why_it_matters": "The Streamlit baseline fills at the very price the rank was computed from. If most of its apparent edge is that same-bar fill (H9), the current execution is not tradable and every downstream optimisation is measuring an artefact. The first honest number is worth more than any amount of model work.",
+ "success_criteria": [
+  "BASELINE_HONEST exists and its gap to BASELINE_ASIS is quantified with an uncertainty interval",
+  "H9 and H10 are resolved — confirmed or refuted — and counted toward FDR",
+  "The entry-time x rank-vintage x exit-rule grid has been run with purged/embargoed CV and overfitting controls",
+  "A specific execution change is recommended, with the expected improvement and the interval around it",
+  "Every number on the console traces to a run under the full contract-gate suite"
+ ],
+ "critical_path": "1a → 2 → 3 → 6",
+ "non_negotiables": [
+  "Upstream is read-only; the archive is append-only",
+  "No same-bar execution, ever — fills strictly after the information timestamp",
+  "Decisions key off available_at, never run_ts",
+  "Never backtest on *_rankings_latest.pkl",
+  "Placeholder-stamped runs are not tradable at their timestamp",
+  "Every result ships with an uncertainty interval",
+  "Pre-register every hypothesis and count it toward FDR",
+  "If a contract test fails, stop rather than loosening the assertion"
+ ],
+ "lanes": {
+  "cowork": "The brain. Holds the end goal, reads the state each heartbeat, decides what is next, writes the cycle. Owns dashboard/ and the review protocol.",
+  "claude-code": "The build. Owns src/, scripts/, tests/, docs/, config/ and data/build/manifest.yaml. Pulls work orders, reports through review.py, raises findings.",
+  "andrew": "The decisions only he can make — scope, priority, what counts as a tradable result, and anything touching real money."
+ },
+ "autonomy": "Cowork issues work orders freely when they are unambiguously next on the critical path. Anything that changes scope, spends money, or picks between defensible approaches is queued as a question or decision for Andrew.",
+ "cadence_minutes": 120,
+ "cadence_human": "every 2 hours, 07:00-19:00 CDT, weekdays",
+ "notify": "push, only for items addressed to Andrew"
+}

@@ -10,6 +10,14 @@ data/*
 !data/build/
 data/build/*
 !data/build/manifest.yaml
+#
+# And data/review/ -- the charter, the sealed cycles and the append-only inbox
+# are the record of how this build was steered, not derived output. The inbox is
+# append-only, so a concurrent-append merge conflict is ALWAYS resolved by
+# keeping BOTH sides in timestamp order. Never resolve one by dropping a line.
+# data/results/review_state.json* stays ignored -- that one IS derived.
+!data/review/
+!data/review/**
 
 # Secrets. .env.example IS tracked; .env never is.
 .env

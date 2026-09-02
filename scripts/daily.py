@@ -27,6 +27,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import os
 import subprocess
 import sys
 import traceback
@@ -133,29 +134,44 @@ STEPS = [
 ]
 
 
+#: Console emitters, in order. Both are stdlib-only, read-only on the repo, and
+#: owned by Cowork -- so they are invoked as subprocesses rather than imported.
+#: The build monitor first (SS08-SS11), then the review board (SS12).
+_EMITTERS = [("build monitor", ("dashboard", "emit_build_status.py"), ()),
+             ("review board", ("dashboard", "review.py"), ("emit",))]
+
+
 def _emit_monitor() -> None:
-    """Refresh the build monitor. Never allowed to affect the run's outcome.
+    """Refresh the console. Never allowed to affect the run's outcome.
 
     Runs after the status write, so it reports THIS run rather than the previous
     one. A monitor that can fail a harvest is worse than a stale monitor, so
     every failure here is logged and swallowed.
     """
-    emitter = REPO_ROOT / "dashboard" / "emit_build_status.py"
-    if not emitter.exists():
-        log.warning("build monitor emitter not found at %s; console will be stale",
-                    emitter)
-        return
-    try:
-        proc = subprocess.run([sys.executable, str(emitter)], cwd=REPO_ROOT,
-                              capture_output=True, text=True, timeout=120)
-        if proc.returncode == 0:
-            log.info("build monitor: %s", (proc.stdout or "").strip().splitlines()[-1:]
-                     or "emitted")
-        else:
-            log.warning("build monitor emitter exited %d: %s",
-                        proc.returncode, (proc.stderr or "")[-400:])
-    except Exception as exc:            # noqa: BLE001 - never fail the harvest
-        log.warning("build monitor emitter failed: %s", exc)
+    # PYTHONIOENCODING is not optional. Python on Windows defaults stdout to
+    # cp1252, and review.py prints the charter, whose critical path contains a
+    # U+2192 arrow -- `review.py next` exits 1 with UnicodeEncodeError without
+    # this. Same class as the schema.sql bug where a non-ASCII comment crashed
+    # connect(). Raised with Cowork; this is the harvest-side guard so a
+    # non-ASCII cycle file can never break the reporting step on the scheduler.
+    env = {**os.environ, "PYTHONIOENCODING": "utf-8"}
+    for label, parts, extra in _EMITTERS:
+        script = REPO_ROOT.joinpath(*parts)
+        if not script.exists():
+            log.warning("%s not found at %s; console will be stale", label, script)
+            continue
+        try:
+            proc = subprocess.run([sys.executable, str(script), *extra],
+                                  cwd=REPO_ROOT, capture_output=True, text=True,
+                                  timeout=120, env=env)
+            if proc.returncode == 0:
+                tail = (proc.stdout or "").strip().splitlines()[-1:]
+                log.info("%s: %s", label, tail[0] if tail else "emitted")
+            else:
+                log.warning("%s exited %d: %s", label, proc.returncode,
+                            (proc.stderr or "")[-400:])
+        except Exception as exc:        # noqa: BLE001 - never fail the harvest
+            log.warning("%s failed: %s", label, exc)
 
 
 def main(argv: list[str] | None = None) -> int:
