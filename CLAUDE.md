@@ -48,6 +48,16 @@ happen?** Phase 1 (archive) is built and validated. Work starts at Phase 2.
 9. **If a contract test fails, stop and report.** Do not loosen the assertion.
    `test_upstream_is_point_in_time` failing means the archive's core assumption
    is broken and everything downstream is suspect.
+10. **`harvest_manifest` is the record of work done. Consult it BEFORE reading,
+    not only when inserting.** Every harvester filters its candidate list through
+    `ingest/manifest.unread()` before it opens a single blob, the way every
+    harvester returns `Incomplete.exit_code()`. Two things this exists to stop:
+    **row-idempotency is not work-idempotency** — `harvest_daily_ranks` passed
+    "staged=866402 inserted=0, counts unchanged" while re-reading 228 blobs
+    (~4.8 GB, 94% of every 30-minute tick) because it parsed `--mode` and never
+    read it; and a **zero-file guard belongs on files DISCOVERED, never on files
+    TO READ**, because after the skip "nothing new" is the normal outcome on 28
+    ticks out of 29. Assert on the blob-read count, not on rows.
 
 ## Two workstreams — stay in your lane
 
@@ -85,7 +95,9 @@ python scripts\daily.py              # the scheduled loop
 - `docs/SESSION_LOG.md` has a new entry: decisions, surprises, workarounds — not
   routine progress. And `START_HERE.md`'s "Where things stand" table reflects
   reality, so the next session starts from the truth.
-- Re-running a harvester inserts **zero** new rows (idempotency holds).
+- Re-running a harvester inserts **zero** new rows *and reads **zero** blobs* —
+  row-idempotency and work-idempotency are different invariants, and only the
+  second one keeps the scheduled tick proportionate. See `tests/test_manifest.py`.
 - Any new pipeline step is appended to `scripts/daily.py::STEPS`.
 - Any new upstream dependency has a contract test that fails loudly on drift.
 - Any claim about performance carries a confidence interval and a note on how

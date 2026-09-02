@@ -6,6 +6,179 @@ decisions, surprises, and anything you had to work around; not routine progress.
 
 ---
 
+## 2026-09-02 (later still) — harvest_daily_ranks re-read 4.8 GB every 30 min
+
+- **🔴 DEFECT CONFIRMED (Andrew's diagnosis, verified).** `harvest_daily_ranks.main()`
+  parsed `--mode` and **never read `args.mode`** -- grep confirms one occurrence,
+  the `add_argument` call. Both modes ran `_read_all()` over every file from
+  `added_prod_files()`: **234 files, ~21 MB each (~4.8 GB), 234 unpickles of
+  ~233k-row frames, ~866k rows staged, 0 inserted -- on every 30-minute tick.**
+  `last_run_status.json` shows what that cost: `daily_ranks` **290.6 s of a
+  309.5 s** run, i.e. **94% of the tick**, 29 times a day, on the box running the
+  live model re-scores. And it grew linearly with every new build.
+
+- **Why our idempotency check missed it: row-idempotency is not
+  work-idempotency.** "staged=866402 inserted=0, table counts unchanged" verifies
+  the ROWS are idempotent and says nothing about the WORK. Same shape as the dead
+  scheduler -- the field we checked was not the field that mattered.
+
+- **Fix: `ingest/manifest.py`, a shared helper alongside `incomplete.py`.**
+  `manifest.unread(con, candidates, key=...)` filters a candidate list through
+  `harvest_manifest` **before** any blob is opened. The skip is exact, not a
+  heuristic: the manifest PK is `(file_path, commit_sha)` and a row is written
+  only after a successful read. `daily_ranks/` files are immutable once added, and
+  `production/*_latest.pkl` is rewritten in place but keyed per-commit, so the
+  same helper is correct for both shapes.
+
+- **MEASURED after the fix: 290.6 s -> 2 s, 0 blobs read, exit 0.** Steady-state
+  cost is now dominated by the git fetch, not by reading.
+
+- **Both traps handled, and both are tested.**
+  1. The zero-file guard stays on files **discovered** (`if not files: return 1`),
+     never on files **to read** -- after the skip, "nothing new" is the normal
+     outcome on ~26 of 29 ticks, and a guard there would fire constantly and stop
+     guarding. `test_zero_new_files_does_not_trip_the_empty_source_guard` and
+     `test_empty_upstream_still_fails_loudly` pin both sides.
+  2. Failed reads still retry, because the manifest records **successes only**.
+     `test_failed_read_is_retried_on_the_next_run` pins it. This is exactly how
+     the 8 unreadable `all_high` files of 2026-07-21/22/23 were recovered; a skip
+     built on attempts rather than successes would have lost them permanently.
+
+- **`--strategy coverage` deliberately does NOT consult the manifest** and now
+  says so loudly. The walk binary-searches the whole ordered list, so filtering it
+  would break the search -- and it is a non-default escape hatch that is UNSOUND
+  on this data anyway.
+
+- **`exit_code(intended=)` now scopes to what THIS run set out to read**, not to
+  everything ever discovered. "could not read 1 of 8" is actionable; "1 of 234" is
+  misleading once the skip means we only ever intended 8.
+
+### Audit of the other four harvesters
+
+| harvester | reads `args.mode` | consults manifest before reading | blobs on a 2nd consecutive run |
+|---|---|---|---|
+| `harvest_daily_ranks` | **NO -> now yes** | **NO -> now yes** | **234 -> 0** (measured) |
+| `harvest_er` | yes | **yes**, already correct | 0 |
+| `harvest_shap` | yes | **yes**, already correct | 0 |
+| `harvest_ranks` | yes | no -- but bounded, see below | 4 (one HEAD blob per rank file) |
+| `harvest_sessions` | **NO** | n/a | 0 -- reads FILENAMES only (Rule 4) |
+
+- **`harvest_er` and `harvest_shap` were already right**, and their
+  `done = {sha...}` / `todo = [s for s in snaps if s.sha not in done]` pattern is
+  what `manifest.unread()` generalises. They were the model, not the problem.
+- **`harvest_ranks` is bounded and left alone.** Daily mode reads HEAD only, one
+  blob per file in `cfg.rank_files` = **4 reads, 13.9 s measured**. It cannot use
+  a plain manifest skip the way the others do, because `production/*_latest.pkl`
+  is rewritten in place and HEAD is usually a genuinely new commit. A skip when
+  HEAD's sha is already in the manifest would help on ticks where upstream has not
+  pushed -- worth doing, but it is a 13.9 s step, not a 290 s one, so it is
+  recorded here rather than done now.
+- **`harvest_sessions` ignores `--mode` too, but harmlessly**: it parses
+  `*_rankings_*` FILENAMES from `git log` and opens no blob at all. 1.4 s.
+  Left as-is; the unused argument is noted so a future reader does not mistake it
+  for the same defect.
+
+### Expected per-run cost on the 30-minute schedule
+
+Measured arrival rate: **6.7 daily_ranks files/day** in **2-3 pushes/day**, at
+most **4 files in a single push**. Per-file cost: **0.29 s** `read_pickle` on a
+cached blob, ~1.2 s including `normalize` + `upsert_new_rows`.
+
+| tick | before | after |
+|---|---|---|
+| nothing new (~26 of 29/day) | 290.6 s | **2 s** (measured) |
+| 2-4 new files (~3 of 29/day) | 290.6 s | ~5-15 s (2 s + per-file read, plus a first-time blob fetch) |
+| **whole day** | ~8,400 s (~2.3 h) | **~100 s (~1.7 min)** |
+| **blob reads/day** | 6,786 | **~7** |
+
+~80x less work per day, and it no longer grows with the number of builds.
+
+- **New tests: `tests/test_manifest.py`, 15 of them**, asserting on the
+  instrumented blob-read **count**, never on rows or timing. Includes a structural
+  guard (`test_harvester_consults_the_manifest_before_reading_pure`) so the next
+  harvester inherits this the way it inherits `Incomplete`.
+
+- **Rule 10 added** to `CLAUDE.md` and `docs/PLAN.md` §0 (now ten rules, and the
+  references in `START_HERE.md` were updated to match).
+
+---
+
+## 2026-09-02 (later) — connectivity restored; the stamp cutover DID NOT HAPPEN
+
+- **Connectivity is fully back, and the AVG TLS block is gone too.** TCP to
+  `github.com:443` succeeds (140.82.113.4), `git ls-remote` works, and Python
+  HTTPS to `query1.finance.yahoo.com` now returns **HTTP 429** rather than the
+  2026-09-01 OpenSSL "Basic Constraints of CA cert not marked critical" error.
+  429 is Yahoo rate-limiting, not interception -- so yfinance is unblocked but
+  needs backoff-and-retry. Pushed `7791216` and `a0f9317`; `origin/main == a0f9317`.
+
+- **Scheduler confirmed alive after the `-Daily` fix.** `LastTaskResult 0`,
+  `NextRunTime 2026-09-02 11:30`, `NumberOfMissedRuns 0`.
+
+- **daily_ranks backfill COMPLETE.** 228 files, `staged=54,858,681 inserted=0`,
+  exit 0, no INCOMPLETE line. The 8 previously-missing files (2026-07-21/22/23)
+  are now in `harvest_manifest` and added **zero** rows -- the `all_*` rolling
+  buffers overlap so heavily that their run timestamps were already covered by
+  neighbouring files. A completed backfill inserting 0 rows is the *expected*
+  outcome here, not a sign the files were skipped; the manifest is the check.
+
+- **🔴 THE 2026-09-02 STAMP CUTOVER DID NOT HAPPEN.**
+  `tests/test_stamp_cutover.py::test_no_third_stamping_convention` fails. Left
+  failing per rule 9. Upstream is still forward-stamping after the cutover date:
+  `all_*_PROD_20260903_000000.pkl` has build stamp 2026-09-03 00:00:00 and was
+  **committed 2026-09-02 08:41:57** -- forward by 15.3h. The only post-cutover
+  files with `build_stamp <= committed_at` are the *morning* builds, which were
+  never forward-stamped under either convention, so they are not evidence.
+  **Caveat, and the reason nothing was changed:** it is 11:25 CT and evening
+  retrains land 19:00-21:18, so the first post-cutover AFTERCLOSE has not landed
+  yet. The cutover may be scheduled for tonight. Check this evening before
+  touching `CUTOVER` or the view.
+
+- **`stamp_convention` is a calendar cutoff, not a measurement of stamp
+  behaviour.** It labels everything with `available_at >= 2026-09-02` as `honest`,
+  which is how run `2026-09-03 00:00:00` is simultaneously
+  `stamp_convention='honest'` and `stamp_is_forward=true`. 6 of the 7 `honest`
+  runs are today's morning/intraday runs, which never had a forward stamp. The
+  column measures **era**, not **convention**. Not fixed -- reported.
+
+- **🔴 `placeholder` is a MORNING artifact, not the evening retrain. Contradicts
+  F4.** All **32** midnight-stamped (`*_000000.pkl`) daily_ranks files were
+  committed 08:16-14:46, 28 of 32 in 08:00-09:59 -- the morning window, never the
+  evening. Decisive on the newest: `20260903_000000.pkl` was committed 2026-09-02
+  08:41:57, so it cannot be the 2026-09-02 evening retrain, which does not exist
+  until ~19:36 that evening. The evening retrain has its own separate
+  forward-stamped form (`20260902_193449.pkl`), so a given day carries **two
+  distinct forward-stamped artifacts**. `evening_retrains` unions both and
+  therefore mixes two processes -- this lands on **H12b**. Not changed; the
+  decisive confirmation is a payload comparison (does a midnight file equal the
+  prior evening retrain, or that morning's build?).
+
+- **`available_at` can overstate by hours on fresh rows, for the same reason it
+  understates on backfilled ones.** Run `2026-09-03 00:00:00` carries
+  `available_at 2026-09-02 10:54:02` because `first_seen_sha` points at the 10:54
+  `production/*_latest.pkl` harvest -- but commit `70690e5` carried the same build
+  at **08:41:57**. `first_seen_sha` is the first commit *harvested*, not the
+  earliest that carried the row, and harvest order is not commit order.
+
+- **Phase 2 spec written before any provider code: `docs/ALIGNMENT_ANCHOR.md`.**
+  Defines the daily / intraday / adjustment anchors as the concrete content of the
+  four `test_reconcile_*` stubs, with justified tolerances (5 bps daily, 25 bps
+  intraday, plus a 3x power guard so a flat tape cannot launder a timezone bug
+  into a green test). Three points worth carrying forward even if the spec
+  changes: the **trading-calendar test must run FIRST** because "prior trade date"
+  is undefined without it; the existing `test_reconcile_intraday_coverage` has
+  **zero power** against a timezone error, since there is a bar every minute
+  either way; and the anchor must run on **unadjusted** prices, which requires
+  folding `returns_adjusted` into `_cache_path`'s key or a raw request is served
+  cached adjusted bars.
+
+- **The intraday anchor is time-critical.** yfinance serves 1-minute bars for ~30
+  days; the dense era starts 2026-08-19, which is 14 days back. Once it falls out
+  of that window the intraday anchor cannot be measured at 1-minute resolution
+  until the offline SSD archive lands.
+
+---
+
 ## 2026-09-02 — stamp cutover, vocabulary, exit-0 invariant; SCHEDULER WAS DEAD
 
 - **🔴 The scheduled task had silently stopped, and it was not the network.**

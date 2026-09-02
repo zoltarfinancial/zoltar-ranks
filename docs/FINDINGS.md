@@ -93,6 +93,27 @@ same event:
 | `run_kind = 'placeholder'` | `classify_run()`, when the forward stamp lands on 00:00:00 |
 | session label `AFTERCLOSE UPDATE` | upstream's own filename suffix |
 
+⚠️ **CONTRADICTED 2026-09-02 on the `placeholder` leg — measured, not assumed.**
+The `nightly` + `AFTERCLOSE UPDATE` equivalence stands. **`placeholder` does not.**
+
+All **32** midnight-stamped (`*_000000.pkl`) `daily_ranks` files were committed
+between **08:16 and 14:46**, 28 of 32 in the **08:00–09:59** window — the morning
+build window, never the evening. The newest case settles it arithmetically:
+`all_*_PROD_20260903_000000.pkl` was committed **2026-09-02 08:41:57**, so it
+cannot be the 2026-09-02 evening retrain, which does not exist until ~19:36 that
+evening. And that evening retrain has its own separate forward-stamped form
+(`all_*_PROD_20260902_193449.pkl`, build stamp = the *next* day's evening time).
+
+So a given day carries **two distinct forward-stamped artifacts**, and
+`run_kind='placeholder'` is a **morning** artifact stamped for the next midnight
+(+13–15 h), not the evening retrain restamped.
+
+**Consequence: the `evening_retrains` view unions `nightly` and `placeholder` and
+therefore mixes two processes.** That lands directly on **H12b**. The view is
+**not** changed yet — the decisive confirmation is a payload comparison: does a
+midnight-stamped file's content equal the prior evening retrain's, or that
+morning's build? Run that before editing the view or this section.
+
 **Canonical name: EVENING RETRAIN.** `placeholder` is an artifact of the forward
 stamp, never a tradability verdict (rule 5). The `evening_retrains` view in
 `schema.sql` is the one definition downstream code should use, and **H12b is
@@ -116,6 +137,35 @@ unchanged, so nothing in `run_sessions` moves.
 |---|---|---|
 | `stamp_convention` | `forward` | `honest` |
 | `Date` | next calendar day, 00:00:00 or +24h | today's date, real time |
+
+🔴 **THE CUTOVER HAS NOT ACTUALLY OCCURRED (measured 2026-09-02 11:25 CT).**
+The table above records the *expected* change. Upstream is still forward-stamping
+after the cutover date:
+
+| file | build stamp | committed | forward by |
+|---|---|---|---|
+| `all_*_PROD_20260903_000000.pkl` | 2026-09-03 00:00:00 | **2026-09-02 08:41:57** | 15.3 h |
+| `all_*_PROD_20260902_193449.pkl` | 2026-09-02 19:34:49 | 2026-09-01 19:36:25 | 24.0 h |
+
+No honestly-stamped post-cutover evening file exists. The only post-cutover files
+with `build_stamp <= committed_at` are the **morning** builds
+(`20260902_080544`), and morning builds were never forward-stamped under either
+convention — they are not evidence of a cutover.
+
+`tests/test_stamp_cutover.py::test_no_third_stamping_convention` **fails on this**,
+which is the canary working. Left failing per rule 9.
+
+**Caveat that is the reason nothing was changed:** the first post-cutover
+AFTERCLOSE had not landed at the time of measurement (11:25 CT; evening retrains
+arrive 19:00–21:18). The cutover may simply be scheduled for that evening's build.
+**Re-check after an evening file has landed before touching `CUTOVER` or the view.**
+
+⚠️ **Separately, `stamp_convention` measures ERA, not CONVENTION.** It is a
+calendar cutoff on `available_at`, so it labels every run from 2026-09-02 as
+`honest` regardless of stamp behaviour — which is how run `2026-09-03 00:00:00` is
+currently *simultaneously* `stamp_convention='honest'` and `stamp_is_forward=true`.
+Six of the seven `honest` runs are ordinary morning/intraday runs that never had a
+forward stamp. Reported, not fixed.
 
 ⚠️ **H11's ~13-hour extended-hours advantage was DERIVED from the forward stamp.**
 Pre- and post-cutover evening rows encode the same physical fact two different
@@ -245,6 +295,11 @@ genuinely two models, not one relabelled.
   literal market cap** (LITE at $870 and BE at $210 are both tagged `Small`).
   Use it to join the SHAP segments. It is **not** valid as a size control
   variable in Phase 5 — use `fundamentals_df_latest.pkl` market cap for that.
+- ⚠️ **`SFTBY` is not yet evidence of a split.** 28.68 / 15.88 = **1.806**, not a
+  clean 2:1, and three months is ample time for a −45% drawdown with no corporate
+  action at all. Check it against `corporate_actions` before citing it — see
+  `docs/ALIGNMENT_ANCHOR.md` §5.3. The adjustment question is settled by the
+  population test in §5.2, not by this one name.
 - `Close_Price` for `SFTBY` reads 28.68 on 2026-06-01 and 15.88 on 2026-09-01.
   Either a split or an unadjusted-price inconsistency. Every return computed
   from `Close_Price` is suspect until corporate actions are joined in — hence

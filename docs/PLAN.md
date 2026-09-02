@@ -27,6 +27,7 @@ great and loses money.
 | R7 | **Log every hypothesis before testing it** in `docs/HYPOTHESES.md`, including the pre-registered success criterion. Count every test for multiple-comparison correction. |
 | R8 | **No look-ahead in universe construction.** Only symbols present in the archive *as of* the decision timestamp are eligible. |
 | R9 | If a contract test in `tests/test_harvest.py` fails, **stop and report**. Do not "fix" it by loosening the assertion. |
+| R10 | **`harvest_manifest` is the record of work done — consult it BEFORE reading, not only when inserting.** Every harvester filters its candidate list through `ingest/manifest.unread()` first. Row-idempotency ("staged=N inserted=0") is not work-idempotency: `harvest_daily_ranks` passed the former while re-reading 228 blobs / ~4.8 GB every 30 minutes. A zero-file guard belongs on files **discovered**, never on files **to read**. |
 
 ---
 

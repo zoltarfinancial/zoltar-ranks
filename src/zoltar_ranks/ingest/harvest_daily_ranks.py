@@ -40,6 +40,7 @@ from datetime import datetime
 from zoltar_ranks.config import Config
 from zoltar_ranks.db import duckdb_io
 from zoltar_ranks.ingest.incomplete import Incomplete
+from zoltar_ranks.ingest import manifest
 from zoltar_ranks.ingest.harvest_ranks import RANK_KEYS, coverage_walk, normalize
 from zoltar_ranks.sources.git_archive import Snapshot, UpstreamMirror, _run
 
@@ -112,13 +113,22 @@ def _read_all(mirror: UpstreamMirror, snaps, bucket: str, unreadable: Incomplete
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--mode", choices=["backfill", "daily"], default="daily")
+    ap.add_argument("--mode", choices=["backfill", "daily"], default="daily",
+                    help="descriptive only for this harvester: both modes skip "
+                         "builds harvest_manifest already records as read, which "
+                         "makes a backfill and a daily tick the same operation "
+                         "differing only in how much is outstanding. Use --force "
+                         "for a deliberate full re-read.")
     ap.add_argument("--config", default=None)
     ap.add_argument("--strategy", choices=["full", "coverage"], default="full",
                     help="'full' reads every build (default -- see MEASURED note "
                          "below); 'coverage' binary-searches and is UNSOUND here")
     ap.add_argument("--max-fetches", type=int, default=20,
                     help="coverage strategy only")
+    ap.add_argument("--force", action="store_true",
+                    help="ignore harvest_manifest and re-read every build. The "
+                         "deliberate full re-read; on this data it is the "
+                         "difference between ~3s and ~290s per run.")
     ap.add_argument("--no-sync", action="store_true",
                     help="skip the mirror fetch and work from blobs already local. "
                          "The operator is ASSERTING the mirror is current -- this "
@@ -149,6 +159,7 @@ def main(argv: list[str] | None = None) -> int:
 
     con = duckdb_io.connect(cfg.duckdb_path)
     grand_seen = grand_ins = 0
+    intended = 0          # builds this run actually set out to read, post-skip
     unreadable = Incomplete('harvest_daily_ranks', log)
 
     for bucket in ("low", "high"):
@@ -164,11 +175,23 @@ def main(argv: list[str] | None = None) -> int:
         log.info("all_%s_risk_PROD: %d builds -> %s", bucket, len(snaps), args.strategy)
         seen_b = ins_b = 0
         if args.strategy == "coverage":
+            # The walk binary-searches over the whole ordered list, so filtering
+            # it would break the search. It is a non-default escape hatch and is
+            # UNSOUND on this data anyway -- say so rather than silently skipping.
+            log.warning("strategy=coverage: harvest_manifest NOT consulted")
             source = coverage_walk(mirror, snaps[0].path, snaps, bucket, FEED,
                                    max_fetches=args.max_fetches,
                                    path_of=lambda s: s.path)
+            intended += len(snaps)
         else:
-            source = _read_all(mirror, snaps, bucket, unreadable)
+            # THE fix: consult the manifest BEFORE reading, not only when
+            # inserting. Without this both modes re-read all 228 builds (~4.8 GB,
+            # ~290 s) on every 30-minute tick. See ingest/manifest.py.
+            todo = manifest.unread(con, snaps, key=lambda s: (s.path, s.sha),
+                                   log=log, label=f"all_{bucket}_risk_PROD",
+                                   force=args.force)
+            intended += len(todo)
+            source = _read_all(mirror, todo, bucket, unreadable)
         for snap, df in source:
             build = build_of[snap.sha + "|" + snap.path]
             seen, ins = duckdb_io.upsert_new_rows(con, "ranks", df, RANK_KEYS)
@@ -193,9 +216,13 @@ def main(argv: list[str] | None = None) -> int:
         grand_seen += seen_b
         grand_ins += ins_b
 
-    log.info("daily_ranks rows staged=%d inserted=%d", grand_seen, grand_ins)
+    log.info("daily_ranks builds read=%d of %d known; rows staged=%d inserted=%d",
+             intended, len(files), grand_seen, grand_ins)
     con.close()
-    return unreadable.exit_code(intended=len(files))
+    # Scope is what THIS run intended to read, not everything ever discovered:
+    # "could not read 1 of 8" is actionable, "1 of 228" is misleading once the
+    # manifest skip means we only ever intended 8.
+    return unreadable.exit_code(intended=intended)
 
 
 if __name__ == "__main__":
