@@ -350,3 +350,54 @@ genuinely two models, not one relabelled.
   the `corporate_actions` table in the schema.
 - Symbol universe drifts (1,124 to 1,214 symbols across files). Survivorship
   matters: a symbol that disappears may have been delisted, not merely dropped.
+
+## F8. The daily alignment anchor: `close_price` is the PRIOR session's close
+
+Measured 2026-09-02 with `python -m zoltar_ranks.analysis.alignment_anchor`
+against **unadjusted** yfinance bars, on a sample fixed by rule before it ran
+(`docs/ALIGNMENT_ANCHOR.md` §3.1). **15 morning runs, 3,556 symbol-days.**
+
+| candidate | match rate at 5 bps | 95% CI |
+|---|---|---|
+| **close(T−1)** — prior trading session | **0.9834** | [0.9787, 0.9871] |
+| open(T) | 0.0603 | [0.0514, 0.0707] |
+| close(T−2) | 0.0305 | [0.0254, 0.0366] |
+| close(T) — *would be look-ahead* | 0.0235 | [0.0181, 0.0305] |
+
+**VERDICT: PASS.** `ranks.close_price` on a morning build is the **previous
+trading session's close, unadjusted**. Separation is ~96 points, and the false
+candidates land at ~2-3%, the coincidence rate predicted for a 5 bps tolerance at
+~1.5% daily volatility.
+
+Why 5 bps and not PLAN §2c's 50: at 50 bps roughly a third of symbol-days have
+|daily return| < 0.5%, so close(T) and close(T−1) both "match" and the test
+cannot separate them. A tolerance wide enough to absorb the error you are looking
+for is worthless.
+
+**No look-ahead.** close(T) never beats close(T−1) on any date, which is the
+failure that would have invalidated Phases 3 and 6 rather than just Phase 2.
+
+**No DST anomaly**, and those were the highest-value cells in the sample. The
+first sessions after both 2026 boundaries score normally: 2025-11-04 (after DST
+ends) 0.9662, 2026-03-10 and 2026-03-12 (after DST begins) 0.9877 / 0.9836. Worst
+date overall is 2026-08-27 at 0.9516, still above the 0.95 bar. Reported per
+date, never pooled — a pooled 98% could be 14 clean dates and one catastrophic
+one, and a DST bug affects exactly one date.
+
+**`morning_ranks` is homogeneous.** `classify_run` labels `morning` as hour < 9.0
+CT while the US open is 08:30 CT, so the class straddles the open. Pre-open and
+post-open runs were reported separately in case they answered differently — they
+do not. The two post-open runs (2026-03-10 08:58, 2026-03-12 08:43) give 0.9877
+and 0.9836, indistinguishable from the pre-open group.
+
+⚠️ **Symbol normalization is confirmed as real work, not a footnote.** yfinance
+never resolves `BF.B` or `BRK.B` (it wants `BF-B`, `BRK-B`), and a further ~11
+names fail on older windows (`APLS`, `ATUS`, `AVDL`, `AXL`, `BITF`, `BK`, `CADE`,
+`CFLT`, `CIVI`, `CMA`). Those are excluded from the rates above rather than
+counted as mismatches — counting them would let a ticker-mapping bug masquerade
+as an adjustment finding. A mapping table is required before the split
+diagnostic (§5) can be trusted.
+
+**Still unmeasured:** the intraday anchor (§4) and the split diagnostic (§5).
+The intraday one is time-critical — yfinance serves 1-minute bars for ~30 days
+and the dense era begins 2026-08-19.

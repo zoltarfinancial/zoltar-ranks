@@ -109,9 +109,14 @@ class PriceProvider(ABC):
 
     def _cache_path(self, kind: str, symbols: list[str], start: date,
                     end: date, interval: str = "") -> Path:
+        # `returns_adjusted` is part of the key, not decoration. It is settable
+        # per instance (the alignment anchor needs RAW prices; returns need
+        # adjusted ones), and without it a raw request is served the adjusted
+        # bars a previous call cached under the same provider name -- silently,
+        # and in exactly the direction that hides the answer to FINDINGS F7.
         key = hashlib.sha1(
-            f"{self.name}|{kind}|{interval}|{start}|{end}|{','.join(sorted(symbols))}"
-            .encode()).hexdigest()[:16]
+            f"{self.name}|adj={self.returns_adjusted}|{kind}|{interval}|{start}"
+            f"|{end}|{','.join(sorted(symbols))}".encode()).hexdigest()[:16]
         return self.cache_dir / f"{kind}_{start}_{end}_{interval or 'd'}_{key}.parquet"
 
     def daily(self, symbols: list[str], start: date, end: date,
@@ -260,6 +265,19 @@ class YFinanceProvider(PriceProvider):
     #: yfinance batches well but rate-limits hard above ~100 tickers per call.
     CHUNK = 100
 
+    def __init__(self, cache_dir: Path, adjusted: bool = True):
+        """`adjusted=False` serves RAW prices, for the alignment anchor.
+
+        Adjusted history is restated backwards for every dividend, so a 2026-03
+        close pulled today differs from what the model saw by the sum of
+        subsequent dividends. Comparing `ranks.close_price` against that would
+        fail for reasons having nothing to do with the clock, and would make
+        "unadjusted" and "misaligned" indistinguishable. The `adjusted` flag
+        already travels with every row; this just lets it be false.
+        """
+        super().__init__(cache_dir)
+        self.returns_adjusted = adjusted
+
     def fetch_daily(self, symbols, start, end):
         """Split/dividend-adjusted daily OHLCV. `adjusted` is True by construction.
 
@@ -273,8 +291,8 @@ class YFinanceProvider(PriceProvider):
         out = []
         for chunk in _chunks(wanted, self.CHUNK):
             raw = yf.download(chunk, start=start, end=end + timedelta(days=1),
-                              auto_adjust=True, actions=False, group_by="ticker",
-                              progress=False, threads=True)
+                              auto_adjust=self.returns_adjusted, actions=False,
+                              group_by="ticker", progress=False, threads=True)
             out.extend(_unstack_yf(raw, chunk))
 
         # yfinance reports transport failures by returning an empty frame, so an
@@ -293,7 +311,7 @@ class YFinanceProvider(PriceProvider):
             # Partial misses are legitimate (delistings), but must never be silent.
             log.warning("yfinance served %d/%d symbols for %s..%s; missing: %s",
                         len(served), len(wanted), start, end, missing[:20])
-        df["adjusted"] = True
+        df["adjusted"] = self.returns_adjusted
         df["provider"] = self.name
         return df
 
