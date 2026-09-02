@@ -93,26 +93,52 @@ same event:
 | `run_kind = 'placeholder'` | `classify_run()`, when the forward stamp lands on 00:00:00 |
 | session label `AFTERCLOSE UPDATE` | upstream's own filename suffix |
 
-⚠️ **CONTRADICTED 2026-09-02 on the `placeholder` leg — measured, not assumed.**
-The `nightly` + `AFTERCLOSE UPDATE` equivalence stands. **`placeholder` does not.**
+🔴 **SETTLED 2026-09-02 (measured): `placeholder` is NOT the evening retrain,
+and it is not a model output at all.** The `nightly` + `AFTERCLOSE UPDATE`
+equivalence stands. The `placeholder` leg of "one event, three names" is WRONG
+and has been removed from the `evening_retrains` view.
 
-All **32** midnight-stamped (`*_000000.pkl`) `daily_ranks` files were committed
-between **08:16 and 14:46**, 28 of 32 in the **08:00–09:59** window — the morning
-build window, never the evening. The newest case settles it arithmetically:
-`all_*_PROD_20260903_000000.pkl` was committed **2026-09-02 08:41:57**, so it
-cannot be the 2026-09-02 evening retrain, which does not exist until ~19:36 that
-evening. And that evening retrain has its own separate forward-stamped form
-(`all_*_PROD_20260902_193449.pkl`, build stamp = the *next* day's evening time).
+The decisive comparison, which round 1 deferred and this round ran:
 
-So a given day carries **two distinct forward-stamped artifacts**, and
-`run_kind='placeholder'` is a **morning** artifact stamped for the next midnight
-(+13–15 h), not the evening retrain restamped.
+| the midnight row `2026-09-03 00:00:00` vs | scores identical |
+|---|---|
+| the evening retrain `2026-09-02 19:34:49` | **0 / 2326** (corr 0.61) |
+| that morning's build `2026-09-02 08:05:44` | **0 / 2326** (corr 0.66) |
+| the intraday re-score `2026-09-02 10:52:07` | **2326 / 2326** (corr 1.0, max Δ 0) |
 
-**Consequence: the `evening_retrains` view unions `nightly` and `placeholder` and
-therefore mixes two processes.** That lands directly on **H12b**. The view is
-**not** changed yet — the decisive confirmation is a payload comparison: does a
-midnight-stamped file's content equal the prior evening retrain's, or that
-morning's build? Run that before editing the view or this section.
+`close_price` matched 2326/2326 on the intraday row too. Archive-wide, **31 of 32
+placeholder runs are an exact duplicate of an earlier real run**; the exception
+(2026-07-21, the archive's first) has no candidate because its source predates
+our coverage.
+
+**And it is not stable.** Three commits of
+`production/all_low_risk_PROD_latest.pkl` on 2026-09-02:
+
+| blob | its newest intraday run | midnight row == that run |
+|---|---|---|
+| 10:54 `6e772af` | 2026-09-02 10:52:07 | **1163 / 1163** |
+| 11:26 `4fd7d08` | 2026-09-02 11:24:18 | **1163 / 1163** |
+| 13:39 `6bee3af` | 2026-09-02 13:37:48 | **1163 / 1163** |
+
+and across those three blobs the midnight rows agreed **0 / 1163** with each
+other. So the midnight build is a forward-stamped **"latest" pointer** that
+upstream rewrites every ~30 minutes to mirror the current re-score.
+
+Three consequences:
+
+1. **F1's "scores are never restated" does NOT hold for this run timestamp.**
+   `ranks` is append-only on `(run_ts, symbol, risk_bucket)`, so we froze
+   whichever version we harvested first and silently dropped every later
+   rewrite. F1 was measured on `production/low_risk_PROD_latest.pkl`, the
+   `daily` feed, and remains true there. The midnight `run_ts` is a **label**,
+   not an observation time.
+2. **Every placeholder row double-counts.** It is a copy of a scoring already in
+   the archive under its true timestamp. ~32 runs x ~2,326 rows. Any analysis
+   grouping by run must exclude them or it counts the same re-score twice.
+3. **`evening_retrains` no longer includes them** (`schema.sql`), so **H12b** is
+   now defined against 138 genuine `nightly` runs rather than a blend of two
+   processes. `tests/test_stamp_cutover.py` pins both the duplication and the
+   exclusion.
 
 **Canonical name: EVENING RETRAIN.** `placeholder` is an artifact of the forward
 stamp, never a tradability verdict (rule 5). The `evening_retrains` view in
@@ -138,7 +164,7 @@ unchanged, so nothing in `run_sessions` moves.
 | `stamp_convention` | `forward` | `honest` |
 | `Date` | next calendar day, 00:00:00 or +24h | today's date, real time |
 
-🔴 **THE CUTOVER HAS NOT ACTUALLY OCCURRED (measured 2026-09-02 11:25 CT).**
+⚠️ **THE CUTOVER IS STILL UNTESTED (corrected 2026-09-02 14:20 CT).**
 The table above records the *expected* change. Upstream is still forward-stamping
 after the cutover date:
 
@@ -152,8 +178,26 @@ with `build_stamp <= committed_at` are the **morning** builds
 (`20260902_080544`), and morning builds were never forward-stamped under either
 convention — they are not evidence of a cutover.
 
-`tests/test_stamp_cutover.py::test_no_third_stamping_convention` **fails on this**,
-which is the canary working. Left failing per rule 9.
+**CORRECTION.** An earlier version of this section, written 11:25 the same day,
+said flatly that the cutover *did not happen*. That was overstated, and the
+error is recorded rather than quietly edited.
+
+The evidence cited was `all_*_PROD_20260903_000000.pkl`, still forward-stamped
+after the cutover date. But that file is the **midnight latest-pointer**, not the
+evening retrain (see the SETTLED block above) — so it shows the *pointer's*
+stamping continued, and says nothing about the convention the cutover was about.
+The other file cited, `20260902_193449.pkl`, was **produced 2026-09-01**, before
+the cutover, so it cannot test it either.
+
+**No post-cutover evening retrain has landed yet** — 0 runs with
+`run_kind='nightly'` and `hour(run_ts) >= 18` and `available_at >= 2026-09-02`.
+The first one arrives ~19:36 tonight. **That is the first real test.**
+
+`test_no_third_stamping_convention` was failing on the midnight pointer, i.e. on
+a row that was never an evening retrain — an error in the assertion's
+**population**, inherited from the `evening_retrains` view, not in its logic. The
+view is fixed and the test now passes with **more** power, not less: it is armed
+for tonight's build. That is a population correction, not a loosened assertion.
 
 **Caveat that is the reason nothing was changed:** the first post-cutover
 AFTERCLOSE had not landed at the time of measurement (11:25 CT; evening retrains

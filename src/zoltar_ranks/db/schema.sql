@@ -232,8 +232,33 @@ LEFT JOIN prov p ON p.commit_sha = r.first_seen_sha;
 -- post-2026-09-02 rows encode the same physical fact two different ways, and
 -- H11's ~13h extended-hours advantage was derived from the forward stamp.
 -- A view cannot enforce that; tests/test_stamp_cutover.py is what fails loudly.
+-- !! `placeholder` was REMOVED from this view on 2026-09-02, and F4's "one
+-- event, three names" is wrong on that leg. MEASURED, not inferred:
+--
+--   * The midnight row is an EXACT DUPLICATE of the publishing blob's newest
+--     intraday re-score -- 1163/1163 scores and close_prices identical, in
+--     every blob checked. Archive-wide: 31 of 32 placeholder runs exactly
+--     duplicate an earlier real run. (The exception, 2026-07-21, is the
+--     archive's first, and its source run predates our coverage.)
+--   * It is NOT STABLE. Across three commits of the same file on 2026-09-02
+--     (10:54, 11:26, 13:39) the 2026-09-03 00:00:00 rows agreed 0/1163 each
+--     time, and each matched ITS OWN blob's newest re-score.
+--
+-- So it is a forward-stamped "latest" POINTER that upstream overwrites every
+-- ~30 minutes, not a model output and not the evening retrain -- which is a
+-- separate artifact published ~19:36 and forward-stamped to the next evening.
+--
+-- Two consequences that outlive this view:
+--   1. `ranks` is append-only on (run_ts, symbol, risk_bucket), so we froze
+--      whichever version we harvested FIRST and silently dropped the rest.
+--      F1's "scores are never restated" holds for real run timestamps and
+--      NOT for this one. Its run_ts is a label, not an observation time.
+--   2. Every placeholder row DOUBLE-COUNTS a scoring already in the archive
+--      under its true timestamp. Grouping by run without excluding them
+--      counts the same re-score twice.
+--
+-- tests/test_stamp_cutover.py pins both properties.
 CREATE OR REPLACE VIEW evening_retrains AS
 SELECT * FROM ranks_pit
-WHERE (run_kind IN ('nightly', 'placeholder'))
-  AND (CAST(run_ts AS TIME) = TIME '00:00:00'          -- forward-stamped midnight
-       OR hour(run_ts) >= 18);                          -- late mode (>=18:00)
+WHERE run_kind = 'nightly'
+  AND hour(run_ts) >= 18;                               -- late mode only

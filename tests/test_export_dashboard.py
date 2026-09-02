@@ -111,10 +111,12 @@ def test_freshness_uses_available_at_not_run_ts(cfg):
     finally:
         con.close()
     assert health["freshness_basis"] == "available_at"
-    assert health["hours_since_last_run_ts"] > 0, (
+    assert health["hours_since_fresh"] > 0, (
         "freshness went negative: computed from a forward-stamped run_ts, the "
         "staleness alarm can never fire and a dead harvester looks healthy")
-    assert health["hours_since_last_run_ts"] == pytest.approx(2, abs=0.2)
+    assert health["hours_since_fresh"] == pytest.approx(2, abs=0.2)
+    # deprecated alias, carried for one version so the console does not break
+    assert health["hours_since_last_run_ts"] == health["hours_since_fresh"]
     # both timestamps visible, so the gap is inspectable rather than implied
     assert health["last_run_ts"] > health["last_available_at"]
 
@@ -153,6 +155,26 @@ def test_unbuilt_sections_are_absent_with_a_reason(cfg):
             f"chart is a claim we have not earned")
         assert section in payload["sections_absent"]
         assert payload["sections_absent"][section], "an absent section needs a reason"
+
+
+def test_js_feed_is_written_from_the_same_payload(cfg):
+    """The `file://` feed and the JSON must never disagree."""
+    import json as _json
+    payload = ex.build_payload(cfg)
+    ex.write_atomic(cfg.results_dir / "dashboard_data.json", payload)
+    ex.write_js(cfg.results_dir / "dashboard_data.js", payload)
+    js = (cfg.results_dir / "dashboard_data.js").read_text(encoding="utf-8")
+    assert js.startswith("window.__ZOLTAR_DATA__ = ") and js.rstrip().endswith(";")
+    body = js[len("window.__ZOLTAR_DATA__ = "):].rstrip().rstrip(";")
+    assert _json.loads(body) == _json.loads(
+        (cfg.results_dir / "dashboard_data.json").read_text(encoding="utf-8"))
+
+
+def test_schema_version_is_2_after_the_freshness_rename(cfg):
+    """v2 renamed hours_since_last_run_ts -> hours_since_fresh. The old name was
+    computed correctly and named after the trap, so any consumer that did not
+    also read freshness_basis would read the name and believe it."""
+    assert ex.build_payload(cfg)["schema_version"] == 2
 
 
 def test_payload_has_the_contracted_top_level_keys(cfg):

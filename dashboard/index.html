@@ -1,3 +1,9 @@
+<meta charset="utf-8">
+<!-- Generated feeds. They live in data/results/ beside their JSON so that the
+     exporter and the emitter never write into dashboard/, which Cowork owns.
+     A <script src> works over file://; a fetch of the same path does not. -->
+<script src="../data/results/build_status.js"></script>
+<script src="../data/results/dashboard_data.js"></script>
 <title>Zoltar Research Console</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
@@ -147,6 +153,165 @@ tbody tr:last-child td{border-bottom:0}
 .prompt .src{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
   color:var(--ink-4);margin-top:10px;display:block}
 
+/* ============ ACTIVE BUILD MONITORING ============ */
+.nav .grp{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-4);padding:16px 0 6px;border-top:1px solid var(--rule-soft);margin-top:10px}
+.nav a.live .n{color:var(--s1)}
+
+/* generic state pill */
+.pill{font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;
+  padding:3px 7px;border-radius:2px;border:1px solid;white-space:nowrap;display:inline-block}
+.pill.ok{color:var(--good);border-color:rgba(63,166,106,.4);background:rgba(63,166,106,.09)}
+.pill.warn{color:var(--warn);border-color:rgba(242,165,65,.38);background:rgba(242,165,65,.08)}
+.pill.crit{color:var(--crit);border-color:rgba(224,92,92,.38);background:rgba(224,92,92,.08)}
+.pill.info{color:var(--s1);border-color:rgba(57,135,229,.4);background:rgba(57,135,229,.09)}
+.pill.idle{color:var(--ink-3);border-color:var(--rule)}
+.pill.plan{color:var(--s4);border-color:rgba(144,133,233,.35);background:rgba(144,133,233,.08)}
+
+/* build gate banner */
+.gate{display:flex;align-items:center;gap:16px;border:1px solid var(--rule);border-radius:5px;
+  background:var(--panel);padding:16px 20px;border-left-width:3px;border-left-style:solid}
+.gate.green{border-left-color:var(--good)}
+.gate.amber{border-left-color:var(--warn)}
+.gate.red{border-left-color:var(--crit)}
+.gate .gk{font-family:var(--mono);font-size:22px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  line-height:1;white-space:nowrap}
+.gate.green .gk{color:var(--good)} .gate.amber .gk{color:var(--warn)} .gate.red .gk{color:var(--crit)}
+.gate .gt{color:var(--ink-2);font-size:13px;line-height:1.5}
+.gate .gt b{color:var(--ink);font-weight:500}
+
+/* job heartbeat rows */
+.jobs{border-top:1px solid var(--rule)}
+.job{display:grid;grid-template-columns:minmax(0,1fr) 190px 132px 92px;gap:16px;align-items:center;
+  padding:14px 4px;border-bottom:1px solid var(--rule-soft)}
+@media (max-width:860px){.job{grid-template-columns:minmax(0,1fr) 92px;row-gap:9px}
+  .job .beat,.job .jlast{grid-column:1/-1}}
+.job .jname{font-size:13.5px;color:var(--ink);display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.job .jname .why{display:block;flex-basis:100%;color:var(--ink-3);font-size:11.5px;line-height:1.45;margin-top:3px;max-width:58ch}
+.job .jcad{font-family:var(--mono);font-size:10px;color:var(--ink-4);letter-spacing:.06em}
+.job .jlast{font-family:var(--mono);font-size:11.5px;color:var(--ink-2);text-align:right;font-variant-numeric:tabular-nums}
+.job .jlast em{font-style:normal;display:block;color:var(--ink-4);font-size:10px;margin-top:2px}
+.job .jst{text-align:right}
+.beat{display:flex;gap:2px;align-items:flex-end;height:22px}
+.beat i{flex:1;min-width:2px;border-radius:1px;background:var(--rule);height:5px;display:block}
+.beat i.ok{background:var(--good);height:16px} .beat i.miss{background:rgba(224,92,92,.55);height:16px}
+.beat i.err{background:var(--crit);height:16px} .beat i.na{background:var(--rule-soft);height:5px}
+.beatkey{font-family:var(--mono);font-size:10px;color:var(--ink-4);margin-top:10px;
+  display:flex;gap:16px;flex-wrap:wrap}
+.beatkey span{display:flex;align-items:center;gap:6px}
+.beatkey i{width:8px;height:8px;border-radius:1px;display:block}
+
+/* phase rail */
+.phases{border-top:1px solid var(--rule)}
+.prow{border-bottom:1px solid var(--rule-soft)}
+.phead{display:grid;grid-template-columns:46px minmax(0,1fr) 128px 104px 96px 26px;gap:14px;align-items:center;
+  padding:15px 4px;cursor:pointer;background:none;border:0;width:100%;text-align:left;color:inherit;font:inherit}
+@media (max-width:860px){.phead{grid-template-columns:40px minmax(0,1fr) 90px 26px}
+  .phead .pbarwrap,.phead .pown{display:none}}
+.phead:hover{background:var(--panel)}
+.phead[aria-expanded="true"] .chev{transform:rotate(45deg)}
+.pid{font-family:var(--mono);font-size:12.5px;color:var(--ink-3);font-weight:500}
+.pid.cp{color:var(--accent)}
+.pname{font-size:13.5px;color:var(--ink)}
+.pname em{font-style:normal;color:var(--ink-4);font-family:var(--mono);font-size:10.5px;display:block;margin-top:2px}
+.pbarwrap{display:flex;align-items:center;gap:9px}
+.pbar{flex:1;height:4px;background:var(--rule);border-radius:2px;overflow:hidden}
+.pbar i{display:block;height:100%;background:var(--s1)}
+.prow.done .pbar i{background:var(--good)}
+.prow.blocked .pbar i{background:var(--crit)}
+.ppct{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);font-variant-numeric:tabular-nums;width:30px;text-align:right}
+.pown{font-family:var(--mono);font-size:10px;color:var(--ink-4);letter-spacing:.06em;text-transform:uppercase}
+.pbody{padding:2px 4px 22px 60px}
+@media (max-width:860px){.pbody{padding-left:8px}}
+.pbody .pnote{color:var(--ink-2);font-size:13px;margin:0 0 14px;max-width:74ch}
+.dels{display:grid;gap:1px}
+.del{display:grid;grid-template-columns:16px minmax(0,1fr) 84px;gap:12px;align-items:baseline;
+  padding:7px 0;border-bottom:1px solid var(--rule-soft)}
+.del:last-child{border-bottom:0}
+.del .box{width:10px;height:10px;border-radius:2px;border:1px solid var(--ink-4);margin-top:4px}
+.del.done .box{background:var(--good);border-color:var(--good)}
+.del.wip .box{background:linear-gradient(90deg,var(--s1) 50%,transparent 50%);border-color:var(--s1)}
+.del.blocked .box{background:var(--crit);border-color:var(--crit)}
+.del .dn{font-size:13px;color:var(--ink-2)}
+.del.done .dn{color:var(--ink-3)}
+.del .dp{font-family:var(--mono);font-size:10.5px;color:var(--ink-4);display:block;margin-top:2px;
+  word-break:break-all}
+.del .dk{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink-4);text-align:right}
+
+/* contract gates */
+.gates{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:860px){.gates{grid-template-columns:1fr}}
+.gcard{background:var(--panel);border:1px solid var(--rule);border-radius:4px;padding:14px 16px;
+  border-left:2px solid var(--ink-4)}
+.gcard.pass{border-left-color:var(--good)}
+.gcard.fail{border-left-color:var(--crit);background:rgba(224,92,92,.05)}
+.gcard.stale{border-left-color:var(--warn)}
+.gcard .gh{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.gcard h4{margin:0;font-size:13.5px;font-weight:600;font-family:var(--sans)}
+.gcard p{margin:7px 0 0;font-size:12px;color:var(--ink-2);line-height:1.5}
+.gcard .gm{font-family:var(--mono);font-size:10px;color:var(--ink-4);margin-top:9px;display:block;
+  letter-spacing:.05em}
+
+/* feed contract table */
+#buildstrip .stat{flex:1}
+#feedtable th:nth-child(2),#feedtable td:nth-child(2){padding-right:18px}
+#feedtable th:nth-child(3),#feedtable td:nth-child(3){width:104px;padding-right:20px}
+#feedtable th:nth-child(4),#feedtable td:nth-child(4){padding-left:4px}
+.feedstate{font-family:var(--mono);font-size:11px}
+td .path{font-family:var(--mono);font-size:11px;color:var(--ink-3);display:block;margin-top:3px;word-break:break-all}
+
+/* activity log */
+.log{border-left:1px solid var(--rule);margin-left:6px;padding-left:0}
+.ev{position:relative;padding:0 0 16px 22px}
+.ev::before{content:"";position:absolute;left:-4.5px;top:5px;width:8px;height:8px;border-radius:50%;
+  background:var(--ink-4);border:2px solid var(--ground)}
+.ev.commit::before{background:var(--s1)}
+.ev.run::before{background:var(--good)}
+.ev.decision::before{background:var(--s4)}
+.ev.blocker::before{background:var(--crit)}
+.ev .et{font-family:var(--mono);font-size:10.5px;color:var(--ink-4);letter-spacing:.04em}
+.ev .es{font-size:13px;color:var(--ink-2);margin-top:2px}
+.ev .es b{color:var(--ink);font-weight:500}
+.ev .eref{font-family:var(--mono);font-size:10.5px;color:var(--ink-4)}
+
+/* blockers */
+.blocks{display:grid;gap:10px}
+.blk{background:var(--panel);border:1px solid var(--rule);border-left:2px solid var(--crit);
+  border-radius:0 4px 4px 0;padding:14px 16px}
+.blk.warn{border-left-color:var(--warn)}
+.blk .bh{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.blk h4{margin:0;font-size:13.5px;font-weight:600;font-family:var(--sans)}
+.blk p{margin:6px 0 0;font-size:12.5px;color:var(--ink-2);line-height:1.55;max-width:78ch}
+.blk .bm{font-family:var(--mono);font-size:10px;color:var(--ink-4);margin-top:8px;display:block;letter-spacing:.05em}
+
+/* ingest / handoff panel */
+.ingest{background:var(--panel);border:1px solid var(--rule);border-radius:5px;margin-top:18px}
+.ingest > summary{cursor:pointer;padding:14px 20px;font-family:var(--mono);font-size:11px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);list-style:none;
+  display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ingest > summary::-webkit-details-marker{display:none}
+.ingest > summary::after{content:"";width:8px;height:8px;border-right:1.5px solid var(--ink-4);
+  border-bottom:1.5px solid var(--ink-4);transform:rotate(45deg);transition:transform .15s;flex:0 0 8px}
+.ingest[open] > summary::after{transform:rotate(-135deg)}
+.ingest .ibody{padding:0 20px 20px;border-top:1px solid var(--rule-soft)}
+.ingest p{font-size:12.5px;color:var(--ink-2);max-width:78ch;line-height:1.55}
+.ingest textarea{width:100%;min-height:130px;background:#0a0c10;color:var(--ink);
+  border:1px solid var(--rule);border-radius:4px;padding:11px 13px;font-family:var(--mono);
+  font-size:11.5px;line-height:1.5;resize:vertical}
+.ingest textarea:focus{outline:2px solid var(--s1);outline-offset:-1px}
+.btnrow{display:flex;gap:9px;flex-wrap:wrap;margin-top:11px;align-items:center}
+button.act{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+  background:var(--panel-2);color:var(--ink-2);border:1px solid var(--rule);border-radius:3px;
+  padding:8px 13px;cursor:pointer}
+button.act:hover{background:var(--rule);color:var(--ink)}
+button.act.primary{border-color:rgba(57,135,229,.5);color:var(--s1)}
+button.act.primary:hover{background:rgba(57,135,229,.12)}
+.msg{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+.msg.ok{color:var(--good)} .msg.bad{color:var(--crit)}
+.srcline{font-family:var(--mono);font-size:10.5px;color:var(--ink-4);letter-spacing:.05em;
+  margin-top:14px;display:block}
+
 /* tooltip */
 #tip{position:fixed;pointer-events:none;opacity:0;transition:opacity .1s;z-index:50;
   background:#0a0c10;border:1px solid var(--rule);border-radius:4px;padding:8px 11px;
@@ -160,6 +325,7 @@ tbody tr:last-child td{border-bottom:0}
   <aside class="rail">
     <div class="mark">Zoltar<small>Research Console</small></div>
     <nav class="nav">
+      <div class="grp" style="border-top:0;margin-top:0;padding-top:0">Research</div>
       <a href="#health"><span class="n">01</span> Archive health</a>
       <a href="#question"><span class="n">02</span> The open question</a>
       <a href="#bench"><span class="n">03</span> Benchmarks</a>
@@ -167,6 +333,11 @@ tbody tr:last-child td{border-bottom:0}
       <a href="#timing"><span class="n">05</span> Execution timing</a>
       <a href="#register"><span class="n">06</span> Hypothesis register</a>
       <a href="#next"><span class="n">07</span> What to test next</a>
+      <div class="grp">Active build</div>
+      <a href="#pipeline" class="live"><span class="n">08</span> Pipeline health</a>
+      <a href="#phases" class="live"><span class="n">09</span> Phase progress</a>
+      <a href="#gates" class="live"><span class="n">10</span> Contract gates</a>
+      <a href="#handoff" class="live"><span class="n">11</span> Feeds &amp; handoff</a>
     </nav>
     <div class="railfoot">
       <span id="genstamp">—</span><br>
@@ -180,6 +351,7 @@ tbody tr:last-child td{border-bottom:0}
 
     <section id="health" style="padding-top:0">
       <div class="status" id="statusstrip"></div>
+      <div class="status" id="buildstrip"></div>
     </section>
 
     <div class="wrap">
@@ -267,6 +439,83 @@ tbody tr:last-child td{border-bottom:0}
         <p class="lede">Patterns visible in the data above that no registered hypothesis covers yet.
           These are prompts for judgement, not results — promote one to the register before testing it.</p>
         <div class="prompts" id="prompts"></div>
+      </section>
+
+      <section id="pipeline">
+        <div class="eyebrow">08 — Active build · pipeline</div>
+        <h2>Is the machine still running?</h2>
+        <p class="lede">The intraday feed is a rolling buffer capped at 200 run timestamps. Every hour
+          the harvester is down is history that cannot be recovered later. This strip answers one
+          question — did each scheduled job fire when it was supposed to.</p>
+        <div id="buildgate"></div>
+        <div class="panel" style="margin-top:18px">
+          <h3>Scheduled jobs</h3>
+          <div class="jobs" id="jobs"></div>
+          <div class="beatkey">
+            <span><i style="background:var(--good)"></i> fired on schedule</span>
+            <span><i style="background:rgba(224,92,92,.55)"></i> missed window</span>
+            <span><i style="background:var(--crit)"></i> ran and errored</span>
+            <span><i style="background:var(--rule-soft)"></i> outside schedule / not yet built</span>
+            <span style="color:var(--ink-3)">newest at right</span>
+          </div>
+          <p class="note" id="jobNote"></p>
+        </div>
+      </section>
+
+      <section id="phases">
+        <div class="eyebrow">09 — Active build · progress</div>
+        <h2>What Claude Code is building, and how far in it is</h2>
+        <p class="lede">One row per phase of the build plan. Open a row for its deliverables — the
+          concrete files that have to exist before the phase can be called done. A phase is only
+          done when every deliverable under it is checked and its contract gate passes.</p>
+        <div class="phases" id="phaselist"></div>
+        <p class="note" id="phaseNote"></p>
+      </section>
+
+      <section id="gates">
+        <div class="eyebrow">10 — Active build · integrity</div>
+        <h2>Contract gates</h2>
+        <p class="lede">Assertions that must hold for any result on this page to mean anything. The
+          rule is stop, not loosen: a failing blocker gate invalidates every number downstream of it
+          until the cause is found. Gates that have never run are as informative as gates that fail.</p>
+        <div class="gates" id="gatecards"></div>
+      </section>
+
+      <section id="handoff">
+        <div class="eyebrow">11 — Active build · handoff</div>
+        <h2>What this console needs next</h2>
+        <p class="lede">The feeds below are the contract between the build and this page. Anything
+          marked missing is a section rendering illustrative data instead of yours — which is the
+          fastest way to read what to generate next.</p>
+        <div class="panel">
+          <h3>Feed contract</h3>
+          <div class="tablewrap"><table id="feedtable"></table></div>
+        </div>
+
+        <h3 style="margin:26px 0 12px">Blocked · needs a decision</h3>
+        <div class="blocks" id="blockers"></div>
+
+        <h3 style="margin:26px 0 12px">Recent activity</h3>
+        <div class="log" id="activity"></div>
+
+        <details class="ingest" id="ingest">
+          <summary>Update this monitor</summary>
+          <div class="ibody">
+            <p style="margin-top:14px">This page reads <code>data/results/build_status.json</code> when
+              it is opened from the repo. Published here it has no filesystem, so paste the file's
+              contents below — it is saved to the artifact's store and to this browser, and stays put
+              across reloads and republishes.</p>
+            <textarea id="ingestbox" spellcheck="false"
+              placeholder="Paste the contents of data/results/build_status.json here"></textarea>
+            <div class="btnrow">
+              <button class="act primary" id="ingestload" type="button">Load status</button>
+              <button class="act" id="ingestcopy" type="button">Copy the Claude Code brief</button>
+              <button class="act" id="ingestclear" type="button">Reset to example</button>
+              <span class="msg" id="ingestmsg"></span>
+            </div>
+            <span class="srcline" id="buildsrc"></span>
+          </div>
+        </details>
       </section>
 
     </div>
@@ -4820,6 +5069,472 @@ tbody tr:last-child td{border-bottom:0}
  },
  "shap_drift": []
 }</script>
+<script id="seed-build" type="application/json">{
+ "schema_version": 1,
+ "generated_at": "2026-09-02T11:35:11",
+ "is_example": true,
+ "example_note": "Example scaffold. Replace by adding dashboard/emit_build_status.py to scripts/daily.py::STEPS.",
+ "repo": {
+  "name": "zoltar-ranks",
+  "branch": "main",
+  "head_sha": "0000000",
+  "head_message": "not yet read from git — run the emitter",
+  "head_at": null,
+  "dirty": false
+ },
+ "gate": {
+  "state": "amber",
+  "headline": "Archive is running; the execution gates that make results meaningful do not exist yet.",
+  "detail": "Phase 1 is validated and the daily loop is green, but no_same_bar, no_latest_pkl and no_run_ts_execution have never run. Until they do, any backtest number this console shows is unverified by construction."
+ },
+ "jobs": [
+  {
+   "id": "harvest_intraday",
+   "name": "Intraday harvest",
+   "why": "scripts/daily.py on the 30-minute scheduled task. Captures all_*_PROD_latest.pkl before the 200-timestamp rolling buffer discards it — the only irreversible job on the board.",
+   "schedule": "*/30 via schedule_harvest.ps1, market hours",
+   "criticality": "critical",
+   "status": "partial",
+   "last_run_at": "2026-09-02T11:35:11",
+   "last_status": "ok",
+   "last_duration_s": 309.4,
+   "next_expected_at": null,
+   "rows_added_last": null,
+   "runs_24h": 1,
+   "expected_24h": 15,
+   "failures_24h": 0,
+   "error": null,
+   "beats": ["na","na","na","na","na","na","na","na","na","na","na","na","na","na","miss","miss","miss","miss","ok","miss","miss","miss","na","na"]
+  },
+  {
+   "id": "harvest_daily",
+   "name": "Daily harvest",
+   "why": "Append-only capture of low/high_risk_PROD_latest.pkl and the daily_ranks session files. Steps: ranks, daily_ranks, run_sessions, expected_returns, shap.",
+   "schedule": "daily, after the close",
+   "criticality": "high",
+   "status": "healthy",
+   "last_run_at": "2026-09-02T11:35:11",
+   "last_status": "ok",
+   "last_duration_s": 309.4,
+   "next_expected_at": "2026-09-03T11:35:00",
+   "rows_added_last": null,
+   "runs_24h": 1,
+   "expected_24h": 1,
+   "failures_24h": 0,
+   "error": null,
+   "beats": ["na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","ok","na","na","na","na","na"]
+  },
+  {
+   "id": "contract_suite",
+   "name": "Contract test suite",
+   "why": "pytest tests -q after every harvest. A failure must halt the pipeline rather than warn — CLAUDE.md rule 9.",
+   "schedule": "after every harvest",
+   "criticality": "high",
+   "status": "partial",
+   "last_run_at": "2026-09-02T11:35:11",
+   "last_status": "ok",
+   "last_duration_s": null,
+   "next_expected_at": null,
+   "rows_added_last": null,
+   "runs_24h": 1,
+   "expected_24h": 1,
+   "failures_24h": 0,
+   "error": null,
+   "beats": ["na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","ok","na","na","na","na","na"]
+  },
+  {
+   "id": "export_dashboard_data",
+   "name": "Console feed export",
+   "why": "analysis/export_dashboard_data.py appended to scripts/daily.py::STEPS. Until it exists, sections 01-05 render invented numbers.",
+   "schedule": "every daily.py run",
+   "criticality": "high",
+   "status": "not_built",
+   "last_run_at": null,
+   "last_status": null,
+   "last_duration_s": null,
+   "next_expected_at": null,
+   "rows_added_last": null,
+   "runs_24h": 0,
+   "expected_24h": 1,
+   "failures_24h": 0,
+   "error": null,
+   "beats": ["na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na"]
+  },
+  {
+   "id": "emit_build_status",
+   "name": "Build monitor emit",
+   "why": "dashboard/emit_build_status.py — writes the file this section is reading. Add it to STEPS and to a git post-commit hook.",
+   "schedule": "every daily.py run and every commit",
+   "criticality": "normal",
+   "status": "not_built",
+   "last_run_at": null,
+   "last_status": null,
+   "last_duration_s": null,
+   "next_expected_at": null,
+   "rows_added_last": null,
+   "runs_24h": 0,
+   "expected_24h": 16,
+   "failures_24h": 0,
+   "error": null,
+   "beats": ["na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na"]
+  },
+  {
+   "id": "prices_sync",
+   "name": "Price data sync",
+   "why": "Daily OHLCV and corporate actions for the archive universe. Phase 3 onward cannot produce an honest fill price without it.",
+   "schedule": "daily, after the close",
+   "criticality": "high",
+   "status": "not_built",
+   "last_run_at": null,
+   "last_status": null,
+   "last_duration_s": null,
+   "next_expected_at": null,
+   "rows_added_last": null,
+   "runs_24h": 0,
+   "expected_24h": 1,
+   "failures_24h": 0,
+   "error": null,
+   "beats": ["na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na","na"]
+  }
+ ],
+ "phases": [
+  {
+   "id": "1",
+   "name": "Point-in-time rank archive",
+   "subtitle": "DuckDB + Parquet · coverage-walk backfill · work-idempotent harvest",
+   "status": "done",
+   "owner": "claude-code",
+   "pct": 100,
+   "critical_path": true,
+   "started_at": "2026-09-01",
+   "completed_at": "2026-09-02",
+   "eta": null,
+   "note": "Validated: overlapping rows between HEAD and an older blob are identical on Score and Close_Price. Scores are never restated, so a backtest over the union of snapshots is honest. harvest_manifest now enforces work-idempotency, not just row-idempotency.",
+   "deliverables": [
+    {"name": "Archive schema + DuckDB store", "path": "data/zoltar.duckdb", "kind": "data", "state": "done"},
+    {"name": "Harvesters + manifest", "path": "src/", "kind": "code", "state": "done"},
+    {"name": "Coverage-walk backfill", "path": "scripts/setup.ps1", "kind": "job", "state": "done"},
+    {"name": "Daily loop", "path": "scripts/daily.py", "kind": "code", "state": "done"},
+    {"name": "Point-in-time contract test", "path": "tests/test_upstream_contract.py", "kind": "test", "state": "done"},
+    {"name": "Work-idempotency test", "path": "tests/test_manifest.py", "kind": "test", "state": "done"}
+   ]
+  },
+  {
+   "id": "1a",
+   "name": "Intraday capture + ER / SHAP / fundamentals ingestion",
+   "subtitle": "urgent — the rolling buffer discards intraday history continuously",
+   "status": "in_progress",
+   "owner": "claude-code",
+   "pct": 55,
+   "critical_path": true,
+   "started_at": "2026-09-02",
+   "completed_at": null,
+   "eta": "2026-09-03",
+   "note": "schedule_harvest.ps1 exists; what is unverified is whether the task is registered and firing. One full session of green beats in section 08 is the acceptance test — until then this phase is not done, however complete the code looks.",
+   "deliverables": [
+    {"name": "30-minute scheduled task", "path": "scripts/schedule_harvest.ps1", "kind": "job", "state": "wip"},
+    {"name": "One full session of green beats", "path": "data/results/run_history.jsonl", "kind": "data", "state": "todo"},
+    {"name": "Expected-return ingestion", "path": "src/", "kind": "code", "state": "done"},
+    {"name": "SHAP snapshot ingestion", "path": "src/", "kind": "code", "state": "done"},
+    {"name": "Fundamentals ingestion", "path": "src/", "kind": "code", "state": "todo"},
+    {"name": "Build monitor emitter", "path": "dashboard/emit_build_status.py", "kind": "code", "state": "todo"}
+   ]
+  },
+  {
+   "id": "2",
+   "name": "Market data layer",
+   "subtitle": "robin_stocks / Alpaca adapters · corporate actions · reconciliation",
+   "status": "blocked",
+   "owner": "claude-code",
+   "pct": 0,
+   "critical_path": true,
+   "started_at": null,
+   "completed_at": null,
+   "eta": "2026-09-05",
+   "note": "Blocked on B2, the intraday-bar source decision. Snapshot closes cannot evaluate a stop honestly, so every bracket-exit result stays unavailable until this lands.",
+   "deliverables": [
+    {"name": "robin_stocks adapter", "path": "src/", "kind": "code", "state": "todo"},
+    {"name": "Alpaca adapter + gap report", "path": "src/", "kind": "code", "state": "todo"},
+    {"name": "Corporate actions / split adjustment", "path": "src/", "kind": "code", "state": "todo"},
+    {"name": "Cross-source reconciliation test", "path": "tests/test_reconciliation.py", "kind": "test", "state": "todo"},
+    {"name": "Daily bars store", "path": "data/cache/prices", "kind": "data", "state": "wip"}
+   ]
+  },
+  {
+   "id": "3",
+   "name": "Benchmarks",
+   "subtitle": "BASELINE_ASIS · BASELINE_HONEST · RANDOM_5 · SPY/QQQ",
+   "status": "queued",
+   "owner": "claude-code",
+   "pct": 0,
+   "critical_path": true,
+   "started_at": null,
+   "completed_at": null,
+   "eta": "2026-09-08",
+   "note": "Resolves H9 and H10 — the two hypotheses that reorder everything else if either confirms.",
+   "deliverables": [
+    {"name": "As-is engine replica", "path": "analysis/baseline_asis.py", "kind": "code", "state": "todo"},
+    {"name": "Honest execution engine", "path": "analysis/baseline_honest.py", "kind": "code", "state": "todo"},
+    {"name": "Random-5 control", "path": "analysis/random5.py", "kind": "code", "state": "todo"},
+    {"name": "Console feed export", "path": "analysis/export_dashboard_data.py", "kind": "code", "state": "todo"}
+   ]
+  },
+  {
+   "id": "4",
+   "name": "Statistics framework",
+   "subtitle": "block bootstrap · purged walk-forward CV · deflated Sharpe · BH-FDR · MDE",
+   "status": "queued",
+   "owner": "claude-code",
+   "pct": 0,
+   "critical_path": false,
+   "started_at": null,
+   "completed_at": null,
+   "eta": "2026-09-10",
+   "note": "CLAUDE.md rule 6: every result reports an interval via analysis/stats.compare_strategies. Nothing publishes to this console until that exists.",
+   "deliverables": [
+    {"name": "compare_strategies + block bootstrap", "path": "analysis/stats.py", "kind": "code", "state": "todo"},
+    {"name": "Purged / embargoed walk-forward", "path": "analysis/walkforward.py", "kind": "code", "state": "todo"},
+    {"name": "Deflated Sharpe + BH-FDR", "path": "analysis/multiplicity.py", "kind": "code", "state": "todo"},
+    {"name": "MDE calculator", "path": "analysis/power.py", "kind": "code", "state": "todo"}
+   ]
+  },
+  {
+   "id": "5",
+   "name": "Bias diagnostics",
+   "subtitle": "IC by horizon / segment / sector / liquidity · calibration · rank stability · SHAP drift",
+   "status": "queued",
+   "owner": "claude-code",
+   "pct": 0,
+   "critical_path": false,
+   "started_at": null,
+   "completed_at": null,
+   "eta": "2026-09-14",
+   "note": "Feeds section 04 and hypothesis H8.",
+   "deliverables": [
+    {"name": "IC engine", "path": "analysis/ic.py", "kind": "code", "state": "todo"},
+    {"name": "Rank stability + regime split", "path": "analysis/stability.py", "kind": "code", "state": "todo"},
+    {"name": "SHAP drift measure", "path": "analysis/shap_drift.py", "kind": "code", "state": "todo"}
+   ]
+  },
+  {
+   "id": "6",
+   "name": "Execution timing study",
+   "subtitle": "primary objective — entry time × rank vintage × exit rule × order type",
+   "status": "queued",
+   "owner": "claude-code",
+   "pct": 0,
+   "critical_path": true,
+   "started_at": null,
+   "completed_at": null,
+   "eta": "2026-09-19",
+   "note": "The question the project exists to answer. Entry timing is measured from available_at, never run_ts — rule 5. Phase 4's overfitting controls are a hard prerequisite.",
+   "deliverables": [
+    {"name": "Timing grid runner", "path": "analysis/timing_grid.py", "kind": "code", "state": "todo"},
+    {"name": "Neighbour-smoothness check", "path": "analysis/smoothness.py", "kind": "code", "state": "todo"},
+    {"name": "Console feed: decay + heatmap", "path": "analysis/export_dashboard_data.py", "kind": "code", "state": "todo"}
+   ]
+  },
+  {
+   "id": "7",
+   "name": "Hypothesis register loop",
+   "subtitle": "pre-registration · FDR accounting · resolution",
+   "status": "in_progress",
+   "owner": "shared",
+   "pct": 50,
+   "critical_path": false,
+   "started_at": "2026-09-01",
+   "completed_at": null,
+   "eta": null,
+   "note": "docs/HYPOTHESES.md is the source of truth. The exporter parses it; this console renders what it is given. Nobody maintains a second copy.",
+   "deliverables": [
+    {"name": "Register", "path": "docs/HYPOTHESES.md", "kind": "doc", "state": "done"},
+    {"name": "Register parsed into the feed", "path": "analysis/export_dashboard_data.py", "kind": "code", "state": "todo"},
+    {"name": "FDR accounting", "path": "analysis/multiplicity.py", "kind": "code", "state": "todo"}
+   ]
+  },
+  {
+   "id": "8",
+   "name": "Console + automated daily job",
+   "subtitle": "this page, fed automatically",
+   "status": "in_progress",
+   "owner": "cowork",
+   "pct": 60,
+   "critical_path": false,
+   "started_at": "2026-09-02",
+   "completed_at": null,
+   "eta": null,
+   "note": "Layout, research sections and the build monitor are live. What is missing is on the backend side of the line: the two emitters. See the feed contract below.",
+   "deliverables": [
+    {"name": "Research console", "path": "dashboard/index.html", "kind": "doc", "state": "done"},
+    {"name": "Active build monitor", "path": "dashboard/index.html", "kind": "doc", "state": "done"},
+    {"name": "Build monitor contract", "path": "dashboard/BUILD_MONITOR.md", "kind": "doc", "state": "done"},
+    {"name": "Status emitter (reference impl)", "path": "dashboard/emit_build_status.py", "kind": "code", "state": "done"},
+    {"name": "Wired into scripts/daily.py::STEPS", "path": "scripts/daily.py", "kind": "job", "state": "todo"},
+    {"name": "Results exporter", "path": "analysis/export_dashboard_data.py", "kind": "code", "state": "todo"}
+   ]
+  }
+ ],
+ "contract_tests": [
+  {
+   "id": "pit_immutability",
+   "name": "Scores are never restated",
+   "severity": "blocker",
+   "status": "pass",
+   "last_run_at": "2026-09-02T11:35:11",
+   "detail": "test_upstream_is_point_in_time — overlapping rows between HEAD and an older blob are identical on Score and Close_Price.",
+   "guards": "the archive can be unioned across snapshots"
+  },
+  {
+   "id": "append_only",
+   "name": "Archive is append-only",
+   "severity": "blocker",
+   "status": "pass",
+   "last_run_at": "2026-09-02T11:35:11",
+   "detail": "No harvest ever UPDATEs the ranks table. A changed historical score is a finding to report, not a row to correct.",
+   "guards": "yesterday's answer cannot change under today's run"
+  },
+  {
+   "id": "work_idempotency",
+   "name": "Re-running a harvester reads zero blobs",
+   "severity": "blocker",
+   "status": "pass",
+   "last_run_at": "2026-09-02T11:35:11",
+   "detail": "tests/test_manifest.py — row-idempotency is not work-idempotency. Assert on blob reads, not on rows: the 30-minute tick was re-reading 228 blobs while reporting inserted=0.",
+   "guards": "a scheduled tick that stays proportionate to what is actually new"
+  },
+  {
+   "id": "no_same_bar",
+   "name": "No same-bar execution",
+   "severity": "blocker",
+   "status": "not_built",
+   "last_run_at": null,
+   "detail": "Every simulated fill must occur strictly after the information timestamp plus a configured latency. A latency of 0 is a bug, not a default.",
+   "guards": "the single largest source of fake edge (H9)"
+  },
+  {
+   "id": "no_run_ts_execution",
+   "name": "No execution decision keys off run_ts",
+   "severity": "blocker",
+   "status": "not_built",
+   "last_run_at": null,
+   "detail": "available_at is the information timestamp and the only one latency may be measured from. Upstream sometimes stamps a build later than it was published, so run_ts is not a lower bound on when the information was knowable.",
+   "guards": "an entry time that looks tradable and was not knowable"
+  },
+  {
+   "id": "no_latest_pkl",
+   "name": "No in-sample rankings file in any backtest",
+   "severity": "blocker",
+   "status": "not_built",
+   "last_run_at": null,
+   "detail": "*_rankings_latest.pkl carries source='train' rows scored by the current model. Diagnostics only — it must never reach a backtest input path.",
+   "guards": "results that would be pure look-ahead"
+  },
+  {
+   "id": "no_lookahead_universe",
+   "name": "No look-ahead in universe construction",
+   "severity": "warning",
+   "status": "not_built",
+   "last_run_at": null,
+   "detail": "Only symbols present in the archive as of the decision timestamp are eligible. The universe drifts 1,124 → 1,214 across the archive.",
+   "guards": "survivorship bias in every aggregate"
+  },
+  {
+   "id": "interval_required",
+   "name": "Every published result carries an interval",
+   "severity": "warning",
+   "status": "not_built",
+   "last_run_at": null,
+   "detail": "The exporter must refuse to write a point estimate without ci_low / ci_high, and must record how many configurations were searched.",
+   "guards": "false precision on this page"
+  },
+  {
+   "id": "split_adjustment",
+   "name": "Prices are split-adjusted",
+   "severity": "warning",
+   "status": "not_built",
+   "last_run_at": null,
+   "detail": "Open question F7: whether upstream Close_Price is split-adjusted is unverified. Needs a corporate-actions join, or an answer from Andrew, before any return is computed.",
+   "guards": "phantom returns on split dates"
+  }
+ ],
+ "feeds": [
+  {
+   "path": "data/results/build_status.json",
+   "consumed_by": "§08 · §09 · §10 · §11",
+   "status": "example",
+   "updated_at": null,
+   "note": "This file. Written by dashboard/emit_build_status.py once it is appended to scripts/daily.py::STEPS."
+  },
+  {
+   "path": "data/results/dashboard_data.json",
+   "consumed_by": "§01 · §03 · §04 · §05 · §06",
+   "status": "missing",
+   "updated_at": null,
+   "note": "The one file the two workstreams meet at. Archive health, benchmarks, IC, decay, the timing grid and the parsed hypothesis register. Every figure in those sections is illustrative until this exists."
+  },
+  {
+   "path": "data/results/last_run_status.json",
+   "consumed_by": "§08 job status",
+   "status": "ok",
+   "updated_at": "2026-09-02T11:35:11",
+   "note": "Written by scripts/daily.py. Holds only the latest run — append data/results/run_history.jsonl alongside it so the heartbeat strip has history."
+  },
+  {
+   "path": "data/zoltar.duckdb",
+   "consumed_by": "everything upstream",
+   "status": "ok",
+   "updated_at": "2026-09-02T11:35:11",
+   "note": "System of record. Point-in-time rank archive, validated."
+  },
+  {
+   "path": "docs/HYPOTHESES.md",
+   "consumed_by": "§06",
+   "status": "ok",
+   "updated_at": "2026-09-02T09:00:00",
+   "note": "Source of truth for the register. The exporter parses it into dashboard_data.json; the console currently renders a hard-coded copy until it does."
+  }
+ ],
+ "blockers": [
+  {
+   "id": "B1",
+   "title": "The 30-minute task is unverified end to end",
+   "severity": "critical",
+   "needs": "claude-code",
+   "since": "2026-09-02",
+   "detail": "schedule_harvest.ps1 exists, but nothing here proves the task is registered and firing. Append data/results/run_history.jsonl on every daily.py run, then read section 08: one full trading session of green beats is the acceptance test. Intraday history lost while this is unproven cannot be recovered."
+  },
+  {
+   "id": "B2",
+   "title": "Intraday bar source for honest exits",
+   "severity": "high",
+   "needs": "andrew",
+   "since": "2026-09-02",
+   "detail": "Evaluating a −1%/+2% bracket needs intraday OHLC, not snapshot closes. robin_stocks covers the ticker universe but is undocumented for bars; Alpaca is clean but has gaps and misses some Robinhood tickers. Decision: Alpaca with a documented gap list, or robin_stocks with a reconciliation test against Alpaca where both cover."
+  },
+  {
+   "id": "B3",
+   "title": "Three unverified upstream facts (FINDINGS §F7)",
+   "severity": "high",
+   "needs": "andrew",
+   "since": "2026-09-01",
+   "detail": "What Cap_Size actually means, whether Close_Price is split-adjusted, and which of the ~40 Strategy_Play_v*.py files is the live Streamlit engine. Each wrong guess silently corrupts a whole phase — the as-is baseline in section 03 is only a baseline if it replicates the right file."
+  },
+  {
+   "id": "B4",
+   "title": "Local historical data not yet handed over",
+   "severity": "normal",
+   "needs": "andrew",
+   "since": "2026-09-01",
+   "detail": "Additional history on the local drive would extend the archive behind 2025-10-01. Not on the critical path, but it raises power on every hypothesis, and several are currently underpowered."
+  }
+ ],
+ "activity": [
+  {"at": "2026-09-02T11:35:11", "kind": "run", "actor": "claude-code", "summary": "daily.py green — ranks, daily_ranks, run_sessions, expected_returns, shap all ok (309s).", "ref": null},
+  {"at": "2026-09-02T10:20:00", "kind": "decision", "actor": "claude-code", "summary": "run_ts demoted to descriptive metadata; available_at is now the only timestamp execution may key off (rule 5).", "ref": null},
+  {"at": "2026-09-02T09:40:00", "kind": "note", "actor": "claude-code", "summary": "harvest_daily_ranks was re-reading 228 blobs per tick while reporting inserted=0 — work-idempotency now enforced via harvest_manifest.", "ref": null},
+  {"at": "2026-09-02T09:00:00", "kind": "decision", "actor": "andrew", "summary": "Claude Code owns the backend; Cowork owns dashboard/. The two meet only at data/results/dashboard_data.json.", "ref": null}
+ ]
+}</script>
 <script>
 (function(){
 "use strict";
@@ -5127,6 +5842,16 @@ function heat(data){
 }
 
 /* ---------------- status strip ---------------- */
+/* `hours_since_last_run_ts` is computed from available_at when the exporter
+   says so - the field name predates the fix. Never label it run_ts blindly:
+   run_ts is forward-stamped for the evening retrain and can be in the future. */
+function freshLabel(h){
+  const basis=h.freshness_basis||"run_ts";
+  let s="since newest "+basis;
+  const rt=h.last_run_ts?new Date(h.last_run_ts):null;
+  if(rt&&!isNaN(rt)&&rt>new Date())s+=" \u00b7 run_ts stamped "+h.last_run_ts.slice(5,10);
+  return s;
+}
 function status(data){
   const h=data.archive_health;
   const daily=h.feeds.filter(f=>f.feed==="daily")[0];
@@ -5137,7 +5862,7 @@ function status(data){
   const items=[
     ["Harvester",failed?"FAILED":"HEALTHY",failed?"crit":"ok",
       failed?failed+" step(s) failed":"last run "+h.last_harvest_at.slice(11,16)],
-    ["Data age",stale.toFixed(1)+"h",staleCls,"since newest run_ts"],
+    ["Data age",stale.toFixed(1)+"h",staleCls,freshLabel(h)],
     ["Daily runs",daily.runs,"","from "+daily.first_run.slice(0,10)],
     ["Intraday runs",all.runs,"","from "+all.first_run.slice(0,10)],
     ["Expected returns",h.expected_returns.as_of_dates,"","as-of dates"],
@@ -5279,10 +6004,377 @@ function prompts(){
    `<div class="prompt"><h4>${x.t}</h4><p>${x.p}</p><span class="src">${x.s}</span></div>`).join("");
 }
 
+/* ================= ACTIVE BUILD MONITORING ================= */
+const BUILD_KEY="zoltar.build_status.v1";
+const BUILD_DOC="state/build_status";
+const BUILD_FILE="../data/results/build_status.json";
+let dbRefP=null;
+let BUILD=null;
+
+const tsShort=s=>s?String(s).replace("T"," ").slice(0,16):"—";
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function hoursSince(iso){
+  if(!iso) return null;
+  const t=Date.parse(iso); if(isNaN(t)) return null;
+  return (Date.now()-t)/36e5;
+}
+function agoText(iso){
+  const h=hoursSince(iso);
+  if(h==null) return "never run";
+  if(h<1) return Math.max(1,Math.round(h*60))+"m ago";
+  if(h<48) return h.toFixed(1)+"h ago";
+  return Math.round(h/24)+"d ago";
+}
+
+const JOB_STATE={
+  healthy:["ok","healthy"], done:["ok","done"], late:["warn","late"], partial:["warn","partial"],
+  failed:["crit","failed"], not_built:["crit","not built"], paused:["idle","paused"]
+};
+const PHASE_STATE={done:["ok","done"],in_progress:["info","in progress"],blocked:["crit","blocked"],queued:["idle","queued"]};
+const GATE_STATE={pass:["ok","pass"],fail:["crit","fail"],stale:["warn","stale"],not_built:["idle","not built"]};
+const FEED_STATE={ok:["ok","ok"],stale:["warn","stale"],missing:["crit","missing"],example:["warn","example"]};
+
+function pill(map,key,softenIfNotCritical){
+  const e=map[key]||["idle",String(key||"—").replace(/_/g," ")];
+  const cls=(softenIfNotCritical&&e[0]==="crit")?"idle":e[0];
+  return `<span class="pill ${cls}">${esc(e[1])}</span>`;
+}
+
+/* ---- gate banner ---- */
+function buildGate(b){
+  const g=b.gate||{state:"amber",headline:"No gate reported.",detail:""};
+  $("#buildgate").innerHTML=
+    `<div class="gate ${esc(g.state)}">
+       <div class="gk">${esc(g.state)}</div>
+       <div class="gt"><b>${esc(g.headline)}</b><br>${esc(g.detail||"")}</div>
+     </div>`;
+}
+
+/* ---- scheduled jobs ---- */
+function buildJobs(b){
+  const rows=(b.jobs||[]).map(j=>{
+    const beats=(j.beats||[]).map(v=>`<i class="${esc(v)}"></i>`).join("");
+    const soft=j.criticality!=="critical";
+    const last=j.last_run_at
+      ? `${tsShort(j.last_run_at)}<em>${agoText(j.last_run_at)}${j.last_duration_s!=null?" · "+j.last_duration_s.toFixed(0)+"s":""}</em>`
+      : `—<em>never run</em>`;
+    return `<div class="job">
+      <div>
+        <div class="jname">${esc(j.name)}
+          ${j.criticality==="critical"?'<span class="pill crit">critical</span>':""}
+          <span class="why">${esc(j.why||"")}</span></div>
+      </div>
+      <div><div class="beat" title="last 24 scheduled windows">${beats}</div>
+        <div class="jcad" style="margin-top:6px">${esc(j.schedule||"")}</div></div>
+      <div class="jlast">${last}</div>
+      <div class="jst">${pill(JOB_STATE,j.status,soft)}</div>
+    </div>`;
+  }).join("");
+  $("#jobs").innerHTML=rows||`<div class="job"><div class="jname">No jobs reported.</div></div>`;
+
+  const js=b.jobs||[];
+  const missing=js.filter(j=>j.status==="not_built").length;
+  const bad=js.filter(j=>j.status==="failed"||j.status==="late").length;
+  $("#jobNote").innerHTML=
+    `${js.length} job${js.length===1?"":"s"} on the board · `+
+    `<b style="color:${bad?"var(--crit)":"var(--ink)"}">${bad}</b> failing or late · `+
+    `<b style="color:${missing?"var(--warn)":"var(--ink)"}">${missing}</b> not yet built. `+
+    `A missed window on an append-only feed is recoverable; a missed window on the intraday buffer is not.`;
+}
+
+/* ---- phase progress ---- */
+function buildPhases(b){
+  const ps=b.phases||[];
+  $("#phaselist").innerHTML=ps.map((p,i)=>{
+    const dels=(p.deliverables||[]).map(d=>
+      `<div class="del ${esc(d.state)}"><span class="box"></span>
+        <span class="dn">${esc(d.name)}<span class="dp">${esc(d.path||"")}</span></span>
+        <span class="dk">${esc(d.state)}</span></div>`).join("");
+    const doneN=(p.deliverables||[]).filter(d=>d.state==="done").length;
+    return `<div class="prow ${esc(p.status)}">
+      <button class="phead" aria-expanded="false" aria-controls="pb${i}">
+        <span class="pid ${p.critical_path?"cp":""}">${esc(p.id)}</span>
+        <span class="pname">${esc(p.name)}<em>${esc(p.subtitle||"")}</em></span>
+        <span class="pbarwrap"><span class="pbar"><i style="width:${Math.max(0,Math.min(100,p.pct||0))}%"></i></span>
+          <span class="ppct">${p.pct||0}%</span></span>
+        <span class="pown">${esc(p.owner||"")}</span>
+        <span>${pill(PHASE_STATE,p.status)}</span>
+        <span class="chev"></span>
+      </button>
+      <div class="pbody" id="pb${i}" hidden>
+        <p class="pnote">${esc(p.note||"")}</p>
+        <div class="dels">${dels||'<div class="del"><span class="box"></span><span class="dn">No deliverables listed.</span><span class="dk"></span></div>'}</div>
+        <span class="srcline">${doneN}/${(p.deliverables||[]).length} deliverables complete${p.eta?" · target "+esc(p.eta):""}${p.critical_path?" · on the critical path":""}</span>
+      </div>
+    </div>`;
+  }).join("");
+  $("#phaselist").querySelectorAll(".phead").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const open=btn.getAttribute("aria-expanded")==="true";
+      btn.setAttribute("aria-expanded",String(!open));
+      document.getElementById(btn.getAttribute("aria-controls")).hidden=open;
+    });
+  });
+  const cur=ps.filter(p=>p.status==="in_progress");
+  const blocked=ps.filter(p=>p.status==="blocked");
+  $("#phaseNote").innerHTML=
+    `In progress: <b style="color:var(--ink)">${cur.length?cur.map(p=>esc(p.id)+" "+esc(p.name)).join(", "):"nothing"}</b>`+
+    (blocked.length?` · blocked: <b style="color:var(--crit)">${blocked.map(p=>esc(p.id)).join(", ")}</b>`:"")+
+    `. Critical path to the first actionable answer is 1a → 2 → 3 → 6.`;
+}
+
+/* ---- contract gates ---- */
+function buildGates(b){
+  const ts=(b.contract_tests||[]).slice().sort((a,c)=>{
+    const r={fail:0,stale:1,not_built:2,pass:3};
+    return (r[a.status]??9)-(r[c.status]??9);
+  });
+  $("#gatecards").innerHTML=ts.map(t=>{
+    const cls=t.status==="pass"?"pass":t.status==="fail"?"fail":t.status==="stale"?"stale":"";
+    return `<div class="gcard ${cls}">
+      <div class="gh"><h4>${esc(t.name)}</h4>${pill(GATE_STATE,t.status)}</div>
+      <p>${esc(t.detail||"")}</p>
+      <span class="gm">${esc(t.severity||"warning")} · guards ${esc(t.guards||"—")} · ${t.last_run_at?"last run "+tsShort(t.last_run_at):"never run"}</span>
+    </div>`;
+  }).join("")||`<div class="gcard"><h4>No gates reported.</h4></div>`;
+}
+
+/* ---- feed contract ---- */
+function buildFeeds(b){
+  const rows=(b.feeds||[]).map(f=>
+    `<tr><td>${esc(f.path.split("/").pop())}<span class="path">${esc(f.path)}</span></td>
+      <td style="text-align:left;font-family:var(--mono);font-size:11.5px;color:var(--ink-3)">${esc(f.consumed_by||"")}</td>
+      <td>${pill(FEED_STATE,f.status)}</td>
+      <td style="text-align:left;font-family:var(--sans);font-size:12px;color:var(--ink-2);max-width:34ch">${esc(f.note||"")}</td></tr>`).join("");
+  $("#feedtable").innerHTML=
+    `<thead><tr><th>File</th><th style="text-align:left">Feeds</th><th style="text-align:right">State</th>
+      <th style="text-align:left">What it carries</th></tr></thead><tbody>${rows}</tbody>`;
+}
+
+/* ---- blockers ---- */
+function buildBlockers(b){
+  const bs=b.blockers||[];
+  $("#blockers").innerHTML=bs.map(x=>
+    `<div class="blk ${x.severity==="critical"?"":"warn"}">
+      <div class="bh"><h4>${esc(x.id)} · ${esc(x.title)}</h4>
+        <span class="pill ${x.needs==="andrew"?"plan":"info"}">${x.needs==="andrew"?"needs you":"claude code"}</span></div>
+      <p>${esc(x.detail||"")}</p>
+      <span class="bm">${esc(x.severity||"")} · open since ${esc(x.since||"—")}</span>
+    </div>`).join("")||`<p class="note">Nothing blocked.</p>`;
+}
+
+/* ---- activity ---- */
+function buildActivity(b){
+  $("#activity").innerHTML=(b.activity||[]).slice(0,12).map(e=>
+    `<div class="ev ${esc(e.kind)}">
+      <div class="et">${tsShort(e.at)} · ${esc(e.actor||"")}${e.ref?' · <span class="eref">'+esc(e.ref)+"</span>":""}</div>
+      <div class="es">${esc(e.summary||"")}</div>
+    </div>`).join("")||`<p class="note">No activity recorded.</p>`;
+}
+
+/* ---- top strip tiles ---- */
+function buildStrip(b){
+  const js=b.jobs||[], ps=b.phases||[], gs=b.contract_tests||[];
+  const jbad=js.filter(j=>j.status==="failed"||j.status==="late"||j.status==="not_built").length;
+  const gbad=gs.filter(g=>g.status==="fail").length;
+  const gmiss=gs.filter(g=>g.status==="not_built"||g.status==="stale").length;
+  const cur=ps.find(p=>p.status==="in_progress")||ps.find(p=>p.status==="queued");
+  const gate=(b.gate&&b.gate.state)||"amber";
+  const items=[
+    ["Build gate",gate.toUpperCase(),gate==="green"?"ok":gate==="amber"?"warn":"crit",(b.gate&&b.gate.headline)||""],
+    ["Active phase",cur?cur.id:"—","",cur?cur.name.slice(0,34):"nothing in progress"],
+    ["Jobs at risk",jbad+" / "+js.length,jbad?"crit":"ok","failed, late or not built"],
+    ["Gates failing",gbad,gbad?"crit":"ok",gmiss+" more never run or stale"],
+    ["Blocked",(b.blockers||[]).length,(b.blockers||[]).length?"warn":"ok",
+      (b.blockers||[]).filter(x=>x.needs==="andrew").length+" need you"],
+    ["Status as of",tsShort(b.generated_at).slice(5),"",b.is_example?"example scaffold":"from the repo"]
+  ];
+  $("#buildstrip").innerHTML=items.map(([k,v,c,s])=>
+    `<div class="stat"><div class="k">${k}</div><div class="v ${c||""}">${esc(v)}</div><div class="s">${esc(s)}</div></div>`
+  ).join("");
+}
+
+/* ---- render + persistence ---- */
+function renderBuild(b,source){
+  BUILD=b;
+  buildStrip(b); buildGate(b); buildJobs(b); buildPhases(b);
+  buildGates(b); buildFeeds(b); buildBlockers(b); buildActivity(b);
+  $("#buildsrc").textContent="Source: "+source+" · generated "+tsShort(b.generated_at)+
+    " · schema v"+(b.schema_version||"?");
+  const bar=$("#seedbar");
+  if(b.is_example&&bar&&bar.hidden===false&&!bar.dataset.buildnote){
+    bar.dataset.buildnote="1";
+    bar.innerHTML+=" Build monitor (§08–§11) is on an example scaffold too — paste "+
+      "<code>build_status.json</code> under &ldquo;Update this monitor&rdquo;.";
+  }
+}
+
+function useDb(){
+  if(dbRefP) return dbRefP;
+  dbRefP=(typeof claude!=="undefined"&&claude&&typeof claude.use==="function")
+    ? claude.use("db").catch(()=>null) : Promise.resolve(null);
+  return dbRefP;
+}
+async function saveBuild(obj){
+  let where=[];
+  try{localStorage.setItem(BUILD_KEY,JSON.stringify(obj));where.push("this browser");}catch(e){}
+  const db=await useDb();
+  if(db){
+    try{ await db.doc(BUILD_DOC).set({payload:JSON.stringify(obj),saved_at:new Date().toISOString()});
+      where.unshift("artifact store"); }catch(e){}
+  }
+  return where.length?where.join(" + "):"nowhere — storage unavailable";
+}
+async function loadBuild(){
+  const seed=JSON.parse(document.getElementById("seed-build").textContent);
+  if(typeof window.__ZOLTAR_BUILD__==="object"&&window.__ZOLTAR_BUILD__){
+    renderBuild(window.__ZOLTAR_BUILD__,"build_status.js loaded beside this page"); return;
+  }
+  try{
+    const r=await fetch(BUILD_FILE,{cache:"no-store"});
+    if(r.ok){const d=await r.json(); renderBuild(d,"build_status.json in the repo"); return;}
+  }catch(e){}
+  const db=await useDb();
+  if(db){
+    try{
+      const snap=await db.doc(BUILD_DOC).get();
+      if(snap&&snap.exists&&snap.data&&snap.data.payload){
+        renderBuild(JSON.parse(snap.data.payload),"artifact store · saved "+tsShort(snap.data.saved_at));
+        return;
+      }
+    }catch(e){}
+  }
+  try{
+    const l=localStorage.getItem(BUILD_KEY);
+    if(l){renderBuild(JSON.parse(l),"saved in this browser"); return;}
+  }catch(e){}
+  renderBuild(seed,"example scaffold — nothing loaded yet");
+}
+
+const CC_BRIEF=
+"Read docs/DASHBOARD_CONTRACT.md in this repo, then build scripts/emit_build_status.py so it writes "+
+"data/results/build_status.json on the schema in that doc.\n\n"+
+"It must report, from real state rather than hand-edited values:\n"+
+"1. jobs[] - every scheduled job with its last run, duration, error and a beats[] array of the last 24 "+
+"scheduled windows (ok / miss / err / na), read from the job's own run log.\n"+
+"2. phases[] - phase status and pct, with deliverables[] whose state is derived from whether the file "+
+"exists and its tests pass, not from a hard-coded list.\n"+
+"3. contract_tests[] - one entry per gate, status from the last pytest run (pass / fail / stale / not_built).\n"+
+"4. feeds[] - for each file this console consumes, whether it exists and when it was written.\n"+
+"5. blockers[] and activity[] - activity from git log plus the run log.\n"+
+"6. gate - red if any blocker-severity gate fails or a critical job is not running, amber if any gate is "+
+"stale or not built, green otherwise.\n\n"+
+"Run the emitter after every harvest and every commit. Never hand-edit build_status.json - if a field "+
+"cannot be derived, emit null and say so in the note rather than guessing.";
+
+function wireIngest(){
+  const box=$("#ingestbox"), msg=$("#ingestmsg");
+  const say=(t,cls)=>{msg.className="msg "+(cls||"");msg.textContent=t;};
+  $("#ingestload").addEventListener("click",async()=>{
+    let obj;
+    try{obj=JSON.parse(box.value);}
+    catch(e){say("That is not valid JSON — "+e.message,"bad");return;}
+    if(!obj||typeof obj!=="object"||!Array.isArray(obj.jobs)||!Array.isArray(obj.phases)){
+      say("Parsed, but it has no jobs[] and phases[] — check it is build_status.json.","bad");return;
+    }
+    say("Saving…");
+    const where=await saveBuild(obj);
+    renderBuild(obj,"pasted "+tsShort(new Date().toISOString()));
+    say("Loaded and saved to "+where+".","ok");
+    box.value="";
+  });
+  $("#ingestcopy").addEventListener("click",async()=>{
+    try{await navigator.clipboard.writeText(CC_BRIEF);say("Brief copied — paste it into Claude Code.","ok");}
+    catch(e){box.value=CC_BRIEF;say("Clipboard blocked — the brief is in the box above, copy it from there.","bad");}
+  });
+  $("#ingestclear").addEventListener("click",async()=>{
+    try{localStorage.removeItem(BUILD_KEY);}catch(e){}
+    const db=await useDb();
+    if(db){try{await db.doc(BUILD_DOC).delete();}catch(e){}}
+    renderBuild(JSON.parse(document.getElementById("seed-build").textContent),"example scaffold");
+    say("Reset to the example scaffold.","ok");
+  });
+}
+
+/* ---------------- sections that are not yet measured ---------------- */
+/* The exporter OMITS a section it cannot measure honestly - benchmarks needs
+   Phase 3, signal_health needs Phase 4, timing needs Phase 6 - and names the
+   reason in `sections_absent`. Two failure modes to avoid, and the second is
+   the dangerous one:
+     1. Rendering a zero, an empty chart or the illustrative seed in place of a
+        missing measurement is a claim we have not earned.
+     2. Reading through the missing key throws, and one uncaught throw blanks
+        EVERY section, including the ones that are real. A page that goes blank
+        when a phase is unbuilt is worse than no page: it looks like a bug in
+        the console rather than an honest gap in the work.
+   So every renderer is wrapped. It runs only when its inputs are present, and
+   otherwise its own containers are replaced in place with the reason. The
+   section header, its prose and the nav entry stay - the plan stays visible. */
+const NOT_MEASURED={
+  status:        {needs:["archive_health"], at:["#statusstrip"]},
+  recommendation:{needs:["timing"],         at:["#rec"]},
+  equity:        {needs:["benchmarks"],     at:["#equity"]},
+  strategyTable: {needs:["benchmarks"],     at:["#strategyTable","#benchNote"]},
+  icHorizon:     {needs:["signal_health"],  at:["#icHorizon","#icNote"]},
+  icSegment:     {needs:["signal_health"],  at:["#icSegment","#segLegend"]},
+  decay:         {needs:["timing"],         at:["#decay","#decayNote"]},
+  heat:          {needs:["timing"],         at:["#heat","#heatNote"]}
+};
+function nmEsc(t){return String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function nmPanel(keys,data,err){
+  const reasons=data.sections_absent||{};
+  const why=keys.map(k=>reasons[k]).filter(Boolean);
+  const d=document.createElement("div");
+  d.setAttribute("style","border:1px dashed var(--line,#2a2f3a);border-radius:8px;padding:18px 20px;"+
+    "margin:10px 0;background:rgba(255,255,255,.02)");
+  const tag=err?"FEED ERROR":"NOT YET MEASURED";
+  const body=err
+    ? "<p>This section's data is present but could not be rendered: <code>"+nmEsc(err)+"</code>. "+
+      "The rest of the page is unaffected.</p>"
+    : (why.length ? "<p>"+why.map(nmEsc).join("</p><p>")+"</p>"
+                  : "<p>The feed does not carry "+keys.map(k=>"<code>"+nmEsc(k)+"</code>").join(", ")+" yet.</p>");
+  d.innerHTML='<div style="font:600 10px/1 \'IBM Plex Mono\',monospace;letter-spacing:.14em;'+
+    'color:'+(err?"var(--bad,#e0644a)":"var(--ink-4,#7a8494)")+';margin-bottom:10px">'+tag+'</div>'+
+    '<div style="color:var(--ink-3,#9aa3b2);font-size:13px;line-height:1.55">'+body+'</div>';
+  return d;
+}
+/* One panel per renderer, not one per anchor: a renderer that fills three
+   containers would otherwise print the same reason three times. The first
+   anchor becomes the panel; the rest are removed. */
+function nmDrop(sels,panel){
+  let placed=false;
+  sels.forEach(sel=>{
+    const n=document.querySelector(sel);
+    if(!n||!n.parentNode)return;
+    if(!placed){n.parentNode.replaceChild(panel,n);placed=true;}
+    else n.parentNode.removeChild(n);
+  });
+}
+
 /* ---------------- boot ---------------- */
 function render(data,source){
-  status(data); recommendation(data); equity(data); strategyTable(data);
-  icHorizon(data); icSegment(data); decay(data); heat(data); register(); prompts();
+  const R={status,recommendation,equity,strategyTable,icHorizon,icSegment,decay,heat};
+  Object.keys(R).forEach(name=>{
+    const spec=NOT_MEASURED[name];
+    const missing=spec.needs.filter(k=>!data[k]);
+    if(missing.length){nmDrop(spec.at,nmPanel(missing,data));return;}
+    try{R[name](data);}
+    catch(e){
+      console.error("[console] "+name+" failed:",e);
+      nmDrop(spec.at,nmPanel(spec.needs,data,e&&e.message||String(e)));
+    }
+  });
+  register(); prompts();
+  const absent=Object.keys(data.sections_absent||{});
+  if(absent.length){
+    const b=$("#seedbar");
+    if(b){b.hidden=false;
+      b.innerHTML="<b>PARTIAL FEED</b> \u2014 "+absent.length+" section(s) not yet measured: <code>"+
+        absent.map(nmEsc).join("</code>, <code>")+"</code>. Everything else on this page is live. "+
+        "A section is absent because the phase that produces it is not built, never because a number came out zero.";
+    }
+  }
   $("#genstamp").textContent=data.generated_at.replace("T"," ").slice(0,16);
   $("#schemav").textContent=data.schema_version;
   $("#srcstamp").textContent=source;
@@ -5293,9 +6385,16 @@ function render(data,source){
   }
 }
 const seed=JSON.parse(document.getElementById("seed-data").textContent);
-fetch("../data/results/dashboard_data.json",{cache:"no-store"})
-  .then(r=>r.ok?r.json():Promise.reject())
-  .then(d=>render(d,"live · dashboard_data.json"))
-  .catch(()=>render(seed,"seed data"));
+if(typeof window.__ZOLTAR_DATA__==="object"&&window.__ZOLTAR_DATA__){
+  render(window.__ZOLTAR_DATA__,"dashboard_data.js beside this page");
+}else{
+  fetch("../data/results/dashboard_data.json",{cache:"no-store"})
+    .then(r=>r.ok?r.json():Promise.reject())
+    .then(d=>render(d,"live · dashboard_data.json"))
+    .catch(()=>render(seed,"seed data"));
+}
+wireIngest();
+loadBuild();
 })();
 </script>
+

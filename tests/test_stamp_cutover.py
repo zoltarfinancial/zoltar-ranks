@@ -47,28 +47,98 @@ def test_placeholder_branch_not_silently_dead(con):
     it is a decision someone makes, not something inferred from an empty column
     months later.
 
-    When it fires: confirm the cutover happened, then either retire the
+    Queries `ranks_pit` directly, NOT `evening_retrains`. It used to query the
+    view, which was wrong twice over: the placeholder is not an evening retrain
+    (see below), and once the view stopped carrying placeholders this test would
+    have reported the branch dead on day three while it was still very much alive.
+
+    When it fires: confirm the stamp convention changed, then either retire the
     `placeholder` branch or narrow this test to the pre-cutover window. Do not
     delete it.
     """
     rows = con.execute("""
         SELECT CAST(available_at AS DATE) d,
-               sum(CASE WHEN CAST(run_ts AS TIME) = TIME '00:00:00' THEN 1 ELSE 0 END) ph
-        FROM evening_retrains
+               count(DISTINCT CASE WHEN run_kind = 'placeholder' THEN run_ts END) ph
+        FROM ranks_pit
         WHERE available_at >= ?
         GROUP BY 1 ORDER BY 1
     """, [CUTOVER]).fetchall()
     if len(rows) < DEAD_BRANCH_DAYS:
-        pytest.skip(f"only {len(rows)} post-cutover day(s) of evening retrains; "
+        pytest.skip(f"only {len(rows)} post-cutover day(s) in the archive; "
                     f"need {DEAD_BRANCH_DAYS} before the branch can be called dead")
     streak = 0
     for _, ph in rows:
         streak = streak + 1 if ph == 0 else 0
     assert streak < DEAD_BRANCH_DAYS, (
-        f"No 00:00:00 evening stamp for {streak} consecutive days after "
+        f"No 00:00:00 stamp for {streak} consecutive days after "
         f"{CUTOVER:%Y-%m-%d}. The forward convention has ended and "
         f"classify_run()'s `placeholder` branch is now dead code. Confirm, then "
         f"retire the branch or scope this test to the pre-cutover window.")
+
+
+def test_placeholder_is_a_duplicate_pointer_not_a_model_output(con):
+    """`run_kind='placeholder'` duplicates an earlier real run. MEASURED 2026-09-02.
+
+    The midnight row is an exact copy of the publishing blob's newest intraday
+    re-score, restamped to the next midnight and overwritten every ~30 minutes.
+    Three commits of the same file on 2026-09-02 (10:54 / 11:26 / 13:39) agreed
+    0/1163 on those rows and each matched its OWN newest re-score 1163/1163.
+
+    This pins the behaviour so that if upstream ever makes the midnight build a
+    real, distinct scoring, we find out here rather than by silently gaining a
+    strategy vintage that never existed.
+    """
+    #: The archive's earliest placeholder. Its source run predates our coverage,
+    #: so there is nothing here for it to duplicate. Not an exception to the
+    #: rule -- an absence of evidence, and the only one.
+    KNOWN_UNVERIFIABLE = {dt.datetime(2026, 7, 21, 0, 0)}
+
+    stamps = [r[0] for r in con.execute(
+        "SELECT DISTINCT run_ts FROM ranks WHERE run_kind='placeholder' ORDER BY 1"
+    ).fetchall()]
+    if not stamps:
+        pytest.skip("no placeholder runs in the archive")
+
+    not_duplicates = []
+    for ts in stamps:
+        if ts in KNOWN_UNVERIFIABLE:
+            continue
+        best = con.execute("""
+            SELECT b.run_ts, count(*) AS shared,
+                   sum(CASE WHEN a.score IS NOT DISTINCT FROM b.score THEN 1 ELSE 0 END) AS same
+            FROM ranks a JOIN ranks b
+              ON a.symbol = b.symbol AND a.risk_bucket = b.risk_bucket
+            WHERE a.run_ts = ? AND b.run_kind <> 'placeholder'
+              AND b.run_ts < a.run_ts AND b.run_ts > a.run_ts - INTERVAL 3 DAY
+            GROUP BY b.run_ts
+            ORDER BY same DESC, b.run_ts DESC LIMIT 1""", [ts]).fetchone()
+        if not best or not best[1] or best[2] != best[1]:
+            not_duplicates.append((str(ts), best))
+
+    assert not not_duplicates, (
+        "A placeholder run is NOT an exact duplicate of an earlier real run: "
+        f"{not_duplicates[:5]}. Either upstream changed what the midnight build "
+        f"is, or the archive captured a version we have not seen before. Decide "
+        f"which before treating these rows as anything.")
+
+
+def test_placeholder_never_reaches_evening_retrains(con):
+    """The population fix that `test_no_third_stamping_convention` depends on.
+
+    `evening_retrains` used to union `nightly` and `placeholder` on F4's
+    "one event, three names". That was wrong: the placeholder is the intraday
+    latest-pointer, and the evening retrain is a separate artifact published
+    ~19:36. Pooling them made H12b a blend of two processes and made the
+    third-convention canary fire on a row that was never an evening retrain.
+    """
+    leaked = con.execute("""
+        SELECT DISTINCT run_ts FROM evening_retrains
+        WHERE run_kind = 'placeholder' OR CAST(run_ts AS TIME) = TIME '00:00:00'
+        ORDER BY 1 LIMIT 10""").fetchall()
+    assert not leaked, (
+        f"placeholder runs leaked back into evening_retrains: {leaked}. They "
+        f"duplicate an intraday re-score; counting them as a retrain vintage "
+        f"double-counts a scoring already in the archive under its true stamp.")
 
 
 def test_no_third_stamping_convention(con):

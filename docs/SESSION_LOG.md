@@ -6,6 +6,82 @@ decisions, surprises, and anything you had to work around; not routine progress.
 
 ---
 
+## 2026-09-02 (round 2) — `placeholder` settled; suite green without loosening
+
+Handoff round 2. **Suite is 125 passed, 5 skipped, 0 failed** -- the first fully
+green run today, and not by relaxing anything.
+
+- **🔴 SETTLED: `run_kind='placeholder'` is a forward-stamped "latest" POINTER,
+  not a model output and not the evening retrain.** Round 1 deferred the payload
+  comparison; this round ran it and it is unambiguous. The midnight row
+  `2026-09-03 00:00:00` matched the intraday re-score `2026-09-02 10:52:07`
+  **2326/2326 on score and 2326/2326 on close_price** (corr 1.0), while matching
+  the evening retrain 0/2326 and that morning's build 0/2326. Archive-wide **31
+  of 32** placeholder runs exactly duplicate an earlier real run.
+
+- **It is also NOT STABLE, which is the more serious half.** Across three commits
+  of the same file on 2026-09-02 (10:54 / 11:26 / 13:39) the midnight rows agreed
+  **0/1163** with each other, and each matched **its own** blob's newest re-score
+  1163/1163. Upstream rewrites that row every ~30 minutes.
+  **So F1's "scores are never restated" does not hold for this run timestamp.**
+  `ranks` is append-only on `(run_ts, symbol, risk_bucket)`, so we froze whichever
+  version we harvested first and silently dropped the rest. F1 was measured on the
+  `daily` feed and remains true there. The midnight `run_ts` is a label, not an
+  observation time -- and every placeholder row double-counts a scoring already in
+  the archive under its true stamp.
+
+- **`evening_retrains` now excludes placeholders** (`run_kind='nightly' AND
+  hour(run_ts) >= 18`): 138 genuine runs, down from 170. H12b is no longer a blend
+  of two processes. Two new canaries pin it:
+  `test_placeholder_is_a_duplicate_pointer_not_a_model_output` and
+  `test_placeholder_never_reaches_evening_retrains`.
+
+- **`test_placeholder_branch_not_silently_dead` was quietly broken by the view
+  fix** and is rewritten to query `ranks_pit` directly. It used to count 00:00:00
+  stamps *inside* `evening_retrains`; once the view stopped carrying them it would
+  have declared the branch dead on day three while it was very much alive. Worth
+  remembering: fixing a view can silently disarm a canary that reads it.
+
+### The stamp_cutover diagnosis Cowork asked for: the ASSERTION, and I overstated round 1
+
+**The assertion's logic is right; its population was wrong.** It fired on exactly
+one run -- the midnight pointer -- which was never an evening retrain. That came
+from `evening_retrains`, not from the test. Fixing the population is a correction,
+not a loosening: the test now has **more** power, and is armed for tonight.
+
+**And round 1's headline was too strong.** I wrote "THE 2026-09-02 STAMP CUTOVER
+DID NOT HAPPEN". The evidence was `all_*_PROD_20260903_000000.pkl` still being
+forward-stamped -- but that is the *pointer*, not the evening retrain, so it shows
+the pointer's stamping continued and says nothing about the convention in
+question. The other file I cited was produced 09-01, before the cutover. **Zero
+post-cutover evening retrains exist**; the first lands ~19:36 tonight and is the
+first real test. Corrected in FINDINGS F4 rather than quietly edited.
+
+### Round 2 mechanical tasks
+
+- **T7 `hours_since_last_run_ts` -> `hours_since_fresh`, feed `schema_version`
+  1 -> 2.** The old key stays one version as a **deprecated alias** so the console
+  does not break mid-rename; remove in v3 on Cowork's word. The point stands: v1
+  computed it correctly and named it after the trap, so any consumer not also
+  reading `freshness_basis` would read the name and believe it.
+- **`data/results/dashboard_data.js` written on every export**, from the same
+  payload object in the same call as the JSON, so the two cannot disagree.
+- **Stale `dashboard/build_status.js` deleted**; `dashboard/` now tracked
+  (`emit_build_status.py`, `BUILD_MONITOR.md` were untracked -- a fresh clone
+  could not run `--check`). Generated feeds stay gitignored.
+- **T8 proof deliverable** on phase 1a. Phase 7 got a **pinned todo instead of a
+  proof block**: `proof` only supports `{job, full_session}`, so pointing it at
+  `harvest_intraday` would have turned "first hypothesis resolved" green when the
+  *harvest* ran. An honest override beats a proof that proves the wrong thing.
+- **T4 and T6 unchanged**, both carried deliberately -- see round 1.
+
+### `--check`: 2 blocking, 1 warning, 15 ok
+
+Both round-2 warnings cleared. The 2 blocking rows are still the clock
+(`harvest_premarket` / `harvest_evening` have no beat yet) and must not be forced.
+
+---
+
 ## 2026-09-02 (evening) — build monitor synced; 10 blocking -> 2
 
 Worked `docs/HANDOFF_CLAUDE_CODE.md`. `emit_build_status.py --check` went from
@@ -105,7 +181,8 @@ a clock, not a code change.
 ### Reporting back to Cowork
 
 - `--check`: **2 blocking, 1 warning, 15 ok** (both blockers are the clock, above).
-- emitter line: `dataesultsuild_status.json  gate=AMBER  Running, but not yet
+- emitter line: `data
+esultsuild_status.json  gate=AMBER  Running, but not yet
   trustworthy - 2 blocker gate(s) never run or stale; 2 high-priority job(s) late
   or failed.`
 - Manifest corrections: Phase 3/4 module names, Phase 2 anchor deliverables,

@@ -118,8 +118,12 @@ overconfidence the plan exists to prevent.
 
 Four additive changes. No existing field changed shape.
 
-- **`archive_health.hours_since_last_run_ts` is computed from `available_at`,
-  not from `run_ts`**, and `freshness_basis` records that. This is not a
+- **`archive_health.hours_since_fresh`** (schema v2; was
+  `hours_since_last_run_ts` in v1, kept one version as a deprecated alias)
+  **is computed from `available_at`, not from `run_ts`**, and `freshness_basis`
+  records that. The rename matters as much as the computation did: v1 computed
+  it correctly and named it after the trap, so any consumer that did not also
+  read `freshness_basis` would read the name and believe it. This is not a
   preference — upstream forward-stamps the evening retrain, so the newest
   `run_ts` in the archive is routinely in the **future** (`2026-09-03 00:00:00`
   observed while it was 2026-09-02). Computed from `run_ts` this field goes
@@ -136,6 +140,17 @@ Four additive changes. No existing field changed shape.
   → `0.157`). A loose numeric search would read `TBD (n~64 paired days)` as an
   MDE of `64` — not a missing value but a fabricated one, which is worse,
   because it renders as a real number.
+
+### Schema v2 — 2026-09-02
+
+- `hours_since_last_run_ts` → **`hours_since_fresh`**. The old key is still
+  emitted as a **deprecated alias** carrying the identical value, so the console
+  does not break mid-rename. Remove it in v3 once Cowork confirms.
+- **`data/results/dashboard_data.js`** is written beside the JSON on every
+  export, from the **same payload object in the same call**, so the two cannot
+  disagree: `window.__ZOLTAR_DATA__ = {...};`. A `<script src>` works over
+  `file://` where `fetch` does not. Both feeds live in `data/results/` —
+  nothing but Cowork writes under `dashboard/`.
 
 Currently emitted: `archive_health`, `hypotheses`, `shap_drift`.
 `shap_drift` is capped at the newest 60 snapshots x top 10 features per segment

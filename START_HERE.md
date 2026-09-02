@@ -193,62 +193,34 @@ Two things deliberately left undone, both recorded in `docs/SESSION_LOG.md`:
 today would pass because the code does not exist), and `monitoring/`, whose
 deletion the sandbox blocked -- **Andrew: `Remove-Item -Recurse -Force monitoring`**.
 
-### 🔴 STOP -- a canary is failing, and it must not be silenced
+### ✅ The suite is green, and `placeholder` is settled
 
-`tests/test_stamp_cutover.py::test_no_third_stamping_convention` **FAILS** as of
-2026-09-02. Suite is **1 failed, 42 passed, 5 skipped**. Per rule 9 it was left
-failing and is reported, not loosened.
+**`pytest tests -q` is 125 passed, 5 skipped, 0 failed.** The stamp canary that
+was failing is fixed -- by correcting the assertion's POPULATION, not by
+loosening it. Read `docs/FINDINGS.md` F4 before touching any of this.
 
-**The 2026-09-02 stamp cutover did not happen.** Upstream is still forward-stamping
-the evening/placeholder class after the cutover date:
+**`run_kind='placeholder'` is a forward-stamped "latest" POINTER.** Measured
+2026-09-02: the midnight row is an exact duplicate of the publishing blob's
+newest intraday re-score (2326/2326 on score and on close_price), and upstream
+**rewrites it every ~30 minutes** -- three commits of the same file agreed 0/1163
+with each other, each matching its own blob's newest re-score. It is not the
+evening retrain, and not a model output.
 
-| file | build stamp | committed | forward by |
-|---|---|---|---|
-| `all_*_PROD_20260903_000000.pkl` | 2026-09-03 00:00:00 | **2026-09-02 08:41:57** | 15.3 h |
-| `all_*_PROD_20260902_193449.pkl` | 2026-09-02 19:34:49 | 2026-09-01 19:36:25 | 24.0 h |
+Three things that follow, all load-bearing:
 
-No honestly-stamped post-cutover evening file exists. The only post-cutover files
-whose `build_stamp <= committed_at` are the **morning** builds
-(`20260902_080544`), and morning builds were never forward-stamped under either
-convention -- so they are not evidence of a cutover.
+1. **F1's "scores are never restated" does NOT hold for this run timestamp.**
+   `ranks` is append-only, so we kept whichever version we harvested first and
+   dropped every later rewrite. The midnight `run_ts` is a **label**, not an
+   observation time. F1 stands for the `daily` feed, where it was measured.
+2. **Every placeholder row double-counts** a scoring already in the archive under
+   its true stamp. Exclude them from anything that groups by run.
+3. **`evening_retrains` now excludes them** -- 138 genuine `nightly` runs. **H12b
+   is defined against that view** and is no longer a blend of two processes.
 
-Two consequences, neither of them acted on yet:
-
-1. **`ranks_pit.stamp_convention` is a calendar cutoff, not a measurement.** It
-   labels everything with `available_at >= 2026-09-02` as `honest` regardless of
-   actual stamp behaviour, which is how run `2026-09-03 00:00:00` is currently
-   *simultaneously* `stamp_convention='honest'` and `stamp_is_forward=true`. Six of
-   the seven `honest` runs are today's morning/intraday runs, which never had a
-   forward stamp to begin with. The column measures **era**, not **convention**.
-2. **The first post-cutover AFTERCLOSE has not landed yet.** It is 11:25 CT;
-   evening retrains arrive 19:00-21:18 CT. Check again this evening before drawing
-   any conclusion about Andrew's intent -- the cutover may simply be scheduled for
-   tonight's build. Do not change `CUTOVER` or the view until an evening file has
-   actually landed post-cutover.
-
-### 🔴 `placeholder` is a MORNING artifact, not the evening retrain
-
-Measured 2026-09-02 against `harvest_manifest`, and it **contradicts FINDINGS F4**.
-
-All **32** midnight-stamped (`*_000000.pkl`) daily_ranks files were committed
-between **08:16 and 14:46**, 28 of 32 in the 08:00-09:59 window -- the morning
-build window, never the evening. And the arithmetic is decisive on the newest
-one: `all_*_PROD_20260903_000000.pkl` was committed **2026-09-02 08:41:57**, so it
-cannot be the 2026-09-02 evening retrain, which does not exist until ~19:36 that
-evening.
-
-The evening retrain already has its own separate forward-stamped form
-(`20260902_193449.pkl`, build stamp = the *next* day's evening time). So on a given
-day there are **two distinct forward-stamped artifacts**, and `run_kind='nightly'`
-and `run_kind='placeholder'` are **not** the same event.
-
-F4's "one event, three names" therefore holds for `nightly` + `AFTERCLOSE UPDATE`
-but **not** for `placeholder`, and the `evening_retrains` view unions both -- so it
-currently mixes two processes, which lands directly on **H12b**.
-
-**Not changed. Reported.** The decisive confirmation is a content comparison: does
-a midnight-stamped file's payload equal the prior evening retrain's or that
-morning's build? Run that before editing the view or F4.
+**The stamp cutover is still UNTESTED.** No post-cutover evening retrain has
+landed; the first arrives ~19:36 and `test_no_third_stamping_convention` is armed
+for it. An earlier version of this file said the cutover "did not happen" -- that
+was overstated, and is corrected in F4.
 
 
 ## Do this first
@@ -260,9 +232,7 @@ machine is still healthy, then start Phase 2:
 cd C:\Shared\ClaudeWork\zoltar-ranks
 .\.venv\Scripts\Activate.ps1
 
-pytest tests -q                                              # expect 1 FAILED, 42 passed, 5 skipped
-                                                             # the 1 failure is the stamp canary above --
-                                                             # read it, do not silence it (rule 9)
+pytest tests -q                                              # expect 125 passed, 5 skipped
 Get-ScheduledTask -TaskName ZoltarRanksHarvest | Get-ScheduledTaskInfo   # LastTaskResult must be 0
 python scripts\daily.py                                      # must insert ZERO rows
 ```

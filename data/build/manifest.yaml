@@ -116,6 +116,12 @@ phases:
       # whether or not daily.py ever calls it. The test can, so the gate is the test.
       - {name: Heartbeat + emitter wired into daily.py, path: tests/test_daily.py, kind: test, test: test_daily}
       - {name: Build manifest mirrors PLAN.md, path: data/build/manifest.yaml, kind: doc}
+      # Behaviour, not a file. Every other 1a deliverable is a path that exists,
+      # so pct derived to 100% while harvest_intraday had 6 of 7 windows missed.
+      # This cannot be made green by writing a file -- only by the harvest running.
+      - name: One full trading session of green beats
+        kind: proof
+        proof: {job: harvest_intraday, full_session: true}
 
   - id: "2"
     name: Market data layer
@@ -190,6 +196,12 @@ phases:
     deliverables:
       - {name: Register, path: docs/HYPOTHESES.md, kind: doc}
       - {name: Register exporter into the console, path: src/zoltar_ranks/analysis/export_dashboard_data.py, kind: code}
+      # Two documents existing is not a testing loop. H9 and H10 are the
+      # falsification tests for the whole premise and neither has run. There is
+      # no job whose beats prove "a hypothesis was resolved", so this is pinned
+      # rather than given a `proof` block that would go green on the harvest.
+      - {name: "First hypothesis resolved (H9/H10)", path: docs/HYPOTHESES.md,
+         kind: doc, state_override: todo}
 
   - id: "8"
     name: Research console + automated daily job

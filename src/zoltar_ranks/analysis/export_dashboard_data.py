@@ -34,7 +34,7 @@ from zoltar_ranks.db import duckdb_io
 
 log = logging.getLogger("export_dashboard_data")
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 REPO_ROOT = Path(__file__).resolve().parents[3]
 
 #: Bound the SHAP payload. 327 snapshots x 3 segments x every feature would be a
@@ -103,7 +103,14 @@ def archive_health(con, cfg: Config) -> dict:
         # From available_at, NOT run_ts. See the module docstring: the newest
         # run_ts is routinely in the future because upstream forward-stamps the
         # evening retrain, which would make this negative and disarm the alarm.
-        "hours_since_last_run_ts": hours,
+        #
+        # The name matters as much as the computation. `hours_since_last_run_ts`
+        # was computed correctly and named after the trap, so any consumer that
+        # did not also read `freshness_basis` would read the name and believe it.
+        # schema_version 2 renames it; the old key is a DEPRECATED ALIAS carried
+        # for one version so the console does not break mid-rename.
+        "hours_since_fresh": hours,
+        "hours_since_last_run_ts": hours,   # DEPRECATED alias, remove in v3
         "freshness_basis": "available_at",
         "expected_returns": {"as_of_dates": er[0], "first": _iso(er[1]), "last": _iso(er[2])},
         "shap": {"snapshots": shap_n, "segments": segments},
@@ -222,17 +229,32 @@ def build_payload(cfg: Config) -> dict:
     return payload
 
 
-def write_atomic(path: Path, payload: dict) -> None:
-    """Temp file then replace, so the dashboard never reads a half-written file."""
+def _write_text_atomic(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, tmp = tempfile.mkstemp(dir=str(path.parent), suffix=".tmp")
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as fh:
-            json.dump(payload, fh, indent=2)
+            fh.write(text)
         os.replace(tmp, path)
     except BaseException:
         Path(tmp).unlink(missing_ok=True)
         raise
+
+
+def write_atomic(path: Path, payload: dict) -> None:
+    """Temp file then replace, so the dashboard never reads a half-written file."""
+    _write_text_atomic(path, json.dumps(payload, indent=2))
+
+
+def write_js(path: Path, payload: dict) -> None:
+    """The `file://` feed: a `<script src>` works where `fetch` does not.
+
+    Written from the SAME payload object as the JSON, in the same call, so the
+    two can never disagree. Both live in `data/results/` -- generated feeds are
+    the backend's to write, and nothing but Cowork writes under `dashboard/`.
+    """
+    _write_text_atomic(path, "window.__ZOLTAR_DATA__ = "
+                       + json.dumps(payload, indent=2) + ";\n")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -247,8 +269,9 @@ def main(argv: list[str] | None = None) -> int:
     payload = build_payload(cfg)
     out = cfg.results_dir / "dashboard_data.json"
     write_atomic(out, payload)
-    log.info("wrote %s: %d feed row(s), %d hypothesis row(s), %d shap row(s); "
-             "absent: %s", out,
+    write_js(cfg.results_dir / "dashboard_data.js", payload)
+    log.info("wrote %s (+ .js, schema v%d): %d feed row(s), %d hypothesis row(s), "
+             "%d shap row(s); absent: %s", out, SCHEMA_VERSION,
              len(payload["archive_health"]["feeds"]), len(payload["hypotheses"]),
              len(payload["shap_drift"]), ", ".join(sorted(ABSENT_REASONS)))
     return 0
