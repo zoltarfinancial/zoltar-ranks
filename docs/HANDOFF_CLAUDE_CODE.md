@@ -1,165 +1,149 @@
-# Handoff — round 2
+# Handoff — round 3: the review protocol
 
-**To: Claude Code, in `C:\Shared\ClaudeWork\zoltar-ranks`. From: Cowork (owns `dashboard/`). 2026-09-02, after `cd027cc`.**
+**To: Claude Code, in `C:\Shared\ClaudeWork\zoltar-ranks`. From: Cowork. 2026-09-02, after `c294faa`.**
 
-Round 1 landed. `--check` went 11 blocking → 2, the heartbeat is real, the
-research feed exists, and the two remaining blocking rows are the two you were
-right not to fake. This round is smaller: three corrections in your lane, two
-answers to questions you raised, and one thing only Andrew can do.
+Rounds 1 and 2 are closed. This round changes how we work rather than what the
+code does, so read the whole thing once before touching anything.
 
-Round 1 for reference: T1 mode stamping ✅ · T1b row counts ✅ · T2 emitter
-wiring ✅ · T3 pytest report ✅ · T5 manifest ✅ · B1 exporter ✅. T4 (two gates)
-and T6 (`monitoring/`) carry forward below.
+**From now on your work comes from a queue, not from this file.** Cowork fires
+on a heartbeat, reads the state, and writes a cycle of work orders into
+`data/review/cycles/`. You pull them, do them, and report back through one
+command. Andrew answers in §12 of the console. This document is the last static
+handoff; after it, the equivalent is `python dashboard\review.py next`.
 
 ---
 
-## Answers to your two questions
+## Start every session with this
 
-**1. `dashboard/dashboard_data.js` — resolved by moving the generated feeds, not
-by crossing the lane.** Both `.js` feeds now live in `data/results/` beside their
-JSON, and `index.html` loads them as `<script src="../data/results/*.js">`. A
-script tag works over `file://` where a `fetch` does not, so nothing is lost.
-Nothing but Cowork ever writes into `dashboard/` again.
-
-Your one extra line, in `export_dashboard_data.py`, beside the JSON write:
-
-```python
-(cfg.results_dir / "dashboard_data.js").write_text(
-    "window.__ZOLTAR_DATA__ = " + payload + ";\n", encoding="utf-8")
+```powershell
+python dashboard\review.py next
 ```
 
-The emitter already does the equivalent for `build_status.js`. Delete the stale
-`dashboard/build_status.js` when you see it — `--check` now warns about it.
+It prints the end goal, the critical path, the live build gate, the current
+cycle's assessment, and the open items addressed to you — each with a `why` and
+a checkable `acceptance`. There are four waiting for you in `c-0001`.
 
-**2. Committing `dashboard/` — yes, track it.** The lane rule is about who
-*edits*, not who commits. A fresh clone that cannot run `--check` is a real
-defect. Commit `dashboard/emit_build_status.py`, `BUILD_MONITOR.md`,
-`index.html`, `README.md`, `seed_data.json`, `serve.ps1`. Keep the generated
-feeds (`data/results/*.js`, `build_status.json`, `dashboard_data.json`,
-`pytest_report.json`, `run_history.jsonl`) gitignored — they are derived, and a
-tracked derived file produces a merge conflict on every run.
+Report as you go. One command per event; never hand-edit the log.
+
+```powershell
+python dashboard\review.py post --item c-0001.2 --type start
+python dashboard\review.py post --item c-0001.2 --type done --ref (git rev-parse --short HEAD) --text "what landed"
+python dashboard\review.py post --item c-0001.3 --type blocked --needs andrew --text "why, and what would unblock it"
+```
+
+Found something the brain needs to know — another placeholder-pointer — but it
+is not any current item?
+
+```powershell
+python dashboard\review.py raise --kind finding --title "..." --text "..."
+```
+
+It appears in §12 under *Raised, not yet in a cycle*, and the next heartbeat
+folds it into a cycle with a why and an acceptance. **You never write a cycle
+file.** Cycles are Cowork's; the inbox is everyone's.
 
 ---
 
-## What Cowork changed this round
+## Why it is built this way
 
-| File | Change |
+The board borrows the archive's discipline rather than the monitor's. §08–§11
+are entirely derived because machine state can be observed. Intent cannot — a
+work order, a judgement call, a "this is blocked on you" are things a party
+asserts. So §12 is the one place in the console that accepts writing, and it
+keeps its honesty with one rule:
+
+> **Cycles are immutable. Everything after is an append.**
+
+Item status is derived from the append-only inbox exactly the way job status is
+derived from the run history. Nobody types a status, nobody can quietly rewrite
+what was asked for last Tuesday, and the reasoning behind a decision survives.
+
+This is not ceremony. The failure this project keeps rediscovering is *evidence
+replaced by claim*: a scheduled task reporting Ready while expired, a manifest
+declaring `built: true` for a job that never ran, a forward-stamped pointer read
+as a model output. A review board anyone can edit is that same failure with a
+friendlier face.
+
+Two guards follow from it, and both will refuse you:
+
+- `--type done` without `--ref` or `--text` is rejected. A completion with no
+  evidence is a claim.
+- A `done` whose `acceptance` names a file that does not exist is recorded but
+  reported as **`done_unverified`**, and the item does not count as closed. Same
+  principle as `kind: proof` in the build manifest.
+
+`dashboard/review_protocol.md` is the full contract — schema, event types,
+status derivation, invariants. `python dashboard\review.py check` enforces it,
+and `emit_build_status.py --check` now calls it, so one command still audits
+everything.
+
+---
+
+## What Cowork shipped this round
+
+| File | What it is |
 |---|---|
-| `dashboard/index.html` | Per-section absence handling; `<meta charset>`; freshness label reads `freshness_basis`; script tags repointed to `../data/results/` |
-| `dashboard/emit_build_status.py` | `build_status.js` now written to `data/results/`; new `kind: proof` deliverable; `--check` warns on the stale JS and the missing `dashboard_data.js` |
+| `dashboard/review_protocol.md` | the contract |
+| `dashboard/review.py` | `next` · `post` · `raise` · `beat` · `emit` · `check` · `open-cycle` |
+| `dashboard/serve.py` + `serve.ps1` | the local server, now with one write route |
+| `dashboard/index.html` | §12 Review & work orders |
+| `data/review/charter.json` | the end goal, success criteria, critical path, lanes |
+| `data/review/cycles/c-0001.json` | the first cycle — four items for you, two for Andrew |
 
-**The absence fix was urgent and is worth knowing about.** `render()` called
-`equity(data)` → `data.benchmarks.equity_curves` with no guard. Your exporter
-correctly omits `benchmarks`, so the first live load would have thrown a
-`TypeError` and blanked **every** section — including `archive_health`, which is
-real. A console that goes dark when a phase is unbuilt reads as a broken page
-rather than an honest gap, which is the worst of both. Each renderer is now
-wrapped: absent inputs produce a *NOT YET MEASURED* panel carrying your
-`sections_absent` reason string verbatim, a throw produces a *FEED ERROR* panel
-naming the message, and neither can take down its neighbours.
-
-Verified headless against your live `dashboard_data.json`: 7 absence panels, 0
-page errors, the archive strip showing 235 daily / 308 intraday runs from
-2025-10-01 and `0.6h since newest available_at · run_ts stamped 09-03`.
+`serve.ps1` no longer wraps `python -m http.server`. It runs `dashboard/serve.py`,
+which serves the repo read-only **plus** `POST /api/review`, bound to 127.0.0.1.
+That is what lets Andrew answer from the page. Over `file://` the page composes
+the event line and hands it over with a Copy button instead, so a reply is never
+lost — it just arrives through the CLI or the chat.
 
 ---
 
-## Task 7 — a schema-name trap you left behind
+## Your work order for the protocol itself
 
-`archive_health.hours_since_last_run_ts` is now computed from `available_at` —
-correctly — but still named `run_ts`. The console only got this right because it
-reads `freshness_basis`; anything else consuming that field will read the name
-and believe it.
+It is `c-0001.6` in the queue, repeated here because it gates the rest:
 
-You fixed the freshness *computation* and left the *name* pointing at the trap.
-Rename it to `hours_since_fresh`, keep `freshness_basis` beside it, and bump the
-feed's `schema_version`. Tell Cowork the version and both keys will be read.
+- `review.py emit` runs after `emit_build_status.py` in `scripts/daily.py` and in
+  `.git/hooks/post-commit`
+- `review.py check` runs as part of the test suite
+- **`data/review/` is tracked in git** — charter, cycles and inbox are the record
+  of how this build was steered and belong in history. `data/results/review_state.json*`
+  stays ignored; it is derived.
+- a `done` posted through the CLI shows up in §12 on refresh
 
----
-
-## Task 8 — Phase 1a reads 100% and it is not done
-
-Every 1a deliverable is a path that exists, so `pct` derives to 100 while
-`harvest_intraday` has 7 scheduled windows, 6 of them missed. That is the
-`schedule_harvest.ps1` lesson recurring one level up: file existence is not
-evidence of behaviour.
-
-`kind: proof` now exists for exactly this. Add to phase `1a` in
-`data/build/manifest.yaml`:
-
-```yaml
-      - name: One full trading session of green beats
-        kind: proof
-        proof: {job: harvest_intraday, full_session: true}
-```
-
-Derivation: `done` only when the job's non-`na` beats are all `ok` **and** there
-are at least `expected_24h` of them; `wip` once there is at least one `ok` among
-misses; `todo` otherwise. It reads `todo` today and 1a drops to 90%. It cannot be
-made green by writing a file — only by the harvest actually running.
-
-Add the same to any phase whose completion is behavioural rather than textual.
-Phase 7 also reads 100% on two documents while H9 and H10 are unrun; a proof
-deliverable pointed at the first resolved hypothesis would be honest there too.
+One caution on tracking the inbox: it is append-only, so two sessions appending
+concurrently produce a merge conflict that is always resolved by **keeping both
+sides in timestamp order**. Never resolve one by dropping a line.
 
 ---
 
-## Task 4 (carried) — the two remaining gates
+## The heartbeat, and what it means for you
 
-`no_same_bar` and `no_run_ts_execution` stay `not_built`, and you were right to
-leave them: a test that passes because the code under test does not exist is a
-green light meaning nothing. They land with `analysis/backtest.py`. Until then
-the gate stays amber and §10 says why — that is the system working.
+Cowork now fires every two hours, 07:00–19:00 CDT on weekdays. Each fire reads
+`build_status.json`, `review_state.json`, the inbox since the last cycle and
+`git log`, then writes a cycle. Fires with nothing to say write a quiet
+heartbeat and stop.
 
-`no_latest_pkl` passing already, via the AST check on the one module allowed to
-name those files, is the right shape for the other two.
+Consequences worth knowing:
 
-## Task 6 (carried) — `monitoring/`
-
-Blocked on your side; the stubs are untracked so `git rm` does not apply.
-Andrew runs it — see below.
-
----
-
-## `stamp_cutover` is failing
-
-Decision: **it stays `severity: warning` until the test passes**, then gets
-promoted to `blocker`. Rationale — a gate should go red because the system is
-wrong, and we do not yet know whether the system or the assertion is wrong. The
-test was written today, on the day the convention changed, which is exactly when
-a test is most likely to encode the old world.
-
-So the next question is yours: **is the assertion right?** Report which of the
-two it is before changing either. If the assertion is right, the failure is a
-real pooling bug and rule 9 applies — stop, fix the grouping, do not loosen it.
+- **Your `done` events are what drive the next cycle.** A finished work order
+  that is not posted is invisible to the brain, and the next cycle will be
+  written as though you were still on it. Posting is cheaper than explaining.
+- **A `raise` is the fastest way to change the plan.** The placeholder-pointer
+  finding reordered the whole board; had it existed as a raised finding it would
+  have been folded into a cycle within two hours instead of waiting for a report.
+- **Cowork issues freely on the critical path and queues judgement calls for
+  Andrew.** If an order looks wrong, `--type reject --text "why"` is a legitimate
+  response and it will be read. You are not obliged to build something you can
+  see is a mistake.
 
 ---
 
-## Acceptance for round 2
+## Acceptance for round 3
 
-- [ ] `data/results/dashboard_data.js` written on every export
-- [ ] `dashboard/` tracked in git; generated feeds still ignored
-- [ ] stale `dashboard/build_status.js` deleted
-- [ ] `hours_since_fresh` renamed, feed `schema_version` bumped
-- [ ] `1a` carries the proof deliverable and reads below 100%
-- [ ] `stamp_cutover` diagnosed: assertion wrong, or system wrong
-- [ ] `--check` reports 0 blocking, and the `harvest_evening` /
-      `harvest_premarket` beats fill in on their own after 15:30 today and
-      before 09:00 tomorrow
+- [ ] `python dashboard\review.py next` runs and shows four items
+- [ ] `c-0001.6` posted `done` with the wiring in place
+- [ ] `data/review/` tracked; `review_state.json*` ignored
+- [ ] `emit_build_status.py --check` shows `[OK  ] review protocol  0 blocking`
+- [ ] the remaining `c-0001` items picked up in priority order
 
-The real acceptance test is unchanged: §08 showing 13 of 13 green beats for
-`harvest_intraday` across one full trading session.
-
----
-
-## For Andrew
-
-```powershell
-Remove-Item -Recurse -Force C:\Shared\ClaudeWork\zoltar-ranks\monitoring
-```
-
-Then, to see the console:
-
-```powershell
-.\dashboard\serve.ps1     # http://localhost:8787/dashboard/
-```
+Everything after this comes from the queue.

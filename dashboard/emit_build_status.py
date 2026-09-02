@@ -30,6 +30,9 @@ v2 changes (2026-09-02, Cowork):
     reported by --check, rather than silently absorbed.
   * `--check` added.
   * Dead `if True:` removed from activity().
+
+v3 (2026-09-02, Cowork): a gate whose tests include skips no longer reads
+`stale`. `stale` now means only that the report is old.
 """
 
 from __future__ import annotations
@@ -328,10 +331,16 @@ def gate_entry(g: dict, tests: dict[str, str], ran: datetime | None, t0: datetim
         matches = [o for nid, o in tests.items() if node in nid]
         if matches:
             last = ran
+            # A skipped test is not a stale one. `stale` must mean "the report is
+            # old" and nothing else, or a suite with normal skips reports gates as
+            # stale forever and the word stops carrying information. A gate whose
+            # tests ALL skipped never actually ran, so it is not_built.
             if any(o == "failed" for o in matches):
                 status = "fail"
-            elif all(o == "passed" for o in matches):
+            elif any(o == "passed" for o in matches):
                 status = "pass"
+            elif all(o == "skipped" for o in matches):
+                status = "not_built"
             else:
                 status = "stale"
     if g.get("status_override"):
@@ -671,6 +680,21 @@ def check() -> int:
             warn(str(p.relative_to(REPO)), f"not written yet ({why})")
         else:
             ok(str(p.relative_to(REPO)), f"{why}, written {m:%Y-%m-%d %H:%M}")
+
+    # 9. the review protocol - one command still audits everything
+    review_py = REPO / "dashboard" / "review.py"
+    if not review_py.exists():
+        warn("dashboard/review.py", "missing -- SS12 has no feed")
+    else:
+        try:
+            r = subprocess.run([sys.executable, str(review_py), "check"], cwd=REPO,
+                               capture_output=True, text=True, timeout=60)
+            tail = [l.strip() for l in (r.stdout or "").splitlines() if l.strip()]
+            summary = next((l for l in reversed(tail) if "blocking" in l), "no summary")
+            (bad if r.returncode else ok)("review protocol", summary
+                                          + "  (python dashboard/review.py check for detail)")
+        except Exception as e:
+            warn("review protocol", f"could not run review.py check: {e}")
 
     width = max(len(w) for _, w, _ in rows) if rows else 0
     print(f"\nmonitor input check - {t0:%Y-%m-%d %H:%M %Z}\n")

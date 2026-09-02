@@ -4,6 +4,7 @@
      A <script src> works over file://; a fetch of the same path does not. -->
 <script src="../data/results/build_status.js"></script>
 <script src="../data/results/dashboard_data.js"></script>
+<script src="../data/results/review_state.js"></script>
 <title>Zoltar Research Console</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
@@ -318,6 +319,86 @@ button.act.primary:hover{background:rgba(57,135,229,.12)}
   font-family:var(--mono);font-size:11.5px;color:var(--ink);box-shadow:0 8px 24px rgba(0,0,0,.6);
   font-variant-numeric:tabular-nums;white-space:nowrap;line-height:1.6}
 #tip .tk{color:var(--ink-4)}
+
+/* ---------------- 12 · review board ---------------- */
+#review .rvcharter{padding:18px 20px;margin:8px 0 14px}
+#review .rvgoal{font-size:15px;line-height:1.55;color:var(--ink);margin:0 0 12px}
+#review .rvmeta{display:flex;flex-wrap:wrap;gap:18px 26px;font:11px/1.5 var(--mono);
+  color:var(--ink-3);letter-spacing:.04em}
+#review .rvmeta b{color:var(--ink);font-weight:500}
+#review .pulse{display:inline-flex;gap:2px;align-items:center;vertical-align:-1px}
+#review .pulse i{width:5px;height:12px;border-radius:1px;display:inline-block;background:var(--rule)}
+#review .pulse i.a{background:var(--good)}
+#review .pulse i.q{background:var(--rule)}
+#review .rvtiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));
+  border:1px solid var(--rule);border-radius:8px;overflow:hidden;margin-bottom:20px}
+#review .rvtile{padding:12px 14px;border-right:1px solid var(--rule)}
+#review .rvtile:last-child{border-right:0}
+#review .rvtile .k{font:10px/1 var(--mono);letter-spacing:.14em;
+  color:var(--ink-3);text-transform:uppercase}
+#review .rvtile .v{font:600 22px/1.2 var(--mono);margin-top:7px;color:var(--ink)}
+#review .rvtile .v.hot{color:var(--warn)}
+#review .rvtile .v.ok{color:var(--good)}
+#review .rvtile .v.bad{color:var(--crit)}
+#review .rvtile .s{font-size:11px;color:var(--ink-3);margin-top:4px}
+#review .rvcycle{padding:16px 20px;margin-bottom:18px}
+#review .rvcycle .h{font:11px/1 var(--mono);letter-spacing:.12em;
+  color:var(--ink-3);margin-bottom:10px}
+#review .rvcycle p{margin:0;font-size:13.5px;line-height:1.6;color:var(--ink)}
+#review .rvbar{display:flex;align-items:center;justify-content:space-between;gap:16px;
+  flex-wrap:wrap;margin-bottom:12px}
+#review .rvfilters{display:flex;gap:6px;flex-wrap:wrap}
+#review .rvf{font:11px/1 var(--mono);letter-spacing:.06em;padding:7px 11px;
+  border:1px solid var(--rule);border-radius:5px;background:transparent;
+  color:var(--ink-2);cursor:pointer}
+#review .rvf.on{border-color:var(--s1);color:var(--ink)}
+#review .rvf .c{color:var(--ink-3);margin-left:6px}
+#review .rvsrc{font:10px/1 var(--mono);color:var(--ink-3)}
+#review .rvitem{border:1px solid var(--rule);border-left-width:2px;border-radius:8px;
+  padding:16px 18px;margin-bottom:10px;background:rgba(255,255,255,.012)}
+#review .rvitem.p-now{border-left-color:var(--warn)}
+#review .rvitem.p-next{border-left-color:var(--s1)}
+#review .rvitem.p-later{border-left-color:var(--rule)}
+#review .rvitem.closed{opacity:.55}
+#review .rvhead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+#review .rvid{font:11px/1 var(--mono);color:var(--ink-3)}
+#review .rvchip{font:10px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;
+  padding:4px 7px;border-radius:4px;border:1px solid var(--rule);color:var(--ink-2)}
+#review .rvchip.st-open{border-color:var(--ink-3)}
+#review .rvchip.st-acked,#review .rvchip.st-in_progress{border-color:var(--s1);color:var(--s1)}
+#review .rvchip.st-done,#review .rvchip.st-answered{border-color:var(--good);color:var(--good)}
+#review .rvchip.st-blocked{border-color:var(--crit);color:var(--crit)}
+#review .rvchip.st-rejected,#review .rvchip.st-deferred{border-color:var(--ink-3);color:var(--ink-3)}
+#review .rvchip.who{border-style:dashed}
+#review .rvtitle{font-size:14.5px;line-height:1.45;color:var(--ink);
+  font-weight:500;margin:2px 0 10px;flex-basis:100%}
+#review .rvfield{display:grid;grid-template-columns:96px 1fr;gap:10px;margin-bottom:7px}
+#review .rvfield .fk{font:10px/1.6 var(--mono);letter-spacing:.1em;
+  color:var(--ink-3);text-transform:uppercase}
+#review .rvfield .fv{font-size:13px;line-height:1.6;color:var(--ink)}
+#review .rvwarn{font-size:12px;color:var(--crit);margin:8px 0 0}
+#review .rvthread{margin:12px 0 0;border-top:1px solid var(--rule);padding-top:10px}
+#review .rvev{font:11.5px/1.6 var(--mono);color:var(--ink-2);
+  display:grid;grid-template-columns:104px 122px 1fr;gap:8px;padding:2px 0}
+#review .rvev .t{color:var(--ink-3)}
+#review .rvev .y{color:var(--ink)}
+#review .rvacts{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:12px}
+#review .rvacts textarea{flex:1 1 240px;min-height:38px;resize:vertical;
+  background:rgba(0,0,0,.25);border:1px solid var(--rule);border-radius:5px;
+  color:var(--ink);font:12.5px/1.5 inherit;padding:8px 10px}
+#review .rvb{font:11px/1 var(--mono);letter-spacing:.06em;padding:8px 11px;
+  border:1px solid var(--rule);border-radius:5px;background:transparent;
+  color:var(--ink-2);cursor:pointer}
+#review .rvb:hover{color:var(--ink);border-color:var(--ink-3)}
+#review .rvb.go{border-color:var(--s1);color:var(--s1)}
+#review .rvb.no{border-color:var(--crit);color:var(--crit)}
+#review .rvsay{font:11px/1 var(--mono);margin-left:4px}
+#review .rvsay.ok{color:var(--good)}
+#review .rvsay.bad{color:var(--crit)}
+#review .rvempty{border:1px dashed var(--rule);border-radius:8px;padding:22px;
+  text-align:center;color:var(--ink-3);font-size:13px}
+#review #rvout{width:100%;min-height:80px;margin-top:12px}
+
 </style>
 
 <div id="tip"></div>
@@ -338,6 +419,7 @@ button.act.primary:hover{background:rgba(57,135,229,.12)}
       <a href="#phases" class="live"><span class="n">09</span> Phase progress</a>
       <a href="#gates" class="live"><span class="n">10</span> Contract gates</a>
       <a href="#handoff" class="live"><span class="n">11</span> Feeds &amp; handoff</a>
+      <a href="#review" class="live"><span class="n">12</span> Review &amp; work orders</a>
     </nav>
     <div class="railfoot">
       <span id="genstamp">—</span><br>
@@ -514,6 +596,61 @@ button.act.primary:hover{background:rgba(57,135,229,.12)}
               <span class="msg" id="ingestmsg"></span>
             </div>
             <span class="srcline" id="buildsrc"></span>
+          </div>
+        </details>
+      </section>
+
+      <section id="review">
+        <div class="eyebrow">12 — Active build · review &amp; work orders</div>
+        <h2>What the three of us owe each other</h2>
+        <p class="lede">The one section of this console that accepts writing. Cowork opens a cycle
+          on each heartbeat; Claude Code reports through <code>review.py</code>; Andrew answers here.
+          Cycles are immutable and every reaction is an append — so item status is derived, exactly
+          the way job status is, and nobody can quietly rewrite what was asked for.</p>
+
+        <div class="rvcharter panel" id="rvcharter"></div>
+        <div class="rvtiles" id="rvtiles"></div>
+
+        <div class="rvcycle panel" id="rvcycle"></div>
+
+        <div class="rvbar">
+          <div class="rvfilters" id="rvfilters"></div>
+          <span class="rvsrc" id="rvsrc"></span>
+        </div>
+
+        <div class="rvitems" id="rvitems"></div>
+
+        <div id="rvraised"></div>
+
+        <details class="ingest" id="rvhistory">
+          <summary>Cycle history</summary>
+          <div class="ibody"><div class="log" id="rvcycles"></div></div>
+        </details>
+
+        <details class="ingest" id="rvoffline">
+          <summary>Posting when the local server is not running</summary>
+          <div class="ibody">
+            <p style="margin-top:14px">Replies post to <code>POST /api/review</code>, served by
+              <code>.\dashboard\serve.ps1</code>. Opened straight from Explorer over
+              <code>file://</code> there is no server to post to, so the page hands you the exact
+              event line instead — paste it into the Cowork chat, or run the printed command. The
+              board ends up in the same state either way.</p>
+            <textarea id="rvout" spellcheck="false" readonly
+              placeholder="An event you compose while offline appears here."></textarea>
+            <div class="btnrow">
+              <button class="act" id="rvcopy" type="button">Copy the event line</button>
+              <span class="msg" id="rvmsg"></span>
+            </div>
+            <p style="margin-top:18px">Read-only away from the repo: paste
+              <code>data/results/review_state.json</code> below and the board renders from it.
+              It is saved to this browser and, on the published copy, to the artifact's own store,
+              so it survives reloads and republishes.</p>
+            <textarea id="rvin" spellcheck="false"
+              placeholder="Paste the contents of data/results/review_state.json here"></textarea>
+            <div class="btnrow">
+              <button class="act primary" id="rvload" type="button">Load board</button>
+              <span class="msg" id="rvinmsg"></span>
+            </div>
           </div>
         </details>
       </section>
@@ -5856,7 +5993,10 @@ function status(data){
   const h=data.archive_health;
   const daily=h.feeds.filter(f=>f.feed==="daily")[0];
   const all=h.feeds.filter(f=>f.feed==="all")[0];
-  const stale=h.hours_since_last_run_ts;
+  /* schema v2 renamed this to hours_since_fresh and kept the old key as a
+     deprecated alias for one version. Read the new name first so the v3 removal
+     is a no-op here. */
+  const stale=(h.hours_since_fresh!==undefined?h.hours_since_fresh:h.hours_since_last_run_ts);
   const staleCls=stale<12?"ok":stale<36?"warn":"crit";
   const failed=h.failed_steps.length;
   const items=[
@@ -6352,6 +6492,244 @@ function nmDrop(sels,panel){
   });
 }
 
+/* ---------------- 12 · review board ----------------
+   The only section that writes. It reads data/results/review_state.js (or the
+   JSON over http), renders the current cycle's items, and posts one inbox event
+   per action to POST /api/review.
+
+   Posting degrades rather than failing: over file:// there is no server, so the
+   page composes the exact event line and hands it over with a Copy button. The
+   board reaches the same state whether the reply arrives through the server,
+   the CLI, or a paste into the Cowork chat - which is what makes the interface
+   portable off this laptop. */
+const $$=s=>Array.from(document.querySelectorAll(s));
+const REVIEW_KEY="zoltar.review_state.v1";
+const REVIEW_DOC="state/review_state";
+let RV = null, RVFILTER = "open";
+const RV_PARTY = "andrew";              // who this page posts as
+const RV_CLOSED = ["done", "rejected", "deferred", "answered"];
+
+function rvEsc(t){return String(t==null?"":t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function rvWhen(t){return t?String(t).replace("T"," ").slice(5,16):"—";}
+
+function rvCharter(s){
+  const c=s.charter||{}, hb=s.heartbeat||{}, b=s.build||{};
+  const beats=(hb.recent||[]).slice(-24)
+    .map(x=>`<i class="${x.quiet?"q":"a"}" title="${rvEsc(x.at)}${x.quiet?" · quiet":""}"></i>`).join("");
+  const late=hb.late?`<b style="color:var(--crit)">LATE</b>`:`<b>${rvWhen(hb.next_expected_at)}</b>`;
+  $("#rvcharter").innerHTML=
+    `<p class="rvgoal">${rvEsc(c.end_goal||"No charter — data/review/charter.json is missing.")}</p>`+
+    `<div class="rvmeta">`+
+      `<span>CRITICAL PATH <b>${rvEsc(c.critical_path||"—")}</b></span>`+
+      `<span>BUILD GATE <b style="color:${b.gate==="green"?"var(--good)":b.gate==="red"?"var(--crit)":"var(--warn)"}">${rvEsc((b.gate||"—").toUpperCase())}</b></span>`+
+      `<span>HEARTBEAT <span class="pulse">${beats||'<i></i>'}</span> next ${late}</span>`+
+      `<span>CADENCE <b>${rvEsc(c.cadence_human||(hb.cadence_minutes+" min"))}</b></span>`+
+    `</div>`;
+}
+
+function rvTiles(s){
+  const c=s.counts||{};
+  const t=[
+    ["Needs you",c["andrew"]||0,(c["andrew"]?"hot":"ok"),"decisions and answers"],
+    ["Claude Code",c["claude-code"]||0,"","in flight"],
+    ["Cowork",c["cowork"]||0,"","brain's own queue"],
+    ["Open",c.open||0,"","across all cycles"],
+    ["Done",c.done||0,"ok","closed items"],
+    ["Unverified",c.unverified||0,(c.unverified?"bad":""),"claimed done, artifact missing"],
+    ["Raised",c.raised||0,(c.raised?"hot":""),"not yet in a cycle"]
+  ];
+  $("#rvtiles").innerHTML=t.map(([k,v,cl,sub])=>
+    `<div class="rvtile"><div class="k">${k}</div><div class="v ${cl}">${v}</div><div class="s">${sub}</div></div>`).join("");
+}
+
+function rvCycle(s){
+  const c=s.current_cycle;
+  if(!c){$("#rvcycle").innerHTML=`<div class="h">No cycle yet</div><p>The first heartbeat writes one.</p>`;return;}
+  const snap=c.state_snapshot||{};
+  $("#rvcycle").innerHTML=
+    `<div class="h">${rvEsc(c.cycle_id)} · opened ${rvWhen(c.opened_at)} by ${rvEsc(c.opened_by)}`+
+    (c.quiet?" · quiet cycle":"")+
+    (snap.head_sha?` · at ${rvEsc(snap.head_sha)}`:"")+`</div>`+
+    `<p>${rvEsc(c.assessment||"")}</p>`;
+}
+
+function rvFilters(s){
+  const c=s.counts||{};
+  const f=[["open","Open",c.open||0],["andrew","Needs you",c["andrew"]||0],
+           ["claude-code","Claude Code",c["claude-code"]||0],
+           ["cowork","Cowork",c["cowork"]||0],["all","All",(s.items||[]).length]];
+  $("#rvfilters").innerHTML=f.map(([k,l,n])=>
+    `<button class="rvf ${RVFILTER===k?"on":""}" data-f="${k}" type="button">${l}<span class="c">${n}</span></button>`).join("");
+  $$("#rvfilters .rvf").forEach(b=>b.addEventListener("click",()=>{RVFILTER=b.dataset.f;rvRender();}));
+}
+
+/* Buttons offered depend on who owes the move and what kind of item it is.
+   Andrew never sees "start"/"done" on a Claude Code work order - a party
+   reporting another party's progress is how a board stops being evidence. */
+function rvActions(i){
+  if(RV_CLOSED.indexOf(i.status)>=0) return [["reopen","Reopen",""]];
+  if(i.for===RV_PARTY){
+    return i.kind==="question"||i.kind==="decision"
+      ? [["reply","Answer","go"],["defer","Defer",""],["note","Note",""]]
+      : [["done","Mark done","go"],["accept","Accept",""],["defer","Defer",""],["reject","Reject","no"],["note","Note",""]];
+  }
+  return [["note","Comment",""],["defer","Defer",""],["reject","Cancel this","no"]];
+}
+
+function rvItemHtml(i,s){
+  const unmet=(s.unmet_dependencies||{})[i.id]||[];
+  const closed=RV_CLOSED.indexOf(i.status)>=0;
+  const ev=(i.events||[]).map(e=>
+    `<div class="rvev"><span class="t">${rvWhen(e.at)}</span><span class="y">${rvEsc(e.by)} ${rvEsc(e.type)}</span>`+
+    `<span>${rvEsc(e.text||"")}${e.ref?` <span class="t">[${rvEsc(e.ref)}]</span>`:""}${e.needs?` <span class="t">→ ${rvEsc(e.needs)}</span>`:""}</span></div>`).join("");
+  const fields=[["Why",i.why],["Acceptance",i.acceptance],
+                ["Depends on",(i.depends_on||[]).join(", ")],
+                ["Estimate",i.estimate],["Refs",(i.refs||[]).join("  ·  ")]]
+    .filter(([,v])=>v).map(([k,v])=>
+      `<div class="rvfield"><div class="fk">${k}</div><div class="fv">${rvEsc(v)}</div></div>`).join("");
+  return `<div class="rvitem p-${rvEsc(i.priority||"later")} ${closed?"closed":""}" data-id="${rvEsc(i.id)}">
+    <div class="rvhead">
+      <span class="rvid">${rvEsc(i.id)}</span>
+      <span class="rvchip">${rvEsc((i.priority||"").toUpperCase())}</span>
+      <span class="rvchip">${rvEsc((i.kind||"").replace("_"," "))}</span>
+      <span class="rvchip st-${rvEsc(i.status)}">${rvEsc(i.status.replace("_"," "))}</span>
+      ${i.waiting_on?`<span class="rvchip who">waiting on ${rvEsc(i.waiting_on)}</span>`:""}
+      <div class="rvtitle">${rvEsc(i.title)}</div>
+    </div>
+    ${fields}
+    ${unmet.length?`<p class="rvwarn">Blocked by unfinished ${unmet.join(", ")}.</p>`:""}
+    ${(i.done_unverified||[]).length?`<p class="rvwarn">Reported done, but the acceptance names files that do not exist: ${rvEsc(i.done_unverified.join(", "))}. Not counted as closed.</p>`:""}
+    ${ev?`<div class="rvthread">${ev}</div>`:""}
+    <div class="rvacts">
+      <textarea placeholder="Say something — it is appended to the log, not merged into the item." rows="1"></textarea>
+      ${rvActions(i).map(([t,l,c])=>`<button class="rvb ${c}" data-t="${t}" type="button">${l}</button>`).join("")}
+      <span class="rvsay"></span>
+    </div>
+  </div>`;
+}
+
+function rvRaised(s){
+  const r=s.raised||[];
+  $("#rvraised").innerHTML=!r.length?"":
+    `<h3 style="margin:26px 0 12px">Raised, not yet in a cycle</h3>`+
+    r.map(x=>`<div class="rvitem p-later"><div class="rvhead">
+        <span class="rvid">${rvWhen(x.at)}</span>
+        <span class="rvchip">${rvEsc(x.kind||"finding")}</span>
+        <span class="rvchip who">from ${rvEsc(x.by)}</span>
+        <div class="rvtitle">${rvEsc(x.title)}</div></div>
+      ${x.text?`<div class="rvfield"><div class="fk">Detail</div><div class="fv">${rvEsc(x.text)}</div></div>`:""}
+      <div class="rvfield"><div class="fk">Next</div><div class="fv">The next heartbeat folds this into a cycle with a why and an acceptance.</div></div>
+      </div>`).join("");
+}
+
+function rvRender(){
+  const s=RV; if(!s) return;
+  rvCharter(s); rvTiles(s); rvCycle(s); rvFilters(s); rvRaised(s);
+  let items=(s.items||[]);
+  if(RVFILTER==="open") items=items.filter(i=>RV_CLOSED.indexOf(i.status)<0);
+  else if(RVFILTER!=="all") items=items.filter(i=>i.waiting_on===RVFILTER);
+  $("#rvitems").innerHTML=items.length?items.map(i=>rvItemHtml(i,s)).join("")
+    :`<div class="rvempty">Nothing here. ${RVFILTER==="andrew"?"Nothing is waiting on you.":"Try another filter."}</div>`;
+  $$("#rvitems .rvitem").forEach(card=>{
+    const id=card.dataset.id, box=card.querySelector("textarea"), say=card.querySelector(".rvsay");
+    card.querySelectorAll(".rvb").forEach(b=>b.addEventListener("click",()=>
+      rvPost({item:id,type:b.dataset.t,by:RV_PARTY,text:box.value.trim()||null,
+              needs:b.dataset.t==="blocked"?"cowork":null},say)));
+  });
+  const cyc=(s.cycles||[]).map(c=>
+    `<div class="rvev"><span class="t">${rvWhen(c.opened_at)}</span><span class="y">${rvEsc(c.cycle_id)}${c.quiet?" quiet":""}</span>`+
+    `<span>${rvEsc(c.assessment||"")} <span class="t">(${c.n_items} item${c.n_items===1?"":"s"})</span></span></div>`).join("");
+  $("#rvcycles").innerHTML=cyc||"<p>No cycles yet.</p>";
+}
+
+async function rvPost(ev,say){
+  const line=JSON.stringify({at:new Date().toISOString(),by:ev.by,cycle:(ev.item||"").split(".")[0],
+                             item:ev.item,type:ev.type,needs:ev.needs,text:ev.text,ref:null});
+  if(ev.type==="done"&&!ev.text){
+    say.textContent="A completion needs a note saying what landed."; say.className="rvsay bad"; return;
+  }
+  say.textContent="posting…"; say.className="rvsay";
+  try{
+    const r=await fetch("/api/review",{method:"POST",headers:{"Content-Type":"application/json"},
+                                       body:JSON.stringify(ev)});
+    const d=await r.json();
+    if(!r.ok||!d.ok) throw new Error(d.error||("HTTP "+r.status));
+    say.textContent="posted"; say.className="rvsay ok";
+    if(d.state){RV=d.state; rvRender();}
+  }catch(e){
+    /* No server (file://, or serve.ps1 not running). Compose the line so the
+       reply is never lost - it can go in through the CLI or the Cowork chat. */
+    say.textContent="offline — event copied below"; say.className="rvsay bad";
+    const cmd=`python dashboard/review.py post --item ${ev.item} --type ${ev.type} --by ${ev.by}`+
+              (ev.text?` --text ${JSON.stringify(ev.text)}`:"")+(ev.needs?` --needs ${ev.needs}`:"");
+    $("#rvout").value=line+"\n\n"+cmd;
+    const d=$("#rvoffline"); if(d) d.open=true;
+  }
+}
+
+function rvWire(){
+  const ld=$("#rvload"), inb=$("#rvin"), im=$("#rvinmsg");
+  if(ld) ld.addEventListener("click",async()=>{
+    let d; try{d=JSON.parse(inb.value);}catch(e){
+      im.textContent="Not valid JSON — "+e.message; im.className="msg bad"; return;}
+    if(!d||!Array.isArray(d.items)){
+      im.textContent="Parsed, but it has no items[] — check it is review_state.json.";
+      im.className="msg bad"; return;}
+    const where=await rvSave(d);
+    rvShow(d,"pasted"+(where.length?" · saved to "+where.join(" and "):""));
+    im.textContent="Loaded"+(where.length?" and saved to "+where.join(" and "):"")+"."; im.className="msg ok";
+    inb.value="";
+  });
+  const c=$("#rvcopy");
+  if(c) c.addEventListener("click",async()=>{
+    try{await navigator.clipboard.writeText($("#rvout").value);
+        $("#rvmsg").textContent="Copied.";$("#rvmsg").className="msg ok";}
+    catch(e){$("#rvmsg").textContent="Clipboard blocked — select the text above.";$("#rvmsg").className="msg bad";}
+  });
+}
+
+function rvShow(s,where){RV=s;$("#rvsrc").textContent=where;rvRender();}
+
+/* Away from the repo there is no file to read, so the board falls back to the
+   artifact's own store and then to this browser - the same chain SS08 uses.
+   Nothing is invented: with no source at all it says so and renders nothing. */
+async function rvSave(obj){
+  const where=[];
+  try{localStorage.setItem(REVIEW_KEY,JSON.stringify(obj));where.push("this browser");}catch(e){}
+  const db=await useDb();
+  if(db){try{await db.doc(REVIEW_DOC).set({payload:JSON.stringify(obj),saved_at:new Date().toISOString()});
+              where.unshift("artifact store");}catch(e){}}
+  return where;
+}
+
+async function loadReview(){
+  rvWire();
+  if(typeof window.__ZOLTAR_REVIEW__==="object"&&window.__ZOLTAR_REVIEW__){
+    rvShow(window.__ZOLTAR_REVIEW__,"review_state.js beside this page");
+  }
+  try{
+    const r=await fetch("../data/results/review_state.json",{cache:"no-store"});
+    if(r.ok){rvShow(await r.json(),"live · review_state.json"); return;}
+  }catch(e){}
+  if(!RV){
+    const db=await useDb();
+    if(db){try{
+      const snap=await db.doc(REVIEW_DOC).get();
+      if(snap&&snap.exists&&snap.data&&snap.data.payload){
+        rvShow(JSON.parse(snap.data.payload),"artifact store · saved "+String(snap.data.saved_at).slice(5,16));
+        return;}
+    }catch(e){}}
+    try{const l=localStorage.getItem(REVIEW_KEY);
+        if(l){rvShow(JSON.parse(l),"saved in this browser"); return;}}catch(e){}
+  }
+  if(!RV){
+    $("#rvsrc").textContent="no feed";
+    $("#rvitems").innerHTML=`<div class="rvempty">No review feed yet. Run
+      <code>python dashboard/review.py emit</code>, or start
+      <code>.\\dashboard\\serve.ps1</code> — which does it for you.</div>`;
+  }
+}
+
 /* ---------------- boot ---------------- */
 function render(data,source){
   const R={status,recommendation,equity,strategyTable,icHorizon,icSegment,decay,heat};
@@ -6395,6 +6773,7 @@ if(typeof window.__ZOLTAR_DATA__==="object"&&window.__ZOLTAR_DATA__){
 }
 wireIngest();
 loadBuild();
+loadReview();
 })();
 </script>
 
