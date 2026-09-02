@@ -26,7 +26,7 @@ import hashlib
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 
 import pandas as pd
@@ -43,6 +43,15 @@ ACTION_COLUMNS = ["ex_date", "symbol", "kind", "ratio", "amount", "provider"]
 
 VALID_INTERVALS = {"1min", "5min", "1hour"}
 MARKET_TZ = "America/Chicago"   # the archive's wall clock; NOT US/Eastern
+
+
+class ProviderUnavailable(RuntimeError):
+    """The provider could not answer -- distinct from "there is nothing to report".
+
+    Raised rather than returning a short frame. Silence and emptiness look the
+    same to every downstream join, and for corporate actions the difference is a
+    phantom -50% return.
+    """
 
 
 @dataclass
@@ -165,6 +174,47 @@ def validate(df: pd.DataFrame, columns: list[str], kind: str) -> pd.DataFrame:
     return out
 
 
+
+def _chunks(seq, n):
+    for i in range(0, len(seq), n):
+        yield seq[i:i + n]
+
+
+def _unstack_yf(raw: pd.DataFrame, symbols: list[str]) -> list[pd.DataFrame]:
+    """Flatten yfinance's output into DAILY_COLUMNS-shaped frames.
+
+    yfinance returns flat columns for one ticker and a (ticker, field)
+    MultiIndex for several, so both shapes are handled here rather than at every
+    call site. Symbols it could not serve are simply absent -- callers that care
+    about coverage must compare against what they requested.
+    """
+    if raw is None or raw.empty:
+        return []
+    frames = []
+    multi = isinstance(raw.columns, pd.MultiIndex)
+    for sym in symbols:
+        try:
+            sub = raw[sym] if multi else raw
+        except KeyError:
+            continue
+        sub = sub.dropna(how="all")
+        if sub.empty:
+            continue
+        idx = pd.to_datetime(sub.index)
+        if getattr(idx, "tz", None) is not None:
+            idx = idx.tz_convert(MARKET_TZ).tz_localize(None)
+        frames.append(pd.DataFrame({
+            "trade_date": idx.date,
+            "symbol": sym,
+            "open": sub["Open"].to_numpy(),
+            "high": sub["High"].to_numpy(),
+            "low": sub["Low"].to_numpy(),
+            "close": sub["Close"].to_numpy(),
+            "volume": sub["Volume"].to_numpy(),
+        }))
+    return frames
+
+
 # --------------------------------------------------------------------------
 # Providers. Each raises NotImplementedError until built -- see docs/PLAN.md §2a.
 # Order of work: RobinStocks first (it is the source the ranks are built from,
@@ -207,16 +257,80 @@ class YFinanceProvider(PriceProvider):
     name = "yfinance"
     returns_adjusted = True
 
+    #: yfinance batches well but rate-limits hard above ~100 tickers per call.
+    CHUNK = 100
+
     def fetch_daily(self, symbols, start, end):
-        raise NotImplementedError("PLAN §2a. auto_adjust=True; set adjusted=True.")
+        """Split/dividend-adjusted daily OHLCV. `adjusted` is True by construction.
+
+        `auto_adjust=True` is not optional here: mixing adjusted and raw prices
+        is exactly how the SFTBY halving in FINDINGS F7 becomes a phantom -50%
+        return. The flag travels with every row so a later join cannot lose it.
+        """
+        import yfinance as yf
+
+        out = []
+        for chunk in _chunks(sorted(set(symbols)), self.CHUNK):
+            raw = yf.download(chunk, start=start, end=end + timedelta(days=1),
+                              auto_adjust=True, actions=False, group_by="ticker",
+                              progress=False, threads=True)
+            out.extend(_unstack_yf(raw, chunk))
+        if not out:
+            return pd.DataFrame(columns=DAILY_COLUMNS)
+        df = pd.concat(out, ignore_index=True)
+        df["adjusted"] = True
+        df["provider"] = self.name
+        return df
 
     def fetch_intraday(self, symbols, start, end, interval):
         raise NotImplementedError(
-            "PLAN §2a. yfinance serves 1-minute bars for roughly the last 30 days "
-            "only -- fine as a cross-check, not as the timing study's backbone.")
+            "PLAN §2a/§2a-bis. yfinance serves 1-minute bars for roughly the last "
+            "30 days only -- fine as a cross-check, not as the timing study's "
+            "backbone. Blocked on the INTRADAY_COLUMNS `session` decision.")
 
     def fetch_actions(self, symbols, start, end):
-        raise NotImplementedError("PLAN §2a. Ticker.splits and Ticker.dividends.")
+        """Splits and dividends -- the table that makes returns trustworthy.
+
+        Long form, one row per event: `kind='split'` carries `ratio` (new/old)
+        and a null `amount`; `kind='dividend'` carries `amount` and a null
+        `ratio`. That matches `corporate_actions` in schema.sql exactly.
+        """
+        import yfinance as yf
+
+        rows, failed = [], []
+        wanted = sorted(set(symbols))
+        for sym in wanted:
+            try:
+                acts = yf.Ticker(sym).actions
+            except Exception as exc:                      # noqa: BLE001 - provider is flaky
+                # NEVER swallow this into an empty frame. "no corporate actions"
+                # and "the provider could not answer" look identical downstream,
+                # and the difference is a phantom -50% return (FINDINGS F7).
+                log.warning("yfinance actions failed for %s: %s", sym, exc)
+                failed.append(sym)
+                continue
+            if acts is None or acts.empty:
+                continue
+            idx = pd.to_datetime(acts.index)
+            if getattr(idx, "tz", None) is not None:
+                idx = idx.tz_convert(MARKET_TZ).tz_localize(None)
+            for when, row in zip(idx, acts.itertuples(index=False)):
+                d = when.date()
+                if not (start <= d <= end):
+                    continue
+                split = float(getattr(row, "Stock_Splits", 0) or 0)
+                div = float(getattr(row, "Dividends", 0) or 0)
+                if split:
+                    rows.append((d, sym, "split", split, None, self.name))
+                if div:
+                    rows.append((d, sym, "dividend", None, div, self.name))
+        if failed:
+            raise ProviderUnavailable(
+                f"yfinance could not serve corporate actions for {len(failed)} of "
+                f"{len(wanted)} symbols (e.g. {failed[:5]}). Refusing to return a "
+                f"partial frame: an absent split is indistinguishable from no "
+                f"split, and that is exactly how a split becomes a -50% return.")
+        return pd.DataFrame(rows, columns=ACTION_COLUMNS)
 
 
 PROVIDERS: dict[str, type[PriceProvider]] = {
