@@ -70,6 +70,27 @@ class UpstreamMirror:
         _run(["git", "clone", "--filter=blob:none", "--bare",
               "--branch", self.branch, self.url, str(self.dir)])
 
+    def prefetch_small_blobs(self, limit: str = "600k") -> None:
+        """Pull every blob under `limit` in ONE pack, instead of one at a time.
+
+        Why: a blobless clone fetches each blob lazily on first read, and that
+        round trip dominates the ER/SHAP backfill -- those files change on almost
+        every commit, so there are ~1,000 of them and no two are identical.
+        Measured 2026-09-02 against upstream:
+
+            lazy, one blob at a time : ~0.45 s each  -> ~8 min for the backfill
+            one bulk fetch at 600k   : 14.5 s total  -> reads then take ~5 ms
+
+        Cost is disk: the mirror grows from ~1 MB to ~326 MB at 600k (~620 MB at
+        1m). It lives under data/cache/, which is gitignored. The 20-24 MB rank
+        pickles stay excluded either way -- the coverage walk only needs 2-4 of
+        those, so lazy fetching is already optimal for them.
+
+        Safe to re-run; git skips what it already has.
+        """
+        _run(["git", "fetch", "--refetch", f"--filter=blob:limit={limit}",
+              "origin", self.branch], cwd=self.dir)
+
     # ---------- history ----------
 
     def commits_touching(self, path: str, since: str | None = None) -> list[Snapshot]:

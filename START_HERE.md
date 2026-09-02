@@ -11,8 +11,9 @@ Andrew runs a quant ranking pipeline that publishes stock ranks to
 that history sits in a rolling buffer that **permanently deletes old snapshots
 every ~10 trading days**. This repo captures that history into a local
 point-in-time archive, then uses it to answer one question: *given a rank
-produced at time T, when should the buy actually happen?* Phase 1 (the archive)
-is already built and validated. Your job starts at Phase 2.
+produced at time T, when should the buy actually happen?* The archive **code**
+is built and validated against live upstream — but it has never been **run**, so
+the archive itself is empty. Populate it first, then start Phase 2.
 
 ## Read these, in this order
 
@@ -22,52 +23,92 @@ is already built and validated. Your job starts at Phase 2.
 | 2 | `docs/PLAN.md` | The phased build plan. Section 0 contains nine rules you must not break. |
 | 3 | `AGENTS.md` | Working agreement, layout, conventions. |
 | 4 | `docs/HYPOTHESES.md` | The pre-registration register. Every experiment gets a row here *before* it runs. |
+| 5 | `docs/DASHBOARD.md` | The one file you hand to the dashboard workstream, and the schema it expects. |
 
 `CLAUDE.md` is loaded automatically at the repo root and carries the nine
 non-negotiable rules in condensed form, so they stay in context for the whole
 session. It is a summary of `docs/PLAN.md` §0, not a substitute for reading it.
 
+## Where things stand — updated 2026-09-01 (clock time; see SESSION_LOG note)
+
+Do not re-do these. A previous session already ran them.
+
+| Done | Detail |
+|---|---|
+| ✅ Repo initialised, pushed | `origin` = `github.com/zoltarfinancial/zoltar-ranks`, branch `main`. Pushing works. |
+| ✅ venv + dependencies | `.venv` on **Python 3.14.7** (the only interpreter on this box), `pip install -e .` done. The pins resolve on 3.14 — nothing loosened. |
+| ✅ **All tests pass, network included** | 27 passed, 4 skipped. All four upstream contract tests green, `test_upstream_is_point_in_time` among them. The 4 skips are the Phase 2 `test_reconcile_*`. |
+| ✅ **The archive is POPULATED** | `data/zoltar.duckdb`, 1.25M rank rows. Numbers below. |
+| ✅ **The 30-min harvester is scheduled and proven** | `ZoltarRanksHarvest`, 07:00–21:30 every 30 min. Triggered a live run: `LastTaskResult 0`. |
+| ✅ Idempotency verified | Manual re-run and scheduled run both: `staged=866402 inserted=0`, all table counts unchanged. |
+| ✅ `.env` created | From `.env.example`, **still empty** — fill in credentials before Phase 2. |
+| ✅ Dashboard workstream started | `dashboard/` exists and is owned by the Cowork session — **do not edit it** |
+
+### What the archive actually holds
+
+| feed | bucket | run ts | rows | first | last |
+|---|---|---|---|---|---|
+| `daily` | low / high | **233** each | 276,666 each | 2025-10-01 07:46:57 | 2026-09-02 19:34:49 |
+| `all` | low / high | **300** each | 350,672 each | 2026-05-18 15:09:29 | 2026-09-01 15:17:16 |
+
+533 distinct run timestamps in union. By class: 214 morning, 255 intraday,
+64 nightly, **0 placeholder**. `expected_returns`: 43 as-of dates (32 `daily`,
+43 `live`), 14 horizons, 1.23M rows. `shap_summary`: 322 snapshots across
+Large/Mid/Small, 3.73M rows.
+
+`daily` starting at 2025-10-01 (not 2026-01-01) confirms the coverage walk ran.
+
+### Two things the next session must not discover the hard way
+
+1. **Only ~10 trading days of real intraday granularity exist.** The `all` feed
+   holds **1 run/day up to 2026-08-18** and 9–16/day only from 2026-08-19 on.
+   That is 300 run timestamps, not FINDINGS F3's 376 — a density shortfall, not
+   a date gap. The rolling buffer already destroyed the intraday history the
+   Phase 6 timing study is built on. Everything before 2026-08-19 is one
+   snapshot per day and will never improve. **The harvester lapsing for a day
+   costs a day of the primary objective's raw material.**
+2. **`classify_run` is not catching FINDINGS F4's forward-stamped build.** Run
+   `2026-09-02 19:34:49` was committed `2026-09-01 19:36:25` — 24h forward, but
+   not at `00:00:00`, so it is labelled `nightly` and CLAUDE.md rule 5 (which
+   only guards `placeholder`) does not apply. Zero rows archive-wide are
+   `placeholder`. `harvest_manifest.committed_at` exists, so `run_ts >
+   committed_at` is the available invariant. **Ask Andrew before changing it** —
+   re-labelling a run class re-labels every downstream decision point.
+
+| Open question | Blocks |
+|---|---|
+| `schema.sql` says `prices_intraday.ts` is `America/New_York`; `prices.py`, CLAUDE.md and AGENTS.md all say `America/Chicago` | Phase 2 — a comment only, but on the column the timing study keys off |
+| The three FINDINGS §F7 items (`Cap_Size`, `Close_Price` adjustment, live Streamlit engine) | Phases 2, 3, 5 |
+
 ## Do this first, in this order
 
 ```powershell
 cd C:\Shared\ClaudeWork\zoltar-ranks
-copy .env.example .env           # then fill in credentials (Phase 2 needs them)
-.\scripts\init_repo.ps1          # git init + connect to the empty GitHub remote
-.\scripts\setup.ps1              # venv, deps, contract tests, one-time backfill
-.\scripts\schedule_harvest.ps1   # elevated PowerShell; every 30 min, 07:00-21:30
+.\.venv\Scripts\Activate.ps1
+
+pytest tests -q                  # ALL of them, including the 8 network tests
+.\scripts\setup.ps1              # idempotent; its real job now is the backfill
+.\scripts\schedule_harvest.ps1   # elevated PowerShell
 ```
 
-`.env` is gitignored. Never commit it, never print it into logs or results.
-Phase 1 needs no credentials at all — it reads a public repo — so you can run
-the backfill before you have any keys.
+Three things that will come up:
 
-`setup.ps1` stops at the first failure on purpose. If the **upstream contract
-tests** fail, stop and report — that means upstream changed its data shape or
-started restating historical scores, and every downstream conclusion in this
-repo becomes suspect until that is understood. Do not loosen the assertion.
-
-### What "the backfill worked" looks like
-
-After `setup.ps1`, this query should return roughly these numbers:
-
-```sql
-SELECT feed, risk_bucket, count(DISTINCT run_ts) runs,
-       min(run_ts) first_run, max(run_ts) last_run
-FROM ranks GROUP BY 1,2;
-```
-
-| feed | runs | first_run |
-|---|---|---|
-| `daily` | ~234 | ~2025-10-01 |
-| `all` | ~376 | ~2026-05-16 |
-
-Plus `expected_returns` covering ~30 as-of dates and `shap_summary` covering
-~200+ snapshots across three segments. If `daily` starts at 2026-01-01 instead
-of 2025-10-01, the coverage walk did not run — you fetched HEAD only and are
-missing three months.
-
-Re-running any harvester must insert **zero** new rows. If it does not, the
-idempotency is broken and you must fix that before building on the archive.
+1. **`requirements.txt` is now version-pinned with upper bounds.** If a pin will
+   not resolve on Python 3.14, loosen **that one line**, note it in
+   `docs/SESSION_LOG.md`, and carry on. Do not strip the pins wholesale — in a
+   research repo a silent dependency major bump changes results without failing a
+   test. (pandas 3.0.2 / numpy 2.4.4 were verified to read every upstream pickle
+   correctly; Python 3.14 specifically has not been verified.)
+2. **The backfill bulk-fetches small blobs.** The ER and SHAP harvesters read
+   ~1,000 distinct blobs, and fetching them lazily costs ~0.45 s each (~8 min).
+   `--mode backfill` therefore does one bulk fetch first: 10-15 s, after which
+   reads take ~7 ms — a 63× speedup, measured. The cost is disk: the mirror under
+   `data/cache/` grows from ~1 MB to ~328 MB. That directory is gitignored. Pass
+   `--no-prefetch` if you would rather trade the 8 minutes for the disk.
+3. **`setup.ps1` stops at the first failure on purpose.** If the network contract
+   tests fail, stop and report. That means upstream changed shape or started
+   restating historical scores, and every downstream conclusion becomes suspect.
+   Do not loosen the assertion.
 
 ## Then: Phase 2, and the order of the work
 
@@ -118,7 +159,9 @@ for Phases 5 and 6.
 | `tests/test_harvest.py` | offline unit tests + upstream contract tests |
 
 Not built: `analysis/metrics.py`, `analysis/stats.py`, `analysis/backtest.py`,
-`ingest/harvest_reference.py`, `dashboard/` — create them per `docs/PLAN.md`.
+`analysis/export_dashboard_data.py`, `ingest/harvest_reference.py` — create them
+per `docs/PLAN.md`. (`dashboard/` already exists and belongs to the other
+workstream — leave it alone.)
 `sources/prices.py` has the interface, cache and coverage machinery already;
 your Phase 2 job is to implement the three `fetch_*` methods on each provider
 **without changing the column contract**, then un-skip the four

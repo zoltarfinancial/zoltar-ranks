@@ -1,7 +1,9 @@
 # zoltar-ranks — project instructions
 
-**First action in a new session: read `START_HERE.md`.** Then `docs/FINDINGS.md`,
-`docs/PLAN.md`, `AGENTS.md`, `docs/HYPOTHESES.md`.
+**First action in a new session: read `START_HERE.md`** — its "Where things
+stand" table says what the last session actually finished, so you neither redo
+completed work nor assume work that was never run. Then `docs/FINDINGS.md`,
+`docs/PLAN.md`, `AGENTS.md`, `docs/HYPOTHESES.md`, and `docs/SESSION_LOG.md`.
 
 This is a quantitative research repo, not a normal application. The failure mode
 here is not a crash — it is a backtest that looks excellent and loses real money.
@@ -41,6 +43,14 @@ happen?** Phase 1 (archive) is built and validated. Work starts at Phase 2.
    `test_upstream_is_point_in_time` failing means the archive's core assumption
    is broken and everything downstream is suspect.
 
+## Two workstreams — stay in your lane
+
+A second session (Cowork) owns `dashboard/`. You own everything else. You meet
+at exactly one file: `data/results/dashboard_data.json`, which you produce via
+`analysis/export_dashboard_data.py` (append it to `scripts/daily.py::STEPS`).
+Read `docs/DASHBOARD.md` for the schema. Never edit anything under `dashboard/`;
+never change the JSON schema without updating `docs/DASHBOARD.md` first.
+
 ## Environment
 
 - Windows, PowerShell. Repo root is `C:\Shared\ClaudeWork\zoltar-ranks`.
@@ -66,6 +76,9 @@ python scripts\daily.py              # the scheduled loop
 ## Before you finish any task
 
 - `pytest tests -q` passes.
+- `docs/SESSION_LOG.md` has a new entry: decisions, surprises, workarounds — not
+  routine progress. And `START_HERE.md`'s "Where things stand" table reflects
+  reality, so the next session starts from the truth.
 - Re-running a harvester inserts **zero** new rows (idempotency holds).
 - Any new pipeline step is appended to `scripts/daily.py::STEPS`.
 - Any new upstream dependency has a contract test that fails loudly on drift.

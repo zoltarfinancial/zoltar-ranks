@@ -32,13 +32,13 @@ great and loses money.
 
 ## Phase 0 — Environment (½ day)
 
-```bash
+Done as of 2026-09-02 except the network tests. See `START_HERE.md` §"Where
+things stand" for exactly what has and has not been run.
+
+```powershell
 cd C:\Shared\ClaudeWork\zoltar-ranks
-python -m venv .venv && .venv\Scripts\activate
-pip install -r requirements.txt
-pip install -e .
-pytest tests -q -m "not network"     # offline contract tests
-pytest tests -q                       # includes upstream verification
+.\.venv\Scripts\Activate.ps1
+pytest tests -q                       # ALL of them, network tests included
 ```
 
 **Acceptance:** all tests pass, including `test_upstream_is_point_in_time`.
@@ -73,14 +73,15 @@ so they read every commit rather than walking coverage.
 
 **Still to do in this phase:**
 
+0. **Run the backfill and register the scheduler.** As of 2026-09-02 neither has
+   happened — the code is validated but the archive is empty and upstream is
+   still shedding intraday run timestamps. `.\scripts\setup.ps1` then
+   `.\scripts\schedule_harvest.ps1`. Everything else in the project is blocked
+   on this.
 1. `ingest/harvest_reference.py` — `fundamentals_df_latest.pkl` and
    `ratings_detail_df_latest.pkl`, stamped with the harvest date so they form a
    slowly-changing dimension rather than being overwritten. Add the tables to
    `schema.sql` and the step to `scripts/daily.py::STEPS`.
-2. **Run `scripts/schedule_harvest.ps1`.** This is the time-sensitive step —
-   it stops the ongoing intraday data loss described in FINDINGS F2. Do it
-   before any analysis work.
-
 **Acceptance:** re-running any harvester inserts 0 new rows; `run_ts` coverage
 matches the table in FINDINGS F3; `Get-ScheduledTask -TaskName ZoltarRanksHarvest
 | Get-ScheduledTaskInfo` shows a recent successful run; `data/results/
@@ -95,15 +96,19 @@ The archive tells us what was *recommended*. This tells us what would have
 
 ### 2a. Provider adapter
 
-`sources/prices.py` with one interface and three implementations, selected by
-`config.price_provider`:
+**`sources/prices.py` is already written** — the `PriceProvider` ABC, the
+column contracts (`DAILY_COLUMNS` / `INTRADAY_COLUMNS` / `ACTION_COLUMNS`), the
+`Coverage` object, the on-disk cache and the `validate()` boundary check all
+exist and are unit-tested in `tests/test_prices.py`. Your job is to implement
+`fetch_daily`, `fetch_intraday` and `fetch_actions` on each of the three
+providers **without changing the column contract** — everything downstream and
+all four reconciliation tests depend on it.
 
-```python
-class PriceProvider(Protocol):
-    def daily_bars(symbols, start, end) -> DataFrame   # date, symbol, o,h,l,c,v, adjusted
-    def intraday_bars(symbols, start, end, interval) -> DataFrame
-    def corporate_actions(symbols, start, end) -> DataFrame
-```
+Two rules the interface enforces, so do not work around them:
+`adjusted` must be explicitly True/False on every daily row (`validate()`
+rejects nulls), and `fetch_intraday` must return a real `Coverage` — a provider
+that silently returns a short frame turns the timing study into a survivorship
+study.
 
 - **`robin_stocks`** — primary. Same source the ranks are built from, so
   `Close_Price` in `ranks` should reconcile against it. That reconciliation is

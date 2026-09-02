@@ -68,12 +68,24 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Harvest SHAP summaries from upstream git history")
     ap.add_argument("--mode", choices=["backfill", "daily"], default="daily")
     ap.add_argument("--config", default=None)
+    ap.add_argument("--no-prefetch", action="store_true",
+                    help="skip the bulk small-blob fetch during backfill (slower, "
+                         "but keeps the mirror at ~1 MB instead of ~326 MB)")
+    ap.add_argument("--prefetch-limit", default="600k",
+                    help="max blob size for the bulk fetch (default 600k)")
     args = ap.parse_args(argv)
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     cfg = Config.load(args.config)
     mirror = UpstreamMirror(cfg.upstream_url, cfg.mirror_dir, cfg.upstream_branch)
     mirror.ensure()
+    if args.mode == "backfill" and not args.no_prefetch:
+        # These files change on nearly every commit, so the backfill reads ~1,000
+        # distinct small blobs. One bulk fetch turns ~8 minutes of round trips
+        # into ~15 seconds. See UpstreamMirror.prefetch_small_blobs.
+        log.info("bulk-fetching blobs under %s (one time, grows the mirror cache "
+                 "to a few hundred MB under data/cache/)", args.prefetch_limit)
+        mirror.prefetch_small_blobs(args.prefetch_limit)
     con = duckdb_io.connect(cfg.duckdb_path)
 
     total_new = 0

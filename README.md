@@ -36,7 +36,8 @@ upstream destroys intraday history roughly every ten trading days.
 |---|---|
 | 1 — rank archive | built, validated against live upstream |
 | 1a — expected returns + SHAP ingestion | built, validated |
-| 1a — reference data (fundamentals, ratings) + scheduler | next |
+| 1a — **run the backfill + register the scheduler** | **next — archive is still empty** |
+| 1a — reference data (fundamentals, ratings) | after that |
 | 2 — market data layer | not started |
 | 3 — benchmark replication | not started |
 | 4 — statistics framework | not started |

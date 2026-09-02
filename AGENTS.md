@@ -5,6 +5,7 @@ Read `START_HERE.md` first, then these, in order:
 1. `docs/FINDINGS.md` — verified facts about the upstream data. Do not re-derive.
 2. `docs/PLAN.md` — the phased build plan and the rules in section 0.
 3. `docs/HYPOTHESES.md` — the live register of what is being tested.
+4. `docs/SESSION_LOG.md` — what previous sessions did, decided, and worked around.
 
 ## Ground rules
 
@@ -39,10 +40,12 @@ src/zoltar_ranks/
   db/schema.sql            DuckDB schema — the contract
   db/duckdb_io.py          connect / upsert_new_rows / export_parquet
   analysis/               metrics, stats, backtest engine
+  analysis/export_dashboard_data.py  the ONLY handoff to the dashboard
 scripts/daily.py             the scheduled job; append later phases to STEPS
 scripts/init_repo.ps1        one-time git init + remote
 scripts/setup.ps1            one-time Windows bootstrap
 scripts/schedule_harvest.ps1 registers the 30-minute scheduled task
+dashboard/               owned by the Cowork session - do not edit
 data/                    gitignored: duckdb file, parquet archive, caches, results
 ```
 
@@ -75,3 +78,8 @@ python -m zoltar_ranks.ingest.harvest_ranks --mode backfill --export-parquet
 python -m zoltar_ranks.ingest.harvest_er   --mode backfill
 python -m zoltar_ranks.ingest.harvest_shap --mode backfill
 ```
+
+The ER and SHAP backfills bulk-fetch every upstream blob under 600k in one pack
+(~15 s) because reading ~1,000 of them lazily costs ~8 minutes. That grows the
+gitignored mirror under `data/cache/` to ~328 MB. `--no-prefetch` opts out;
+`--prefetch-limit` changes the size cutoff.

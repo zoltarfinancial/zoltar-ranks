@@ -1,0 +1,5301 @@
+<title>Zoltar Research Console</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme: dark;
+  --ground:#0c0e12; --panel:#12151b; --panel-2:#171b22; --rule:#232833; --rule-soft:#1b1f28;
+  --ink:#e7eaf0; --ink-2:#98a1b2; --ink-3:#626b7c; --ink-4:#454d5c;
+  --accent:#f2a541;                    /* wordmark + warning only */
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#9085e9;
+  --good:#3fa66a; --warn:#f2a541; --crit:#e05c5c;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;
+  --rail:232px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);
+  font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:var(--s1)}
+::selection{background:rgba(242,165,65,.25)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.shell{display:grid;grid-template-columns:var(--rail) minmax(0,1fr);min-height:100vh}
+@media (max-width:900px){.shell{grid-template-columns:1fr}.rail{position:static;height:auto;border-right:0;border-bottom:1px solid var(--rule)}}
+
+/* ---------- left rail ---------- */
+.rail{position:sticky;top:0;height:100vh;border-right:1px solid var(--rule);
+  background:var(--panel);padding:22px 18px;display:flex;flex-direction:column;gap:26px;overflow-y:auto}
+.mark{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.mark small{display:block;color:var(--ink-3);letter-spacing:.1em;font-weight:400;margin-top:5px}
+.nav{display:flex;flex-direction:column;gap:1px}
+.nav a{display:flex;align-items:baseline;gap:9px;padding:6px 8px;margin-left:-8px;border-radius:3px;
+  text-decoration:none;color:var(--ink-2);font-size:13px}
+.nav a:hover{background:var(--panel-2);color:var(--ink)}
+.nav a .n{font-family:var(--mono);font-size:10px;color:var(--ink-4)}
+.railfoot{margin-top:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink-4);line-height:1.7}
+
+/* ---------- main ---------- */
+main{padding:0 0 90px}
+.wrap{max-width:1080px;padding:0 40px}
+@media (max-width:900px){.wrap{padding:0 20px}}
+
+.seedbar{background:rgba(242,165,65,.09);border-bottom:1px solid rgba(242,165,65,.3);
+  padding:9px 40px;font-family:var(--mono);font-size:11.5px;color:var(--accent);letter-spacing:.02em}
+.seedbar b{font-weight:600}
+
+/* status strip */
+.status{display:flex;flex-wrap:wrap;gap:0;border-bottom:1px solid var(--rule);
+  font-family:var(--mono);font-size:11.5px}
+.stat{padding:14px 22px 13px;border-right:1px solid var(--rule-soft);min-width:132px}
+.stat .k{color:var(--ink-4);font-size:10px;letter-spacing:.11em;text-transform:uppercase}
+.stat .v{color:var(--ink);font-size:16px;font-weight:500;margin-top:4px;font-variant-numeric:tabular-nums}
+.stat .v.ok{color:var(--good)} .stat .v.warn{color:var(--warn)} .stat .v.crit{color:var(--crit)}
+.stat .s{color:var(--ink-3);font-size:10.5px;margin-top:2px}
+
+section{padding-top:52px}
+.eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-4);display:flex;align-items:center;gap:10px}
+.eyebrow::after{content:"";flex:1;height:1px;background:var(--rule-soft)}
+h2{font-family:var(--serif);font-weight:400;font-size:27px;line-height:1.25;margin:13px 0 6px;
+  letter-spacing:-.01em;text-wrap:balance}
+.lede{color:var(--ink-2);max-width:64ch;margin:0 0 26px;font-size:14.5px}
+h3{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:500;margin:0 0 14px}
+
+.panel{background:var(--panel);border:1px solid var(--rule);border-radius:5px;padding:20px 22px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:860px){.grid2{grid-template-columns:1fr}}
+
+/* recommendation */
+.rec{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:0;
+  border:1px solid var(--rule);border-radius:5px;overflow:hidden;background:var(--panel)}
+@media (max-width:860px){.rec{grid-template-columns:1fr}}
+.rec .left{padding:24px 26px;border-right:1px solid var(--rule)}
+@media (max-width:860px){.rec .left{border-right:0;border-bottom:1px solid var(--rule)}}
+.rec .big{font-family:var(--mono);font-size:38px;font-weight:500;letter-spacing:-.02em;
+  color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.1}
+.rec .big em{font-style:normal;color:var(--ink-3);font-size:19px}
+.rec .sub{color:var(--ink-2);margin-top:9px;font-size:13.5px}
+.rec .right{padding:22px 26px;display:flex;flex-direction:column;gap:13px}
+.caveat{display:flex;gap:11px;font-size:12.5px;color:var(--ink-2);line-height:1.5}
+.caveat .dot{width:6px;height:6px;border-radius:50%;flex:0 0 6px;margin-top:6px}
+
+/* tables */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-4);font-weight:500;text-align:right;padding:0 0 9px;border-bottom:1px solid var(--rule)}
+th:first-child{text-align:left}
+td{padding:13px 0 12px;border-bottom:1px solid var(--rule-soft);text-align:right;
+  vertical-align:top;font-variant-numeric:tabular-nums;font-family:var(--mono);
+  font-size:12.5px;line-height:1.4}
+td:first-child{text-align:left;font-family:var(--sans);font-size:13.5px;padding-top:12px}
+tbody tr:last-child td{border-bottom:0}
+.swatch{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:9px;vertical-align:baseline}
+.ci{color:var(--ink-4);font-size:10.5px;display:block;margin-top:3px;line-height:1.2;
+  letter-spacing:-.01em}
+.flag{font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;
+  padding:2px 6px;border-radius:2px;border:1px solid;white-space:nowrap}
+.flag.warn{color:var(--warn);border-color:rgba(242,165,65,.4);background:rgba(242,165,65,.08)}
+.tablewrap{overflow-x:auto}
+
+/* charts */
+.chart{width:100%;display:block;overflow:visible}
+.legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--ink-2)}
+.legend span{display:flex;align-items:center;gap:7px}
+.note{font-size:12px;color:var(--ink-3);margin-top:12px;line-height:1.55;max-width:70ch}
+
+/* hypothesis register */
+.hyp{border-top:1px solid var(--rule)}
+.hrow{border-bottom:1px solid var(--rule-soft);padding:0}
+.hhead{display:grid;grid-template-columns:52px minmax(0,1fr) 96px 132px 78px;gap:14px;align-items:center;
+  padding:15px 4px;cursor:pointer;background:none;border:0;width:100%;text-align:left;color:inherit;font:inherit}
+@media (max-width:860px){.hhead{grid-template-columns:44px minmax(0,1fr) 84px;}
+  .hhead .hres,.hhead .hfdr{display:none}}
+.hhead:hover{background:var(--panel)}
+.hid{font-family:var(--mono);font-size:12.5px;color:var(--ink-3);font-weight:500}
+.hst{font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;
+  padding:3px 7px;border-radius:2px;text-align:center;border:1px solid}
+.hst.confirmed{color:var(--good);border-color:rgba(63,166,106,.4);background:rgba(63,166,106,.09)}
+.hst.rejected{color:var(--crit);border-color:rgba(224,92,92,.35);background:rgba(224,92,92,.08)}
+.hst.running{color:var(--s1);border-color:rgba(57,135,229,.4);background:rgba(57,135,229,.09)}
+.hst.proposed{color:var(--ink-3);border-color:var(--rule)}
+.hst.underpowered{color:var(--warn);border-color:rgba(242,165,65,.35);background:rgba(242,165,65,.07)}
+.hres{font-family:var(--mono);font-size:12px;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink-2)}
+.hfdr{font-family:var(--mono);font-size:11.5px;text-align:right;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.hbody{padding:2px 4px 22px 66px;color:var(--ink-2);font-size:13.5px;max-width:78ch}
+@media (max-width:860px){.hbody{padding-left:8px}}
+.hbody .learn{border-left:2px solid var(--s1);padding-left:14px;margin:14px 0 0;color:var(--ink);
+  font-family:var(--serif);font-size:16px;line-height:1.5}
+.hbody dl{display:grid;grid-template-columns:88px 1fr;gap:5px 14px;margin:12px 0 0;font-size:12.5px}
+.hbody dt{font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-4);padding-top:3px}
+.hbody dd{margin:0;color:var(--ink-2)}
+.hbody[hidden]{display:none}
+.chev{width:9px;height:9px;border-right:1.5px solid var(--ink-4);border-bottom:1.5px solid var(--ink-4);
+  transform:rotate(-45deg);transition:transform .15s;justify-self:center}
+.hhead[aria-expanded="true"] .chev{transform:rotate(45deg)}
+
+/* prompts */
+.prompts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:860px){.prompts{grid-template-columns:1fr}}
+.prompt{background:var(--panel);border:1px solid var(--rule);border-left:2px solid var(--s4);
+  border-radius:0 4px 4px 0;padding:16px 18px}
+.prompt h4{margin:0 0 7px;font-size:14px;font-weight:600;font-family:var(--sans)}
+.prompt p{margin:0;font-size:12.5px;color:var(--ink-2);line-height:1.55}
+.prompt .src{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink-4);margin-top:10px;display:block}
+
+/* tooltip */
+#tip{position:fixed;pointer-events:none;opacity:0;transition:opacity .1s;z-index:50;
+  background:#0a0c10;border:1px solid var(--rule);border-radius:4px;padding:8px 11px;
+  font-family:var(--mono);font-size:11.5px;color:var(--ink);box-shadow:0 8px 24px rgba(0,0,0,.6);
+  font-variant-numeric:tabular-nums;white-space:nowrap;line-height:1.6}
+#tip .tk{color:var(--ink-4)}
+</style>
+
+<div id="tip"></div>
+<div class="shell">
+  <aside class="rail">
+    <div class="mark">Zoltar<small>Research Console</small></div>
+    <nav class="nav">
+      <a href="#health"><span class="n">01</span> Archive health</a>
+      <a href="#question"><span class="n">02</span> The open question</a>
+      <a href="#bench"><span class="n">03</span> Benchmarks</a>
+      <a href="#signal"><span class="n">04</span> Where the signal lives</a>
+      <a href="#timing"><span class="n">05</span> Execution timing</a>
+      <a href="#register"><span class="n">06</span> Hypothesis register</a>
+      <a href="#next"><span class="n">07</span> What to test next</a>
+    </nav>
+    <div class="railfoot">
+      <span id="genstamp">—</span><br>
+      schema v<span id="schemav">—</span><br>
+      <span id="srcstamp">—</span>
+    </div>
+  </aside>
+
+  <main>
+    <div class="seedbar" id="seedbar" hidden></div>
+
+    <section id="health" style="padding-top:0">
+      <div class="status" id="statusstrip"></div>
+    </section>
+
+    <div class="wrap">
+
+      <section id="question">
+        <div class="eyebrow">Primary objective</div>
+        <h2>Given a rank produced at time&nbsp;T, when should the buy happen?</h2>
+        <p class="lede">Everything else in this console exists to make the answer to that
+          question trustworthy — and to make it obvious when it isn't.</p>
+        <div class="rec" id="rec"></div>
+      </section>
+
+      <section id="bench">
+        <div class="eyebrow">03 — Benchmarks</div>
+        <h2>What the ranks are worth once you have to actually trade them</h2>
+        <p class="lede">Two backtests run the identical selection rule. The only difference is
+          execution. The gap between them is the execution bias, and it is the first number
+          worth knowing.</p>
+        <div class="panel">
+          <h3>Growth of 1.00</h3>
+          <svg id="equity" class="chart" viewBox="0 0 900 300" role="img"
+               aria-label="Equity curves for four strategies"></svg>
+          <div class="legend" id="equityLegend"></div>
+        </div>
+        <div class="panel" style="margin-top:18px">
+          <h3>Strategy comparison</h3>
+          <div class="tablewrap"><table id="strategyTable"></table></div>
+          <p class="note" id="benchNote"></p>
+        </div>
+      </section>
+
+      <section id="signal">
+        <div class="eyebrow">04 — Signal quality</div>
+        <h2>Where the signal actually lives</h2>
+        <p class="lede">Information Coefficient is the rank correlation between score and realized
+          forward return — a measure of the signal itself, independent of any trading rule. It has
+          ~1,200 symbols × ~230 days behind it, so it detects effects a portfolio-level test never could.</p>
+        <div class="grid2">
+          <div class="panel">
+            <h3>IC by holding horizon</h3>
+            <svg id="icHorizon" class="chart" viewBox="0 0 440 260" role="img"
+                 aria-label="Information coefficient by holding horizon with confidence intervals"></svg>
+            <p class="note" id="icNote"></p>
+          </div>
+          <div class="panel">
+            <h3>IC by cap segment</h3>
+            <svg id="icSegment" class="chart" viewBox="0 0 440 260" role="img"
+                 aria-label="Information coefficient by cap segment and horizon"></svg>
+            <div class="legend" id="segLegend"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="timing">
+        <div class="eyebrow">05 — Execution timing</div>
+        <h2>How fast the edge decays after the model speaks</h2>
+        <p class="lede">Each point is a real, point-in-time observation: the archive holds intraday
+          re-scores at ~30-minute resolution, so “score at 10:30, buy at 11:00” is measured, not reconstructed.</p>
+        <div class="panel">
+          <h3>Edge decay after run timestamp</h3>
+          <svg id="decay" class="chart" viewBox="0 0 900 270" role="img"
+               aria-label="Information coefficient versus minutes elapsed after the rank run"></svg>
+          <p class="note" id="decayNote"></p>
+        </div>
+        <div class="panel" style="margin-top:18px">
+          <h3>Net return by entry time × exit rule <span style="color:var(--ink-4)">(bps per trade, after costs)</span></h3>
+          <svg id="heat" class="chart" viewBox="0 0 900 300" role="img"
+               aria-label="Heatmap of net return in basis points by entry time and exit rule"></svg>
+          <p class="note" id="heatNote"></p>
+        </div>
+      </section>
+
+      <section id="register">
+        <div class="eyebrow">06 — Pre-registration</div>
+        <h2>Hypothesis register</h2>
+        <p class="lede">Every experiment is registered here before it runs, with its success criterion.
+          Rejected hypotheses stay — the row count is the denominator for the false-discovery-rate
+          correction. Click a row for the reasoning and what we learned.</p>
+        <div class="hyp" id="hyp"></div>
+      </section>
+
+      <section id="next">
+        <div class="eyebrow">07 — Exploratory</div>
+        <h2>What to test next</h2>
+        <p class="lede">Patterns visible in the data above that no registered hypothesis covers yet.
+          These are prompts for judgement, not results — promote one to the register before testing it.</p>
+        <div class="prompts" id="prompts"></div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<script id="seed-data" type="application/json">{
+ "generated_at": "2026-09-02T18:30:00",
+ "schema_version": 1,
+ "is_seed_data": true,
+ "seed_note": "Illustrative example data. No backtest has been run. Replace with data/results/dashboard_data.json.",
+ "archive_health": {
+  "feeds": [
+   {
+    "feed": "daily",
+    "risk_bucket": "low",
+    "runs": 234,
+    "first_run": "2025-10-01T07:46:57",
+    "last_run": "2026-09-02T00:00:00",
+    "rows": 277831
+   },
+   {
+    "feed": "daily",
+    "risk_bucket": "high",
+    "runs": 234,
+    "first_run": "2025-10-01T07:46:57",
+    "last_run": "2026-09-02T00:00:00",
+    "rows": 277831
+   },
+   {
+    "feed": "all",
+    "risk_bucket": "low",
+    "runs": 376,
+    "first_run": "2026-05-16T08:37:38",
+    "last_run": "2026-09-02T00:00:00",
+    "rows": 439674
+   },
+   {
+    "feed": "all",
+    "risk_bucket": "high",
+    "runs": 376,
+    "first_run": "2026-05-16T08:37:38",
+    "last_run": "2026-09-02T00:00:00",
+    "rows": 439674
+   }
+  ],
+  "last_harvest_at": "2026-09-02T18:00:04",
+  "hours_since_last_run_ts": 3.2,
+  "failed_steps": [],
+  "expected_returns": {
+   "as_of_dates": 31,
+   "first": "2026-07-17",
+   "last": "2026-09-01"
+  },
+  "shap": {
+   "snapshots": 214,
+   "segments": [
+    "Large",
+    "Mid",
+    "Small"
+   ]
+  }
+ },
+ "signal_health": {
+  "ic_by_horizon": [
+   {
+    "horizon_days": 1,
+    "risk_bucket": "low",
+    "ic": 0.014,
+    "ci_low": 0.002,
+    "ci_high": 0.026,
+    "n_obs": 253100
+   },
+   {
+    "horizon_days": 2,
+    "risk_bucket": "low",
+    "ic": 0.026,
+    "ci_low": 0.013,
+    "ci_high": 0.039,
+    "n_obs": 252200
+   },
+   {
+    "horizon_days": 3,
+    "risk_bucket": "low",
+    "ic": 0.031,
+    "ci_low": 0.017,
+    "ci_high": 0.045,
+    "n_obs": 251300
+   },
+   {
+    "horizon_days": 5,
+    "risk_bucket": "low",
+    "ic": 0.024,
+    "ci_low": 0.008,
+    "ci_high": 0.04,
+    "n_obs": 249500
+   },
+   {
+    "horizon_days": 7,
+    "risk_bucket": "low",
+    "ic": 0.016,
+    "ci_low": -0.002,
+    "ci_high": 0.034,
+    "n_obs": 247700
+   },
+   {
+    "horizon_days": 10,
+    "risk_bucket": "low",
+    "ic": 0.009,
+    "ci_low": -0.012,
+    "ci_high": 0.03,
+    "n_obs": 245000
+   },
+   {
+    "horizon_days": 14,
+    "risk_bucket": "low",
+    "ic": 0.003,
+    "ci_low": -0.022,
+    "ci_high": 0.028,
+    "n_obs": 241400
+   }
+  ],
+  "ic_by_segment": [
+   {
+    "segment": "Large",
+    "horizon_days": 1,
+    "ic": 0.0084,
+    "ci_low": -0.0061,
+    "ci_high": 0.0229,
+    "n_obs": 51000
+   },
+   {
+    "segment": "Large",
+    "horizon_days": 3,
+    "ic": 0.0186,
+    "ci_low": 0.0011,
+    "ci_high": 0.0361,
+    "n_obs": 51000
+   },
+   {
+    "segment": "Large",
+    "horizon_days": 5,
+    "ic": 0.0144,
+    "ci_low": -0.0061,
+    "ci_high": 0.0349,
+    "n_obs": 51000
+   },
+   {
+    "segment": "Large",
+    "horizon_days": 10,
+    "ic": 0.0054,
+    "ci_low": -0.0226,
+    "ci_high": 0.0334,
+    "n_obs": 51000
+   },
+   {
+    "segment": "Mid",
+    "horizon_days": 1,
+    "ic": 0.014,
+    "ci_low": -0.0005,
+    "ci_high": 0.0285,
+    "n_obs": 85000
+   },
+   {
+    "segment": "Mid",
+    "horizon_days": 3,
+    "ic": 0.031,
+    "ci_low": 0.0135,
+    "ci_high": 0.0485,
+    "n_obs": 85000
+   },
+   {
+    "segment": "Mid",
+    "horizon_days": 5,
+    "ic": 0.024,
+    "ci_low": 0.0035,
+    "ci_high": 0.0445,
+    "n_obs": 85000
+   },
+   {
+    "segment": "Mid",
+    "horizon_days": 10,
+    "ic": 0.009,
+    "ci_low": -0.019,
+    "ci_high": 0.037,
+    "n_obs": 85000
+   },
+   {
+    "segment": "Small",
+    "horizon_days": 1,
+    "ic": 0.0203,
+    "ci_low": 0.0018,
+    "ci_high": 0.0388,
+    "n_obs": 123250
+   },
+   {
+    "segment": "Small",
+    "horizon_days": 3,
+    "ic": 0.0449,
+    "ci_low": 0.0234,
+    "ci_high": 0.0664,
+    "n_obs": 123250
+   },
+   {
+    "segment": "Small",
+    "horizon_days": 5,
+    "ic": 0.0348,
+    "ci_low": 0.0103,
+    "ci_high": 0.0593,
+    "n_obs": 123250
+   },
+   {
+    "segment": "Small",
+    "horizon_days": 10,
+    "ic": 0.013,
+    "ci_low": -0.019,
+    "ci_high": 0.045,
+    "n_obs": 123250
+   }
+  ],
+  "quantile_spread": [
+   {
+    "decile": 1,
+    "mean_fwd_return": -0.00197,
+    "ci_low": 0,
+    "ci_high": 0
+   },
+   {
+    "decile": 2,
+    "mean_fwd_return": -0.001,
+    "ci_low": 0,
+    "ci_high": 0
+   },
+   {
+    "decile": 3,
+    "mean_fwd_return": -0.00038,
+    "ci_low": 0,
+    "ci_high": 0
+   },
+   {
+    "decile": 4,
+    "mean_fwd_return": -0.0006,
+    "ci_low": 0,
+    "ci_high": 0
+   },
+   {
+    "decile": 5,
+    "mean_fwd_return": 0.00057,
+    "ci_low": 0,
+    "ci_high": 0
+   },
+   {
+    "decile": 6,
+    "mean_fwd_return": 0.00162,
+    "ci_low": 0,
+    "ci_high": 0
+   },
+   {
+    "decile": 7,
+    "mean_fwd_return": 0.00084,
+    "ci_low": 0,
+    "ci_high": 0
+   },
+   {
+    "decile": 8,
+    "mean_fwd_return": 0.00207,
+    "ci_low": 0,
+    "ci_high": 0
+   },
+   {
+    "decile": 9,
+    "mean_fwd_return": 0.00271,
+    "ci_low": 0,
+    "ci_high": 0
+   },
+   {
+    "decile": 10,
+    "mean_fwd_return": 0.00297,
+    "ci_low": 0,
+    "ci_high": 0
+   }
+  ]
+ },
+ "benchmarks": {
+  "strategies": [
+   {
+    "id": "BASELINE_ASIS",
+    "label": "Streamlit engine, as-is",
+    "total_return": 0.701,
+    "annualized": 0.7852,
+    "sharpe": 5.17,
+    "sharpe_ci": [
+     4.89,
+     5.45
+    ],
+    "max_drawdown": -0.0393,
+    "hit_rate": 0.681,
+    "trades": 198,
+    "avg_hold_days": 3.1,
+    "exposure": 0.84,
+    "note": "same-bar execution - NOT tradable; kept as the bias reference"
+   },
+   {
+    "id": "BASELINE_HONEST",
+    "label": "Same rules, realistic fills",
+    "total_return": 0.1364,
+    "annualized": 0.1497,
+    "sharpe": 0.89,
+    "sharpe_ci": [
+     0.61,
+     1.17
+    ],
+    "max_drawdown": -0.2198,
+    "hit_rate": 0.531,
+    "trades": 232,
+    "avg_hold_days": 2.3,
+    "exposure": 0.76
+   },
+   {
+    "id": "RANDOM_5",
+    "label": "Random 5, same exit rule",
+    "total_return": -0.1634,
+    "annualized": -0.1769,
+    "sharpe": -1.11,
+    "sharpe_ci": [
+     -1.39,
+     -0.83
+    ],
+    "max_drawdown": -0.2463,
+    "hit_rate": 0.461,
+    "trades": 248,
+    "avg_hold_days": 1.9,
+    "exposure": 0.72
+   },
+   {
+    "id": "SPY",
+    "label": "SPY buy & hold",
+    "total_return": 0.2648,
+    "annualized": 0.2921,
+    "sharpe": 2.55,
+    "sharpe_ci": [
+     2.26,
+     2.83
+    ],
+    "max_drawdown": -0.0463,
+    "hit_rate": 0.589,
+    "trades": 219,
+    "avg_hold_days": 2.6,
+    "exposure": 0.79
+   }
+  ],
+  "equity_curves": [
+   {
+    "id": "BASELINE_ASIS",
+    "points": [
+     {
+      "date": "2025-10-01",
+      "value": 1.0112
+     },
+     {
+      "date": "2025-10-02",
+      "value": 1.0237
+     },
+     {
+      "date": "2025-10-03",
+      "value": 1.0262
+     },
+     {
+      "date": "2025-10-06",
+      "value": 1.0226
+     },
+     {
+      "date": "2025-10-07",
+      "value": 1.0165
+     },
+     {
+      "date": "2025-10-08",
+      "value": 1.0188
+     },
+     {
+      "date": "2025-10-09",
+      "value": 1.0132
+     },
+     {
+      "date": "2025-10-10",
+      "value": 1.0047
+     },
+     {
+      "date": "2025-10-13",
+      "value": 1.0081
+     },
+     {
+      "date": "2025-10-14",
+      "value": 1.0111
+     },
+     {
+      "date": "2025-10-15",
+      "value": 1.017
+     },
+     {
+      "date": "2025-10-16",
+      "value": 1.0123
+     },
+     {
+      "date": "2025-10-17",
+      "value": 1.0143
+     },
+     {
+      "date": "2025-10-20",
+      "value": 1.0158
+     },
+     {
+      "date": "2025-10-21",
+      "value": 1.0068
+     },
+     {
+      "date": "2025-10-22",
+      "value": 1.0127
+     },
+     {
+      "date": "2025-10-23",
+      "value": 1.017
+     },
+     {
+      "date": "2025-10-24",
+      "value": 1.0364
+     },
+     {
+      "date": "2025-10-27",
+      "value": 1.04
+     },
+     {
+      "date": "2025-10-28",
+      "value": 1.0409
+     },
+     {
+      "date": "2025-10-29",
+      "value": 1.0522
+     },
+     {
+      "date": "2025-10-30",
+      "value": 1.0558
+     },
+     {
+      "date": "2025-10-31",
+      "value": 1.0647
+     },
+     {
+      "date": "2025-11-03",
+      "value": 1.064
+     },
+     {
+      "date": "2025-11-04",
+      "value": 1.0677
+     },
+     {
+      "date": "2025-11-05",
+      "value": 1.0777
+     },
+     {
+      "date": "2025-11-06",
+      "value": 1.0852
+     },
+     {
+      "date": "2025-11-07",
+      "value": 1.0883
+     },
+     {
+      "date": "2025-11-10",
+      "value": 1.082
+     },
+     {
+      "date": "2025-11-11",
+      "value": 1.0875
+     },
+     {
+      "date": "2025-11-12",
+      "value": 1.0903
+     },
+     {
+      "date": "2025-11-13",
+      "value": 1.098
+     },
+     {
+      "date": "2025-11-14",
+      "value": 1.1019
+     },
+     {
+      "date": "2025-11-17",
+      "value": 1.1127
+     },
+     {
+      "date": "2025-11-18",
+      "value": 1.1144
+     },
+     {
+      "date": "2025-11-19",
+      "value": 1.1182
+     },
+     {
+      "date": "2025-11-20",
+      "value": 1.1258
+     },
+     {
+      "date": "2025-11-21",
+      "value": 1.1192
+     },
+     {
+      "date": "2025-11-24",
+      "value": 1.1181
+     },
+     {
+      "date": "2025-11-25",
+      "value": 1.1163
+     },
+     {
+      "date": "2025-11-26",
+      "value": 1.1344
+     },
+     {
+      "date": "2025-11-27",
+      "value": 1.1358
+     },
+     {
+      "date": "2025-11-28",
+      "value": 1.1434
+     },
+     {
+      "date": "2025-12-01",
+      "value": 1.1507
+     },
+     {
+      "date": "2025-12-02",
+      "value": 1.1506
+     },
+     {
+      "date": "2025-12-03",
+      "value": 1.14
+     },
+     {
+      "date": "2025-12-04",
+      "value": 1.1501
+     },
+     {
+      "date": "2025-12-05",
+      "value": 1.149
+     },
+     {
+      "date": "2025-12-08",
+      "value": 1.1572
+     },
+     {
+      "date": "2025-12-09",
+      "value": 1.1486
+     },
+     {
+      "date": "2025-12-10",
+      "value": 1.1472
+     },
+     {
+      "date": "2025-12-11",
+      "value": 1.1598
+     },
+     {
+      "date": "2025-12-12",
+      "value": 1.174
+     },
+     {
+      "date": "2025-12-15",
+      "value": 1.1653
+     },
+     {
+      "date": "2025-12-16",
+      "value": 1.1564
+     },
+     {
+      "date": "2025-12-17",
+      "value": 1.1583
+     },
+     {
+      "date": "2025-12-18",
+      "value": 1.1666
+     },
+     {
+      "date": "2025-12-19",
+      "value": 1.1702
+     },
+     {
+      "date": "2025-12-22",
+      "value": 1.1751
+     },
+     {
+      "date": "2025-12-23",
+      "value": 1.169
+     },
+     {
+      "date": "2025-12-24",
+      "value": 1.1762
+     },
+     {
+      "date": "2025-12-25",
+      "value": 1.188
+     },
+     {
+      "date": "2025-12-26",
+      "value": 1.1866
+     },
+     {
+      "date": "2025-12-29",
+      "value": 1.1766
+     },
+     {
+      "date": "2025-12-30",
+      "value": 1.1725
+     },
+     {
+      "date": "2025-12-31",
+      "value": 1.1812
+     },
+     {
+      "date": "2026-01-01",
+      "value": 1.1688
+     },
+     {
+      "date": "2026-01-02",
+      "value": 1.1703
+     },
+     {
+      "date": "2026-01-05",
+      "value": 1.1642
+     },
+     {
+      "date": "2026-01-06",
+      "value": 1.1654
+     },
+     {
+      "date": "2026-01-07",
+      "value": 1.1656
+     },
+     {
+      "date": "2026-01-08",
+      "value": 1.168
+     },
+     {
+      "date": "2026-01-09",
+      "value": 1.1829
+     },
+     {
+      "date": "2026-01-12",
+      "value": 1.1888
+     },
+     {
+      "date": "2026-01-13",
+      "value": 1.2025
+     },
+     {
+      "date": "2026-01-14",
+      "value": 1.2037
+     },
+     {
+      "date": "2026-01-15",
+      "value": 1.2018
+     },
+     {
+      "date": "2026-01-16",
+      "value": 1.2075
+     },
+     {
+      "date": "2026-01-19",
+      "value": 1.1852
+     },
+     {
+      "date": "2026-01-20",
+      "value": 1.1871
+     },
+     {
+      "date": "2026-01-21",
+      "value": 1.1908
+     },
+     {
+      "date": "2026-01-22",
+      "value": 1.1826
+     },
+     {
+      "date": "2026-01-23",
+      "value": 1.1888
+     },
+     {
+      "date": "2026-01-26",
+      "value": 1.1863
+     },
+     {
+      "date": "2026-01-27",
+      "value": 1.1676
+     },
+     {
+      "date": "2026-01-28",
+      "value": 1.1681
+     },
+     {
+      "date": "2026-01-29",
+      "value": 1.1622
+     },
+     {
+      "date": "2026-01-30",
+      "value": 1.1601
+     },
+     {
+      "date": "2026-02-02",
+      "value": 1.1611
+     },
+     {
+      "date": "2026-02-03",
+      "value": 1.1738
+     },
+     {
+      "date": "2026-02-04",
+      "value": 1.177
+     },
+     {
+      "date": "2026-02-05",
+      "value": 1.179
+     },
+     {
+      "date": "2026-02-06",
+      "value": 1.1846
+     },
+     {
+      "date": "2026-02-09",
+      "value": 1.1715
+     },
+     {
+      "date": "2026-02-10",
+      "value": 1.1842
+     },
+     {
+      "date": "2026-02-11",
+      "value": 1.1773
+     },
+     {
+      "date": "2026-02-12",
+      "value": 1.1834
+     },
+     {
+      "date": "2026-02-13",
+      "value": 1.1761
+     },
+     {
+      "date": "2026-02-16",
+      "value": 1.1701
+     },
+     {
+      "date": "2026-02-17",
+      "value": 1.169
+     },
+     {
+      "date": "2026-02-18",
+      "value": 1.1873
+     },
+     {
+      "date": "2026-02-19",
+      "value": 1.1955
+     },
+     {
+      "date": "2026-02-20",
+      "value": 1.1927
+     },
+     {
+      "date": "2026-02-23",
+      "value": 1.1926
+     },
+     {
+      "date": "2026-02-24",
+      "value": 1.185
+     },
+     {
+      "date": "2026-02-25",
+      "value": 1.187
+     },
+     {
+      "date": "2026-02-26",
+      "value": 1.1844
+     },
+     {
+      "date": "2026-02-27",
+      "value": 1.1929
+     },
+     {
+      "date": "2026-03-02",
+      "value": 1.1836
+     },
+     {
+      "date": "2026-03-03",
+      "value": 1.183
+     },
+     {
+      "date": "2026-03-04",
+      "value": 1.1782
+     },
+     {
+      "date": "2026-03-05",
+      "value": 1.1744
+     },
+     {
+      "date": "2026-03-06",
+      "value": 1.1827
+     },
+     {
+      "date": "2026-03-09",
+      "value": 1.1861
+     },
+     {
+      "date": "2026-03-10",
+      "value": 1.1934
+     },
+     {
+      "date": "2026-03-11",
+      "value": 1.2059
+     },
+     {
+      "date": "2026-03-12",
+      "value": 1.2182
+     },
+     {
+      "date": "2026-03-13",
+      "value": 1.2086
+     },
+     {
+      "date": "2026-03-16",
+      "value": 1.2156
+     },
+     {
+      "date": "2026-03-17",
+      "value": 1.2026
+     },
+     {
+      "date": "2026-03-18",
+      "value": 1.2044
+     },
+     {
+      "date": "2026-03-19",
+      "value": 1.2233
+     },
+     {
+      "date": "2026-03-20",
+      "value": 1.224
+     },
+     {
+      "date": "2026-03-23",
+      "value": 1.2232
+     },
+     {
+      "date": "2026-03-24",
+      "value": 1.227
+     },
+     {
+      "date": "2026-03-25",
+      "value": 1.2296
+     },
+     {
+      "date": "2026-03-26",
+      "value": 1.2322
+     },
+     {
+      "date": "2026-03-27",
+      "value": 1.2279
+     },
+     {
+      "date": "2026-03-30",
+      "value": 1.2399
+     },
+     {
+      "date": "2026-03-31",
+      "value": 1.2502
+     },
+     {
+      "date": "2026-04-01",
+      "value": 1.2508
+     },
+     {
+      "date": "2026-04-02",
+      "value": 1.256
+     },
+     {
+      "date": "2026-04-03",
+      "value": 1.2644
+     },
+     {
+      "date": "2026-04-06",
+      "value": 1.2763
+     },
+     {
+      "date": "2026-04-07",
+      "value": 1.2824
+     },
+     {
+      "date": "2026-04-08",
+      "value": 1.2913
+     },
+     {
+      "date": "2026-04-09",
+      "value": 1.2914
+     },
+     {
+      "date": "2026-04-10",
+      "value": 1.284
+     },
+     {
+      "date": "2026-04-13",
+      "value": 1.2819
+     },
+     {
+      "date": "2026-04-14",
+      "value": 1.2938
+     },
+     {
+      "date": "2026-04-15",
+      "value": 1.3054
+     },
+     {
+      "date": "2026-04-16",
+      "value": 1.3093
+     },
+     {
+      "date": "2026-04-17",
+      "value": 1.3065
+     },
+     {
+      "date": "2026-04-20",
+      "value": 1.312
+     },
+     {
+      "date": "2026-04-21",
+      "value": 1.3303
+     },
+     {
+      "date": "2026-04-22",
+      "value": 1.3458
+     },
+     {
+      "date": "2026-04-23",
+      "value": 1.3418
+     },
+     {
+      "date": "2026-04-24",
+      "value": 1.344
+     },
+     {
+      "date": "2026-04-27",
+      "value": 1.3326
+     },
+     {
+      "date": "2026-04-28",
+      "value": 1.3243
+     },
+     {
+      "date": "2026-04-29",
+      "value": 1.3287
+     },
+     {
+      "date": "2026-04-30",
+      "value": 1.3315
+     },
+     {
+      "date": "2026-05-01",
+      "value": 1.3433
+     },
+     {
+      "date": "2026-05-04",
+      "value": 1.3582
+     },
+     {
+      "date": "2026-05-05",
+      "value": 1.369
+     },
+     {
+      "date": "2026-05-06",
+      "value": 1.3847
+     },
+     {
+      "date": "2026-05-07",
+      "value": 1.382
+     },
+     {
+      "date": "2026-05-08",
+      "value": 1.3734
+     },
+     {
+      "date": "2026-05-11",
+      "value": 1.3811
+     },
+     {
+      "date": "2026-05-12",
+      "value": 1.4104
+     },
+     {
+      "date": "2026-05-13",
+      "value": 1.4168
+     },
+     {
+      "date": "2026-05-14",
+      "value": 1.4078
+     },
+     {
+      "date": "2026-05-15",
+      "value": 1.413
+     },
+     {
+      "date": "2026-05-18",
+      "value": 1.4302
+     },
+     {
+      "date": "2026-05-19",
+      "value": 1.4224
+     },
+     {
+      "date": "2026-05-20",
+      "value": 1.4334
+     },
+     {
+      "date": "2026-05-21",
+      "value": 1.4299
+     },
+     {
+      "date": "2026-05-22",
+      "value": 1.4458
+     },
+     {
+      "date": "2026-05-25",
+      "value": 1.4567
+     },
+     {
+      "date": "2026-05-26",
+      "value": 1.4628
+     },
+     {
+      "date": "2026-05-27",
+      "value": 1.4867
+     },
+     {
+      "date": "2026-05-28",
+      "value": 1.4852
+     },
+     {
+      "date": "2026-05-29",
+      "value": 1.4808
+     },
+     {
+      "date": "2026-06-01",
+      "value": 1.5034
+     },
+     {
+      "date": "2026-06-02",
+      "value": 1.4969
+     },
+     {
+      "date": "2026-06-03",
+      "value": 1.5235
+     },
+     {
+      "date": "2026-06-04",
+      "value": 1.526
+     },
+     {
+      "date": "2026-06-05",
+      "value": 1.5176
+     },
+     {
+      "date": "2026-06-08",
+      "value": 1.5206
+     },
+     {
+      "date": "2026-06-09",
+      "value": 1.5249
+     },
+     {
+      "date": "2026-06-10",
+      "value": 1.5301
+     },
+     {
+      "date": "2026-06-11",
+      "value": 1.531
+     },
+     {
+      "date": "2026-06-12",
+      "value": 1.5459
+     },
+     {
+      "date": "2026-06-15",
+      "value": 1.5231
+     },
+     {
+      "date": "2026-06-16",
+      "value": 1.52
+     },
+     {
+      "date": "2026-06-17",
+      "value": 1.5201
+     },
+     {
+      "date": "2026-06-18",
+      "value": 1.543
+     },
+     {
+      "date": "2026-06-19",
+      "value": 1.5238
+     },
+     {
+      "date": "2026-06-22",
+      "value": 1.5231
+     },
+     {
+      "date": "2026-06-23",
+      "value": 1.5135
+     },
+     {
+      "date": "2026-06-24",
+      "value": 1.5092
+     },
+     {
+      "date": "2026-06-25",
+      "value": 1.5191
+     },
+     {
+      "date": "2026-06-26",
+      "value": 1.5266
+     },
+     {
+      "date": "2026-06-29",
+      "value": 1.5454
+     },
+     {
+      "date": "2026-06-30",
+      "value": 1.5417
+     },
+     {
+      "date": "2026-07-01",
+      "value": 1.5477
+     },
+     {
+      "date": "2026-07-02",
+      "value": 1.5638
+     },
+     {
+      "date": "2026-07-03",
+      "value": 1.577
+     },
+     {
+      "date": "2026-07-06",
+      "value": 1.5763
+     },
+     {
+      "date": "2026-07-07",
+      "value": 1.5922
+     },
+     {
+      "date": "2026-07-08",
+      "value": 1.5847
+     },
+     {
+      "date": "2026-07-09",
+      "value": 1.6083
+     },
+     {
+      "date": "2026-07-10",
+      "value": 1.6133
+     },
+     {
+      "date": "2026-07-13",
+      "value": 1.6151
+     },
+     {
+      "date": "2026-07-14",
+      "value": 1.6214
+     },
+     {
+      "date": "2026-07-15",
+      "value": 1.6345
+     },
+     {
+      "date": "2026-07-16",
+      "value": 1.6582
+     },
+     {
+      "date": "2026-07-17",
+      "value": 1.6597
+     },
+     {
+      "date": "2026-07-20",
+      "value": 1.6585
+     },
+     {
+      "date": "2026-07-21",
+      "value": 1.6688
+     },
+     {
+      "date": "2026-07-22",
+      "value": 1.6616
+     },
+     {
+      "date": "2026-07-23",
+      "value": 1.6445
+     },
+     {
+      "date": "2026-07-24",
+      "value": 1.6576
+     },
+     {
+      "date": "2026-07-27",
+      "value": 1.6563
+     },
+     {
+      "date": "2026-07-28",
+      "value": 1.673
+     },
+     {
+      "date": "2026-07-29",
+      "value": 1.6639
+     },
+     {
+      "date": "2026-07-30",
+      "value": 1.6324
+     },
+     {
+      "date": "2026-07-31",
+      "value": 1.6389
+     },
+     {
+      "date": "2026-08-03",
+      "value": 1.644
+     },
+     {
+      "date": "2026-08-04",
+      "value": 1.6661
+     },
+     {
+      "date": "2026-08-05",
+      "value": 1.6757
+     },
+     {
+      "date": "2026-08-06",
+      "value": 1.6827
+     },
+     {
+      "date": "2026-08-07",
+      "value": 1.6931
+     },
+     {
+      "date": "2026-08-10",
+      "value": 1.6919
+     },
+     {
+      "date": "2026-08-11",
+      "value": 1.6961
+     },
+     {
+      "date": "2026-08-12",
+      "value": 1.6829
+     },
+     {
+      "date": "2026-08-13",
+      "value": 1.6925
+     },
+     {
+      "date": "2026-08-14",
+      "value": 1.686
+     },
+     {
+      "date": "2026-08-17",
+      "value": 1.6839
+     },
+     {
+      "date": "2026-08-18",
+      "value": 1.6956
+     },
+     {
+      "date": "2026-08-19",
+      "value": 1.7101
+     },
+     {
+      "date": "2026-08-20",
+      "value": 1.701
+     }
+    ]
+   },
+   {
+    "id": "BASELINE_HONEST",
+    "points": [
+     {
+      "date": "2025-10-01",
+      "value": 1.0215
+     },
+     {
+      "date": "2025-10-02",
+      "value": 1.0162
+     },
+     {
+      "date": "2025-10-03",
+      "value": 1.0205
+     },
+     {
+      "date": "2025-10-06",
+      "value": 1.0226
+     },
+     {
+      "date": "2025-10-07",
+      "value": 1.0309
+     },
+     {
+      "date": "2025-10-08",
+      "value": 1.0188
+     },
+     {
+      "date": "2025-10-09",
+      "value": 1.0157
+     },
+     {
+      "date": "2025-10-10",
+      "value": 1.0097
+     },
+     {
+      "date": "2025-10-13",
+      "value": 1.0007
+     },
+     {
+      "date": "2025-10-14",
+      "value": 0.9939
+     },
+     {
+      "date": "2025-10-15",
+      "value": 0.9901
+     },
+     {
+      "date": "2025-10-16",
+      "value": 0.9883
+     },
+     {
+      "date": "2025-10-17",
+      "value": 0.981
+     },
+     {
+      "date": "2025-10-20",
+      "value": 0.9854
+     },
+     {
+      "date": "2025-10-21",
+      "value": 0.9813
+     },
+     {
+      "date": "2025-10-22",
+      "value": 0.954
+     },
+     {
+      "date": "2025-10-23",
+      "value": 0.9648
+     },
+     {
+      "date": "2025-10-24",
+      "value": 0.9621
+     },
+     {
+      "date": "2025-10-27",
+      "value": 0.9565
+     },
+     {
+      "date": "2025-10-28",
+      "value": 0.9594
+     },
+     {
+      "date": "2025-10-29",
+      "value": 0.9621
+     },
+     {
+      "date": "2025-10-30",
+      "value": 0.9632
+     },
+     {
+      "date": "2025-10-31",
+      "value": 0.9566
+     },
+     {
+      "date": "2025-11-03",
+      "value": 0.9589
+     },
+     {
+      "date": "2025-11-04",
+      "value": 0.9464
+     },
+     {
+      "date": "2025-11-05",
+      "value": 0.9593
+     },
+     {
+      "date": "2025-11-06",
+      "value": 0.9491
+     },
+     {
+      "date": "2025-11-07",
+      "value": 0.9481
+     },
+     {
+      "date": "2025-11-10",
+      "value": 0.9489
+     },
+     {
+      "date": "2025-11-11",
+      "value": 0.9514
+     },
+     {
+      "date": "2025-11-12",
+      "value": 0.95
+     },
+     {
+      "date": "2025-11-13",
+      "value": 0.9548
+     },
+     {
+      "date": "2025-11-14",
+      "value": 0.9246
+     },
+     {
+      "date": "2025-11-17",
+      "value": 0.9233
+     },
+     {
+      "date": "2025-11-18",
+      "value": 0.9216
+     },
+     {
+      "date": "2025-11-19",
+      "value": 0.9176
+     },
+     {
+      "date": "2025-11-20",
+      "value": 0.9297
+     },
+     {
+      "date": "2025-11-21",
+      "value": 0.9212
+     },
+     {
+      "date": "2025-11-24",
+      "value": 0.9201
+     },
+     {
+      "date": "2025-11-25",
+      "value": 0.903
+     },
+     {
+      "date": "2025-11-26",
+      "value": 0.9048
+     },
+     {
+      "date": "2025-11-27",
+      "value": 0.8913
+     },
+     {
+      "date": "2025-11-28",
+      "value": 0.8783
+     },
+     {
+      "date": "2025-12-01",
+      "value": 0.8965
+     },
+     {
+      "date": "2025-12-02",
+      "value": 0.9017
+     },
+     {
+      "date": "2025-12-03",
+      "value": 0.9012
+     },
+     {
+      "date": "2025-12-04",
+      "value": 0.9022
+     },
+     {
+      "date": "2025-12-05",
+      "value": 0.8901
+     },
+     {
+      "date": "2025-12-08",
+      "value": 0.8813
+     },
+     {
+      "date": "2025-12-09",
+      "value": 0.8842
+     },
+     {
+      "date": "2025-12-10",
+      "value": 0.867
+     },
+     {
+      "date": "2025-12-11",
+      "value": 0.8687
+     },
+     {
+      "date": "2025-12-12",
+      "value": 0.8547
+     },
+     {
+      "date": "2025-12-15",
+      "value": 0.8552
+     },
+     {
+      "date": "2025-12-16",
+      "value": 0.8463
+     },
+     {
+      "date": "2025-12-17",
+      "value": 0.8593
+     },
+     {
+      "date": "2025-12-18",
+      "value": 0.8667
+     },
+     {
+      "date": "2025-12-19",
+      "value": 0.8623
+     },
+     {
+      "date": "2025-12-22",
+      "value": 0.8472
+     },
+     {
+      "date": "2025-12-23",
+      "value": 0.8408
+     },
+     {
+      "date": "2025-12-24",
+      "value": 0.84
+     },
+     {
+      "date": "2025-12-25",
+      "value": 0.832
+     },
+     {
+      "date": "2025-12-26",
+      "value": 0.8338
+     },
+     {
+      "date": "2025-12-29",
+      "value": 0.8409
+     },
+     {
+      "date": "2025-12-30",
+      "value": 0.84
+     },
+     {
+      "date": "2025-12-31",
+      "value": 0.8364
+     },
+     {
+      "date": "2026-01-01",
+      "value": 0.8419
+     },
+     {
+      "date": "2026-01-02",
+      "value": 0.8392
+     },
+     {
+      "date": "2026-01-05",
+      "value": 0.8453
+     },
+     {
+      "date": "2026-01-06",
+      "value": 0.8425
+     },
+     {
+      "date": "2026-01-07",
+      "value": 0.8544
+     },
+     {
+      "date": "2026-01-08",
+      "value": 0.8518
+     },
+     {
+      "date": "2026-01-09",
+      "value": 0.8433
+     },
+     {
+      "date": "2026-01-12",
+      "value": 0.8437
+     },
+     {
+      "date": "2026-01-13",
+      "value": 0.8384
+     },
+     {
+      "date": "2026-01-14",
+      "value": 0.831
+     },
+     {
+      "date": "2026-01-15",
+      "value": 0.8296
+     },
+     {
+      "date": "2026-01-16",
+      "value": 0.8349
+     },
+     {
+      "date": "2026-01-19",
+      "value": 0.8182
+     },
+     {
+      "date": "2026-01-20",
+      "value": 0.8175
+     },
+     {
+      "date": "2026-01-21",
+      "value": 0.816
+     },
+     {
+      "date": "2026-01-22",
+      "value": 0.8146
+     },
+     {
+      "date": "2026-01-23",
+      "value": 0.8202
+     },
+     {
+      "date": "2026-01-26",
+      "value": 0.8101
+     },
+     {
+      "date": "2026-01-27",
+      "value": 0.8146
+     },
+     {
+      "date": "2026-01-28",
+      "value": 0.8126
+     },
+     {
+      "date": "2026-01-29",
+      "value": 0.8131
+     },
+     {
+      "date": "2026-01-30",
+      "value": 0.8112
+     },
+     {
+      "date": "2026-02-02",
+      "value": 0.8085
+     },
+     {
+      "date": "2026-02-03",
+      "value": 0.8043
+     },
+     {
+      "date": "2026-02-04",
+      "value": 0.807
+     },
+     {
+      "date": "2026-02-05",
+      "value": 0.8221
+     },
+     {
+      "date": "2026-02-06",
+      "value": 0.8297
+     },
+     {
+      "date": "2026-02-09",
+      "value": 0.8358
+     },
+     {
+      "date": "2026-02-10",
+      "value": 0.8398
+     },
+     {
+      "date": "2026-02-11",
+      "value": 0.836
+     },
+     {
+      "date": "2026-02-12",
+      "value": 0.8403
+     },
+     {
+      "date": "2026-02-13",
+      "value": 0.8559
+     },
+     {
+      "date": "2026-02-16",
+      "value": 0.8458
+     },
+     {
+      "date": "2026-02-17",
+      "value": 0.8519
+     },
+     {
+      "date": "2026-02-18",
+      "value": 0.8596
+     },
+     {
+      "date": "2026-02-19",
+      "value": 0.8616
+     },
+     {
+      "date": "2026-02-20",
+      "value": 0.8676
+     },
+     {
+      "date": "2026-02-23",
+      "value": 0.8784
+     },
+     {
+      "date": "2026-02-24",
+      "value": 0.8959
+     },
+     {
+      "date": "2026-02-25",
+      "value": 0.9064
+     },
+     {
+      "date": "2026-02-26",
+      "value": 0.92
+     },
+     {
+      "date": "2026-02-27",
+      "value": 0.9227
+     },
+     {
+      "date": "2026-03-02",
+      "value": 0.9296
+     },
+     {
+      "date": "2026-03-03",
+      "value": 0.9311
+     },
+     {
+      "date": "2026-03-04",
+      "value": 0.9337
+     },
+     {
+      "date": "2026-03-05",
+      "value": 0.9298
+     },
+     {
+      "date": "2026-03-06",
+      "value": 0.9356
+     },
+     {
+      "date": "2026-03-09",
+      "value": 0.948
+     },
+     {
+      "date": "2026-03-10",
+      "value": 0.9468
+     },
+     {
+      "date": "2026-03-11",
+      "value": 0.9491
+     },
+     {
+      "date": "2026-03-12",
+      "value": 0.9546
+     },
+     {
+      "date": "2026-03-13",
+      "value": 0.955
+     },
+     {
+      "date": "2026-03-16",
+      "value": 0.9632
+     },
+     {
+      "date": "2026-03-17",
+      "value": 0.9657
+     },
+     {
+      "date": "2026-03-18",
+      "value": 0.9558
+     },
+     {
+      "date": "2026-03-19",
+      "value": 0.9472
+     },
+     {
+      "date": "2026-03-20",
+      "value": 0.9537
+     },
+     {
+      "date": "2026-03-23",
+      "value": 0.9594
+     },
+     {
+      "date": "2026-03-24",
+      "value": 0.9692
+     },
+     {
+      "date": "2026-03-25",
+      "value": 0.9717
+     },
+     {
+      "date": "2026-03-26",
+      "value": 0.9738
+     },
+     {
+      "date": "2026-03-27",
+      "value": 0.9603
+     },
+     {
+      "date": "2026-03-30",
+      "value": 0.9727
+     },
+     {
+      "date": "2026-03-31",
+      "value": 0.965
+     },
+     {
+      "date": "2026-04-01",
+      "value": 0.9744
+     },
+     {
+      "date": "2026-04-02",
+      "value": 0.9648
+     },
+     {
+      "date": "2026-04-03",
+      "value": 0.9594
+     },
+     {
+      "date": "2026-04-06",
+      "value": 0.9612
+     },
+     {
+      "date": "2026-04-07",
+      "value": 0.9579
+     },
+     {
+      "date": "2026-04-08",
+      "value": 0.9523
+     },
+     {
+      "date": "2026-04-09",
+      "value": 0.9603
+     },
+     {
+      "date": "2026-04-10",
+      "value": 0.9666
+     },
+     {
+      "date": "2026-04-13",
+      "value": 0.9704
+     },
+     {
+      "date": "2026-04-14",
+      "value": 0.9679
+     },
+     {
+      "date": "2026-04-15",
+      "value": 0.9612
+     },
+     {
+      "date": "2026-04-16",
+      "value": 0.9576
+     },
+     {
+      "date": "2026-04-17",
+      "value": 0.9535
+     },
+     {
+      "date": "2026-04-20",
+      "value": 0.9537
+     },
+     {
+      "date": "2026-04-21",
+      "value": 0.9608
+     },
+     {
+      "date": "2026-04-22",
+      "value": 0.9598
+     },
+     {
+      "date": "2026-04-23",
+      "value": 0.9535
+     },
+     {
+      "date": "2026-04-24",
+      "value": 0.9487
+     },
+     {
+      "date": "2026-04-27",
+      "value": 0.9601
+     },
+     {
+      "date": "2026-04-28",
+      "value": 0.962
+     },
+     {
+      "date": "2026-04-29",
+      "value": 0.9645
+     },
+     {
+      "date": "2026-04-30",
+      "value": 0.9675
+     },
+     {
+      "date": "2026-05-01",
+      "value": 0.9732
+     },
+     {
+      "date": "2026-05-04",
+      "value": 0.9749
+     },
+     {
+      "date": "2026-05-05",
+      "value": 0.9858
+     },
+     {
+      "date": "2026-05-06",
+      "value": 0.9935
+     },
+     {
+      "date": "2026-05-07",
+      "value": 0.9689
+     },
+     {
+      "date": "2026-05-08",
+      "value": 0.9684
+     },
+     {
+      "date": "2026-05-11",
+      "value": 0.9945
+     },
+     {
+      "date": "2026-05-12",
+      "value": 0.9837
+     },
+     {
+      "date": "2026-05-13",
+      "value": 0.9855
+     },
+     {
+      "date": "2026-05-14",
+      "value": 0.9956
+     },
+     {
+      "date": "2026-05-15",
+      "value": 0.9963
+     },
+     {
+      "date": "2026-05-18",
+      "value": 1.0088
+     },
+     {
+      "date": "2026-05-19",
+      "value": 0.9981
+     },
+     {
+      "date": "2026-05-20",
+      "value": 0.9876
+     },
+     {
+      "date": "2026-05-21",
+      "value": 0.9866
+     },
+     {
+      "date": "2026-05-22",
+      "value": 0.9808
+     },
+     {
+      "date": "2026-05-25",
+      "value": 0.972
+     },
+     {
+      "date": "2026-05-26",
+      "value": 0.9776
+     },
+     {
+      "date": "2026-05-27",
+      "value": 0.9806
+     },
+     {
+      "date": "2026-05-28",
+      "value": 0.9814
+     },
+     {
+      "date": "2026-05-29",
+      "value": 0.9785
+     },
+     {
+      "date": "2026-06-01",
+      "value": 0.9815
+     },
+     {
+      "date": "2026-06-02",
+      "value": 0.9812
+     },
+     {
+      "date": "2026-06-03",
+      "value": 0.9755
+     },
+     {
+      "date": "2026-06-04",
+      "value": 0.9806
+     },
+     {
+      "date": "2026-06-05",
+      "value": 0.9846
+     },
+     {
+      "date": "2026-06-08",
+      "value": 0.986
+     },
+     {
+      "date": "2026-06-09",
+      "value": 0.9928
+     },
+     {
+      "date": "2026-06-10",
+      "value": 0.9837
+     },
+     {
+      "date": "2026-06-11",
+      "value": 0.9831
+     },
+     {
+      "date": "2026-06-12",
+      "value": 0.9792
+     },
+     {
+      "date": "2026-06-15",
+      "value": 0.9915
+     },
+     {
+      "date": "2026-06-16",
+      "value": 0.9967
+     },
+     {
+      "date": "2026-06-17",
+      "value": 1.0162
+     },
+     {
+      "date": "2026-06-18",
+      "value": 1.0312
+     },
+     {
+      "date": "2026-06-19",
+      "value": 1.0285
+     },
+     {
+      "date": "2026-06-22",
+      "value": 1.0192
+     },
+     {
+      "date": "2026-06-23",
+      "value": 1.0243
+     },
+     {
+      "date": "2026-06-24",
+      "value": 1.0224
+     },
+     {
+      "date": "2026-06-25",
+      "value": 1.0217
+     },
+     {
+      "date": "2026-06-26",
+      "value": 1.0128
+     },
+     {
+      "date": "2026-06-29",
+      "value": 1.0189
+     },
+     {
+      "date": "2026-06-30",
+      "value": 1.0213
+     },
+     {
+      "date": "2026-07-01",
+      "value": 1.0257
+     },
+     {
+      "date": "2026-07-02",
+      "value": 1.0293
+     },
+     {
+      "date": "2026-07-03",
+      "value": 1.0218
+     },
+     {
+      "date": "2026-07-06",
+      "value": 1.0021
+     },
+     {
+      "date": "2026-07-07",
+      "value": 1.0004
+     },
+     {
+      "date": "2026-07-08",
+      "value": 0.9955
+     },
+     {
+      "date": "2026-07-09",
+      "value": 0.9915
+     },
+     {
+      "date": "2026-07-10",
+      "value": 1.0007
+     },
+     {
+      "date": "2026-07-13",
+      "value": 1.0005
+     },
+     {
+      "date": "2026-07-14",
+      "value": 1.0146
+     },
+     {
+      "date": "2026-07-15",
+      "value": 1.017
+     },
+     {
+      "date": "2026-07-16",
+      "value": 1.0239
+     },
+     {
+      "date": "2026-07-17",
+      "value": 1.0293
+     },
+     {
+      "date": "2026-07-20",
+      "value": 1.0374
+     },
+     {
+      "date": "2026-07-21",
+      "value": 1.0265
+     },
+     {
+      "date": "2026-07-22",
+      "value": 1.0372
+     },
+     {
+      "date": "2026-07-23",
+      "value": 1.0389
+     },
+     {
+      "date": "2026-07-24",
+      "value": 1.0306
+     },
+     {
+      "date": "2026-07-27",
+      "value": 1.037
+     },
+     {
+      "date": "2026-07-28",
+      "value": 1.0409
+     },
+     {
+      "date": "2026-07-29",
+      "value": 1.0536
+     },
+     {
+      "date": "2026-07-30",
+      "value": 1.0612
+     },
+     {
+      "date": "2026-07-31",
+      "value": 1.0654
+     },
+     {
+      "date": "2026-08-03",
+      "value": 1.0507
+     },
+     {
+      "date": "2026-08-04",
+      "value": 1.0671
+     },
+     {
+      "date": "2026-08-05",
+      "value": 1.082
+     },
+     {
+      "date": "2026-08-06",
+      "value": 1.0902
+     },
+     {
+      "date": "2026-08-07",
+      "value": 1.0955
+     },
+     {
+      "date": "2026-08-10",
+      "value": 1.1081
+     },
+     {
+      "date": "2026-08-11",
+      "value": 1.1004
+     },
+     {
+      "date": "2026-08-12",
+      "value": 1.108
+     },
+     {
+      "date": "2026-08-13",
+      "value": 1.109
+     },
+     {
+      "date": "2026-08-14",
+      "value": 1.0999
+     },
+     {
+      "date": "2026-08-17",
+      "value": 1.1043
+     },
+     {
+      "date": "2026-08-18",
+      "value": 1.1085
+     },
+     {
+      "date": "2026-08-19",
+      "value": 1.1262
+     },
+     {
+      "date": "2026-08-20",
+      "value": 1.1364
+     }
+    ]
+   },
+   {
+    "id": "RANDOM_5",
+    "points": [
+     {
+      "date": "2025-10-01",
+      "value": 1.0014
+     },
+     {
+      "date": "2025-10-02",
+      "value": 1.0146
+     },
+     {
+      "date": "2025-10-03",
+      "value": 1.0055
+     },
+     {
+      "date": "2025-10-06",
+      "value": 1.0161
+     },
+     {
+      "date": "2025-10-07",
+      "value": 1.0139
+     },
+     {
+      "date": "2025-10-08",
+      "value": 1.0117
+     },
+     {
+      "date": "2025-10-09",
+      "value": 1.0316
+     },
+     {
+      "date": "2025-10-10",
+      "value": 1.0337
+     },
+     {
+      "date": "2025-10-13",
+      "value": 1.0338
+     },
+     {
+      "date": "2025-10-14",
+      "value": 1.0419
+     },
+     {
+      "date": "2025-10-15",
+      "value": 1.0543
+     },
+     {
+      "date": "2025-10-16",
+      "value": 1.0544
+     },
+     {
+      "date": "2025-10-17",
+      "value": 1.0612
+     },
+     {
+      "date": "2025-10-20",
+      "value": 1.0513
+     },
+     {
+      "date": "2025-10-21",
+      "value": 1.0479
+     },
+     {
+      "date": "2025-10-22",
+      "value": 1.0437
+     },
+     {
+      "date": "2025-10-23",
+      "value": 1.0302
+     },
+     {
+      "date": "2025-10-24",
+      "value": 1.015
+     },
+     {
+      "date": "2025-10-27",
+      "value": 0.9988
+     },
+     {
+      "date": "2025-10-28",
+      "value": 0.9969
+     },
+     {
+      "date": "2025-10-29",
+      "value": 0.9956
+     },
+     {
+      "date": "2025-10-30",
+      "value": 0.9929
+     },
+     {
+      "date": "2025-10-31",
+      "value": 0.9941
+     },
+     {
+      "date": "2025-11-03",
+      "value": 0.9811
+     },
+     {
+      "date": "2025-11-04",
+      "value": 0.9808
+     },
+     {
+      "date": "2025-11-05",
+      "value": 0.9836
+     },
+     {
+      "date": "2025-11-06",
+      "value": 0.9916
+     },
+     {
+      "date": "2025-11-07",
+      "value": 0.9836
+     },
+     {
+      "date": "2025-11-10",
+      "value": 0.9801
+     },
+     {
+      "date": "2025-11-11",
+      "value": 0.9606
+     },
+     {
+      "date": "2025-11-12",
+      "value": 0.9562
+     },
+     {
+      "date": "2025-11-13",
+      "value": 0.9354
+     },
+     {
+      "date": "2025-11-14",
+      "value": 0.9225
+     },
+     {
+      "date": "2025-11-17",
+      "value": 0.9332
+     },
+     {
+      "date": "2025-11-18",
+      "value": 0.9129
+     },
+     {
+      "date": "2025-11-19",
+      "value": 0.9207
+     },
+     {
+      "date": "2025-11-20",
+      "value": 0.9241
+     },
+     {
+      "date": "2025-11-21",
+      "value": 0.9217
+     },
+     {
+      "date": "2025-11-24",
+      "value": 0.9264
+     },
+     {
+      "date": "2025-11-25",
+      "value": 0.9318
+     },
+     {
+      "date": "2025-11-26",
+      "value": 0.9421
+     },
+     {
+      "date": "2025-11-27",
+      "value": 0.9403
+     },
+     {
+      "date": "2025-11-28",
+      "value": 0.9351
+     },
+     {
+      "date": "2025-12-01",
+      "value": 0.9299
+     },
+     {
+      "date": "2025-12-02",
+      "value": 0.9211
+     },
+     {
+      "date": "2025-12-03",
+      "value": 0.9211
+     },
+     {
+      "date": "2025-12-04",
+      "value": 0.9142
+     },
+     {
+      "date": "2025-12-05",
+      "value": 0.9245
+     },
+     {
+      "date": "2025-12-08",
+      "value": 0.9075
+     },
+     {
+      "date": "2025-12-09",
+      "value": 0.8979
+     },
+     {
+      "date": "2025-12-10",
+      "value": 0.8897
+     },
+     {
+      "date": "2025-12-11",
+      "value": 0.8713
+     },
+     {
+      "date": "2025-12-12",
+      "value": 0.8885
+     },
+     {
+      "date": "2025-12-15",
+      "value": 0.8673
+     },
+     {
+      "date": "2025-12-16",
+      "value": 0.8652
+     },
+     {
+      "date": "2025-12-17",
+      "value": 0.8611
+     },
+     {
+      "date": "2025-12-18",
+      "value": 0.8759
+     },
+     {
+      "date": "2025-12-19",
+      "value": 0.8587
+     },
+     {
+      "date": "2025-12-22",
+      "value": 0.8684
+     },
+     {
+      "date": "2025-12-23",
+      "value": 0.8624
+     },
+     {
+      "date": "2025-12-24",
+      "value": 0.8615
+     },
+     {
+      "date": "2025-12-25",
+      "value": 0.8561
+     },
+     {
+      "date": "2025-12-26",
+      "value": 0.862
+     },
+     {
+      "date": "2025-12-29",
+      "value": 0.8525
+     },
+     {
+      "date": "2025-12-30",
+      "value": 0.8523
+     },
+     {
+      "date": "2025-12-31",
+      "value": 0.8557
+     },
+     {
+      "date": "2026-01-01",
+      "value": 0.872
+     },
+     {
+      "date": "2026-01-02",
+      "value": 0.8513
+     },
+     {
+      "date": "2026-01-05",
+      "value": 0.8648
+     },
+     {
+      "date": "2026-01-06",
+      "value": 0.8735
+     },
+     {
+      "date": "2026-01-07",
+      "value": 0.8696
+     },
+     {
+      "date": "2026-01-08",
+      "value": 0.8727
+     },
+     {
+      "date": "2026-01-09",
+      "value": 0.869
+     },
+     {
+      "date": "2026-01-12",
+      "value": 0.8839
+     },
+     {
+      "date": "2026-01-13",
+      "value": 0.8862
+     },
+     {
+      "date": "2026-01-14",
+      "value": 0.8847
+     },
+     {
+      "date": "2026-01-15",
+      "value": 0.8831
+     },
+     {
+      "date": "2026-01-16",
+      "value": 0.8817
+     },
+     {
+      "date": "2026-01-19",
+      "value": 0.8806
+     },
+     {
+      "date": "2026-01-20",
+      "value": 0.8732
+     },
+     {
+      "date": "2026-01-21",
+      "value": 0.8918
+     },
+     {
+      "date": "2026-01-22",
+      "value": 0.875
+     },
+     {
+      "date": "2026-01-23",
+      "value": 0.8435
+     },
+     {
+      "date": "2026-01-26",
+      "value": 0.8429
+     },
+     {
+      "date": "2026-01-27",
+      "value": 0.8421
+     },
+     {
+      "date": "2026-01-28",
+      "value": 0.8456
+     },
+     {
+      "date": "2026-01-29",
+      "value": 0.8443
+     },
+     {
+      "date": "2026-01-30",
+      "value": 0.8434
+     },
+     {
+      "date": "2026-02-02",
+      "value": 0.8467
+     },
+     {
+      "date": "2026-02-03",
+      "value": 0.8554
+     },
+     {
+      "date": "2026-02-04",
+      "value": 0.8519
+     },
+     {
+      "date": "2026-02-05",
+      "value": 0.8491
+     },
+     {
+      "date": "2026-02-06",
+      "value": 0.8661
+     },
+     {
+      "date": "2026-02-09",
+      "value": 0.8712
+     },
+     {
+      "date": "2026-02-10",
+      "value": 0.8629
+     },
+     {
+      "date": "2026-02-11",
+      "value": 0.8836
+     },
+     {
+      "date": "2026-02-12",
+      "value": 0.891
+     },
+     {
+      "date": "2026-02-13",
+      "value": 0.8861
+     },
+     {
+      "date": "2026-02-16",
+      "value": 0.876
+     },
+     {
+      "date": "2026-02-17",
+      "value": 0.8791
+     },
+     {
+      "date": "2026-02-18",
+      "value": 0.8721
+     },
+     {
+      "date": "2026-02-19",
+      "value": 0.8632
+     },
+     {
+      "date": "2026-02-20",
+      "value": 0.8523
+     },
+     {
+      "date": "2026-02-23",
+      "value": 0.8484
+     },
+     {
+      "date": "2026-02-24",
+      "value": 0.8583
+     },
+     {
+      "date": "2026-02-25",
+      "value": 0.8549
+     },
+     {
+      "date": "2026-02-26",
+      "value": 0.8428
+     },
+     {
+      "date": "2026-02-27",
+      "value": 0.8489
+     },
+     {
+      "date": "2026-03-02",
+      "value": 0.8499
+     },
+     {
+      "date": "2026-03-03",
+      "value": 0.8575
+     },
+     {
+      "date": "2026-03-04",
+      "value": 0.8684
+     },
+     {
+      "date": "2026-03-05",
+      "value": 0.8673
+     },
+     {
+      "date": "2026-03-06",
+      "value": 0.8664
+     },
+     {
+      "date": "2026-03-09",
+      "value": 0.8665
+     },
+     {
+      "date": "2026-03-10",
+      "value": 0.8569
+     },
+     {
+      "date": "2026-03-11",
+      "value": 0.8631
+     },
+     {
+      "date": "2026-03-12",
+      "value": 0.8755
+     },
+     {
+      "date": "2026-03-13",
+      "value": 0.8775
+     },
+     {
+      "date": "2026-03-16",
+      "value": 0.8758
+     },
+     {
+      "date": "2026-03-17",
+      "value": 0.8739
+     },
+     {
+      "date": "2026-03-18",
+      "value": 0.8674
+     },
+     {
+      "date": "2026-03-19",
+      "value": 0.8608
+     },
+     {
+      "date": "2026-03-20",
+      "value": 0.8577
+     },
+     {
+      "date": "2026-03-23",
+      "value": 0.8509
+     },
+     {
+      "date": "2026-03-24",
+      "value": 0.8475
+     },
+     {
+      "date": "2026-03-25",
+      "value": 0.8344
+     },
+     {
+      "date": "2026-03-26",
+      "value": 0.8378
+     },
+     {
+      "date": "2026-03-27",
+      "value": 0.8386
+     },
+     {
+      "date": "2026-03-30",
+      "value": 0.8292
+     },
+     {
+      "date": "2026-03-31",
+      "value": 0.8104
+     },
+     {
+      "date": "2026-04-01",
+      "value": 0.8107
+     },
+     {
+      "date": "2026-04-02",
+      "value": 0.8201
+     },
+     {
+      "date": "2026-04-03",
+      "value": 0.8144
+     },
+     {
+      "date": "2026-04-06",
+      "value": 0.8109
+     },
+     {
+      "date": "2026-04-07",
+      "value": 0.8066
+     },
+     {
+      "date": "2026-04-08",
+      "value": 0.8123
+     },
+     {
+      "date": "2026-04-09",
+      "value": 0.8052
+     },
+     {
+      "date": "2026-04-10",
+      "value": 0.8136
+     },
+     {
+      "date": "2026-04-13",
+      "value": 0.8115
+     },
+     {
+      "date": "2026-04-14",
+      "value": 0.8195
+     },
+     {
+      "date": "2026-04-15",
+      "value": 0.8201
+     },
+     {
+      "date": "2026-04-16",
+      "value": 0.8186
+     },
+     {
+      "date": "2026-04-17",
+      "value": 0.8068
+     },
+     {
+      "date": "2026-04-20",
+      "value": 0.8016
+     },
+     {
+      "date": "2026-04-21",
+      "value": 0.7998
+     },
+     {
+      "date": "2026-04-22",
+      "value": 0.8055
+     },
+     {
+      "date": "2026-04-23",
+      "value": 0.8079
+     },
+     {
+      "date": "2026-04-24",
+      "value": 0.8026
+     },
+     {
+      "date": "2026-04-27",
+      "value": 0.8063
+     },
+     {
+      "date": "2026-04-28",
+      "value": 0.8148
+     },
+     {
+      "date": "2026-04-29",
+      "value": 0.8139
+     },
+     {
+      "date": "2026-04-30",
+      "value": 0.8107
+     },
+     {
+      "date": "2026-05-01",
+      "value": 0.8079
+     },
+     {
+      "date": "2026-05-04",
+      "value": 0.8149
+     },
+     {
+      "date": "2026-05-05",
+      "value": 0.8197
+     },
+     {
+      "date": "2026-05-06",
+      "value": 0.8124
+     },
+     {
+      "date": "2026-05-07",
+      "value": 0.8159
+     },
+     {
+      "date": "2026-05-08",
+      "value": 0.8123
+     },
+     {
+      "date": "2026-05-11",
+      "value": 0.8065
+     },
+     {
+      "date": "2026-05-12",
+      "value": 0.817
+     },
+     {
+      "date": "2026-05-13",
+      "value": 0.8242
+     },
+     {
+      "date": "2026-05-14",
+      "value": 0.8185
+     },
+     {
+      "date": "2026-05-15",
+      "value": 0.8196
+     },
+     {
+      "date": "2026-05-18",
+      "value": 0.8241
+     },
+     {
+      "date": "2026-05-19",
+      "value": 0.8192
+     },
+     {
+      "date": "2026-05-20",
+      "value": 0.8186
+     },
+     {
+      "date": "2026-05-21",
+      "value": 0.8245
+     },
+     {
+      "date": "2026-05-22",
+      "value": 0.81
+     },
+     {
+      "date": "2026-05-25",
+      "value": 0.8131
+     },
+     {
+      "date": "2026-05-26",
+      "value": 0.8195
+     },
+     {
+      "date": "2026-05-27",
+      "value": 0.8241
+     },
+     {
+      "date": "2026-05-28",
+      "value": 0.8133
+     },
+     {
+      "date": "2026-05-29",
+      "value": 0.8163
+     },
+     {
+      "date": "2026-06-01",
+      "value": 0.8096
+     },
+     {
+      "date": "2026-06-02",
+      "value": 0.8147
+     },
+     {
+      "date": "2026-06-03",
+      "value": 0.82
+     },
+     {
+      "date": "2026-06-04",
+      "value": 0.8222
+     },
+     {
+      "date": "2026-06-05",
+      "value": 0.8162
+     },
+     {
+      "date": "2026-06-08",
+      "value": 0.8118
+     },
+     {
+      "date": "2026-06-09",
+      "value": 0.8192
+     },
+     {
+      "date": "2026-06-10",
+      "value": 0.8121
+     },
+     {
+      "date": "2026-06-11",
+      "value": 0.8166
+     },
+     {
+      "date": "2026-06-12",
+      "value": 0.8212
+     },
+     {
+      "date": "2026-06-15",
+      "value": 0.8193
+     },
+     {
+      "date": "2026-06-16",
+      "value": 0.8395
+     },
+     {
+      "date": "2026-06-17",
+      "value": 0.8405
+     },
+     {
+      "date": "2026-06-18",
+      "value": 0.8591
+     },
+     {
+      "date": "2026-06-19",
+      "value": 0.842
+     },
+     {
+      "date": "2026-06-22",
+      "value": 0.8233
+     },
+     {
+      "date": "2026-06-23",
+      "value": 0.8319
+     },
+     {
+      "date": "2026-06-24",
+      "value": 0.8376
+     },
+     {
+      "date": "2026-06-25",
+      "value": 0.8354
+     },
+     {
+      "date": "2026-06-26",
+      "value": 0.8353
+     },
+     {
+      "date": "2026-06-29",
+      "value": 0.8197
+     },
+     {
+      "date": "2026-06-30",
+      "value": 0.8149
+     },
+     {
+      "date": "2026-07-01",
+      "value": 0.8068
+     },
+     {
+      "date": "2026-07-02",
+      "value": 0.8053
+     },
+     {
+      "date": "2026-07-03",
+      "value": 0.8129
+     },
+     {
+      "date": "2026-07-06",
+      "value": 0.8138
+     },
+     {
+      "date": "2026-07-07",
+      "value": 0.8172
+     },
+     {
+      "date": "2026-07-08",
+      "value": 0.8118
+     },
+     {
+      "date": "2026-07-09",
+      "value": 0.8087
+     },
+     {
+      "date": "2026-07-10",
+      "value": 0.81
+     },
+     {
+      "date": "2026-07-13",
+      "value": 0.808
+     },
+     {
+      "date": "2026-07-14",
+      "value": 0.8188
+     },
+     {
+      "date": "2026-07-15",
+      "value": 0.8119
+     },
+     {
+      "date": "2026-07-16",
+      "value": 0.8278
+     },
+     {
+      "date": "2026-07-17",
+      "value": 0.82
+     },
+     {
+      "date": "2026-07-20",
+      "value": 0.8292
+     },
+     {
+      "date": "2026-07-21",
+      "value": 0.8231
+     },
+     {
+      "date": "2026-07-22",
+      "value": 0.8372
+     },
+     {
+      "date": "2026-07-23",
+      "value": 0.8387
+     },
+     {
+      "date": "2026-07-24",
+      "value": 0.8425
+     },
+     {
+      "date": "2026-07-27",
+      "value": 0.8493
+     },
+     {
+      "date": "2026-07-28",
+      "value": 0.8442
+     },
+     {
+      "date": "2026-07-29",
+      "value": 0.8357
+     },
+     {
+      "date": "2026-07-30",
+      "value": 0.819
+     },
+     {
+      "date": "2026-07-31",
+      "value": 0.8295
+     },
+     {
+      "date": "2026-08-03",
+      "value": 0.8241
+     },
+     {
+      "date": "2026-08-04",
+      "value": 0.8196
+     },
+     {
+      "date": "2026-08-05",
+      "value": 0.8197
+     },
+     {
+      "date": "2026-08-06",
+      "value": 0.8366
+     },
+     {
+      "date": "2026-08-07",
+      "value": 0.8224
+     },
+     {
+      "date": "2026-08-10",
+      "value": 0.8248
+     },
+     {
+      "date": "2026-08-11",
+      "value": 0.8219
+     },
+     {
+      "date": "2026-08-12",
+      "value": 0.8267
+     },
+     {
+      "date": "2026-08-13",
+      "value": 0.8121
+     },
+     {
+      "date": "2026-08-14",
+      "value": 0.8092
+     },
+     {
+      "date": "2026-08-17",
+      "value": 0.8165
+     },
+     {
+      "date": "2026-08-18",
+      "value": 0.8297
+     },
+     {
+      "date": "2026-08-19",
+      "value": 0.8435
+     },
+     {
+      "date": "2026-08-20",
+      "value": 0.8366
+     }
+    ]
+   },
+   {
+    "id": "SPY",
+    "points": [
+     {
+      "date": "2025-10-01",
+      "value": 1.0007
+     },
+     {
+      "date": "2025-10-02",
+      "value": 1.0043
+     },
+     {
+      "date": "2025-10-03",
+      "value": 1.0016
+     },
+     {
+      "date": "2025-10-06",
+      "value": 1.0044
+     },
+     {
+      "date": "2025-10-07",
+      "value": 1.0111
+     },
+     {
+      "date": "2025-10-08",
+      "value": 1.0144
+     },
+     {
+      "date": "2025-10-09",
+      "value": 1.0256
+     },
+     {
+      "date": "2025-10-10",
+      "value": 1.0198
+     },
+     {
+      "date": "2025-10-13",
+      "value": 1.0207
+     },
+     {
+      "date": "2025-10-14",
+      "value": 1.0163
+     },
+     {
+      "date": "2025-10-15",
+      "value": 1.0113
+     },
+     {
+      "date": "2025-10-16",
+      "value": 1.0104
+     },
+     {
+      "date": "2025-10-17",
+      "value": 1.0124
+     },
+     {
+      "date": "2025-10-20",
+      "value": 1.0157
+     },
+     {
+      "date": "2025-10-21",
+      "value": 1.0196
+     },
+     {
+      "date": "2025-10-22",
+      "value": 1.0355
+     },
+     {
+      "date": "2025-10-23",
+      "value": 1.0421
+     },
+     {
+      "date": "2025-10-24",
+      "value": 1.0312
+     },
+     {
+      "date": "2025-10-27",
+      "value": 1.0331
+     },
+     {
+      "date": "2025-10-28",
+      "value": 1.0291
+     },
+     {
+      "date": "2025-10-29",
+      "value": 1.0259
+     },
+     {
+      "date": "2025-10-30",
+      "value": 1.0355
+     },
+     {
+      "date": "2025-10-31",
+      "value": 1.0343
+     },
+     {
+      "date": "2025-11-03",
+      "value": 1.0211
+     },
+     {
+      "date": "2025-11-04",
+      "value": 1.0236
+     },
+     {
+      "date": "2025-11-05",
+      "value": 1.022
+     },
+     {
+      "date": "2025-11-06",
+      "value": 1.0143
+     },
+     {
+      "date": "2025-11-07",
+      "value": 1.0084
+     },
+     {
+      "date": "2025-11-10",
+      "value": 1.0045
+     },
+     {
+      "date": "2025-11-11",
+      "value": 1.0048
+     },
+     {
+      "date": "2025-11-12",
+      "value": 1.0023
+     },
+     {
+      "date": "2025-11-13",
+      "value": 1.0032
+     },
+     {
+      "date": "2025-11-14",
+      "value": 1.0161
+     },
+     {
+      "date": "2025-11-17",
+      "value": 1.011
+     },
+     {
+      "date": "2025-11-18",
+      "value": 1.0059
+     },
+     {
+      "date": "2025-11-19",
+      "value": 1.0046
+     },
+     {
+      "date": "2025-11-20",
+      "value": 1.0125
+     },
+     {
+      "date": "2025-11-21",
+      "value": 1.0081
+     },
+     {
+      "date": "2025-11-24",
+      "value": 1.0184
+     },
+     {
+      "date": "2025-11-25",
+      "value": 1.0097
+     },
+     {
+      "date": "2025-11-26",
+      "value": 1.0031
+     },
+     {
+      "date": "2025-11-27",
+      "value": 1.0031
+     },
+     {
+      "date": "2025-11-28",
+      "value": 0.9976
+     },
+     {
+      "date": "2025-12-01",
+      "value": 0.9939
+     },
+     {
+      "date": "2025-12-02",
+      "value": 0.9973
+     },
+     {
+      "date": "2025-12-03",
+      "value": 1.0027
+     },
+     {
+      "date": "2025-12-04",
+      "value": 1.0039
+     },
+     {
+      "date": "2025-12-05",
+      "value": 1.0024
+     },
+     {
+      "date": "2025-12-08",
+      "value": 1.012
+     },
+     {
+      "date": "2025-12-09",
+      "value": 1.0152
+     },
+     {
+      "date": "2025-12-10",
+      "value": 1.014
+     },
+     {
+      "date": "2025-12-11",
+      "value": 1.0228
+     },
+     {
+      "date": "2025-12-12",
+      "value": 1.017
+     },
+     {
+      "date": "2025-12-15",
+      "value": 1.0185
+     },
+     {
+      "date": "2025-12-16",
+      "value": 1.0235
+     },
+     {
+      "date": "2025-12-17",
+      "value": 1.0239
+     },
+     {
+      "date": "2025-12-18",
+      "value": 1.0203
+     },
+     {
+      "date": "2025-12-19",
+      "value": 1.0232
+     },
+     {
+      "date": "2025-12-22",
+      "value": 1.0198
+     },
+     {
+      "date": "2025-12-23",
+      "value": 1.0161
+     },
+     {
+      "date": "2025-12-24",
+      "value": 1.0095
+     },
+     {
+      "date": "2025-12-25",
+      "value": 1.0189
+     },
+     {
+      "date": "2025-12-26",
+      "value": 1.0155
+     },
+     {
+      "date": "2025-12-29",
+      "value": 1.0239
+     },
+     {
+      "date": "2025-12-30",
+      "value": 1.027
+     },
+     {
+      "date": "2025-12-31",
+      "value": 1.0256
+     },
+     {
+      "date": "2026-01-01",
+      "value": 1.0307
+     },
+     {
+      "date": "2026-01-02",
+      "value": 1.033
+     },
+     {
+      "date": "2026-01-05",
+      "value": 1.0344
+     },
+     {
+      "date": "2026-01-06",
+      "value": 1.0251
+     },
+     {
+      "date": "2026-01-07",
+      "value": 1.026
+     },
+     {
+      "date": "2026-01-08",
+      "value": 1.0327
+     },
+     {
+      "date": "2026-01-09",
+      "value": 1.0366
+     },
+     {
+      "date": "2026-01-12",
+      "value": 1.044
+     },
+     {
+      "date": "2026-01-13",
+      "value": 1.055
+     },
+     {
+      "date": "2026-01-14",
+      "value": 1.0584
+     },
+     {
+      "date": "2026-01-15",
+      "value": 1.0731
+     },
+     {
+      "date": "2026-01-16",
+      "value": 1.0625
+     },
+     {
+      "date": "2026-01-19",
+      "value": 1.0612
+     },
+     {
+      "date": "2026-01-20",
+      "value": 1.0434
+     },
+     {
+      "date": "2026-01-21",
+      "value": 1.0497
+     },
+     {
+      "date": "2026-01-22",
+      "value": 1.0508
+     },
+     {
+      "date": "2026-01-23",
+      "value": 1.0633
+     },
+     {
+      "date": "2026-01-26",
+      "value": 1.0611
+     },
+     {
+      "date": "2026-01-27",
+      "value": 1.0469
+     },
+     {
+      "date": "2026-01-28",
+      "value": 1.0565
+     },
+     {
+      "date": "2026-01-29",
+      "value": 1.0473
+     },
+     {
+      "date": "2026-01-30",
+      "value": 1.0387
+     },
+     {
+      "date": "2026-02-02",
+      "value": 1.0379
+     },
+     {
+      "date": "2026-02-03",
+      "value": 1.0428
+     },
+     {
+      "date": "2026-02-04",
+      "value": 1.0396
+     },
+     {
+      "date": "2026-02-05",
+      "value": 1.0413
+     },
+     {
+      "date": "2026-02-06",
+      "value": 1.0285
+     },
+     {
+      "date": "2026-02-09",
+      "value": 1.041
+     },
+     {
+      "date": "2026-02-10",
+      "value": 1.0409
+     },
+     {
+      "date": "2026-02-11",
+      "value": 1.0422
+     },
+     {
+      "date": "2026-02-12",
+      "value": 1.0468
+     },
+     {
+      "date": "2026-02-13",
+      "value": 1.0485
+     },
+     {
+      "date": "2026-02-16",
+      "value": 1.0503
+     },
+     {
+      "date": "2026-02-17",
+      "value": 1.0441
+     },
+     {
+      "date": "2026-02-18",
+      "value": 1.0438
+     },
+     {
+      "date": "2026-02-19",
+      "value": 1.0473
+     },
+     {
+      "date": "2026-02-20",
+      "value": 1.0552
+     },
+     {
+      "date": "2026-02-23",
+      "value": 1.0548
+     },
+     {
+      "date": "2026-02-24",
+      "value": 1.0559
+     },
+     {
+      "date": "2026-02-25",
+      "value": 1.0587
+     },
+     {
+      "date": "2026-02-26",
+      "value": 1.0633
+     },
+     {
+      "date": "2026-02-27",
+      "value": 1.0652
+     },
+     {
+      "date": "2026-03-02",
+      "value": 1.0639
+     },
+     {
+      "date": "2026-03-03",
+      "value": 1.0606
+     },
+     {
+      "date": "2026-03-04",
+      "value": 1.0692
+     },
+     {
+      "date": "2026-03-05",
+      "value": 1.0718
+     },
+     {
+      "date": "2026-03-06",
+      "value": 1.0724
+     },
+     {
+      "date": "2026-03-09",
+      "value": 1.0982
+     },
+     {
+      "date": "2026-03-10",
+      "value": 1.1052
+     },
+     {
+      "date": "2026-03-11",
+      "value": 1.1121
+     },
+     {
+      "date": "2026-03-12",
+      "value": 1.1137
+     },
+     {
+      "date": "2026-03-13",
+      "value": 1.1065
+     },
+     {
+      "date": "2026-03-16",
+      "value": 1.1155
+     },
+     {
+      "date": "2026-03-17",
+      "value": 1.1153
+     },
+     {
+      "date": "2026-03-18",
+      "value": 1.1162
+     },
+     {
+      "date": "2026-03-19",
+      "value": 1.1244
+     },
+     {
+      "date": "2026-03-20",
+      "value": 1.1327
+     },
+     {
+      "date": "2026-03-23",
+      "value": 1.135
+     },
+     {
+      "date": "2026-03-24",
+      "value": 1.1356
+     },
+     {
+      "date": "2026-03-25",
+      "value": 1.1523
+     },
+     {
+      "date": "2026-03-26",
+      "value": 1.1573
+     },
+     {
+      "date": "2026-03-27",
+      "value": 1.1497
+     },
+     {
+      "date": "2026-03-30",
+      "value": 1.1561
+     },
+     {
+      "date": "2026-03-31",
+      "value": 1.1577
+     },
+     {
+      "date": "2026-04-01",
+      "value": 1.1585
+     },
+     {
+      "date": "2026-04-02",
+      "value": 1.1643
+     },
+     {
+      "date": "2026-04-03",
+      "value": 1.1667
+     },
+     {
+      "date": "2026-04-06",
+      "value": 1.1831
+     },
+     {
+      "date": "2026-04-07",
+      "value": 1.1852
+     },
+     {
+      "date": "2026-04-08",
+      "value": 1.1878
+     },
+     {
+      "date": "2026-04-09",
+      "value": 1.1976
+     },
+     {
+      "date": "2026-04-10",
+      "value": 1.1935
+     },
+     {
+      "date": "2026-04-13",
+      "value": 1.2023
+     },
+     {
+      "date": "2026-04-14",
+      "value": 1.2023
+     },
+     {
+      "date": "2026-04-15",
+      "value": 1.2125
+     },
+     {
+      "date": "2026-04-16",
+      "value": 1.206
+     },
+     {
+      "date": "2026-04-17",
+      "value": 1.2099
+     },
+     {
+      "date": "2026-04-20",
+      "value": 1.1973
+     },
+     {
+      "date": "2026-04-21",
+      "value": 1.1942
+     },
+     {
+      "date": "2026-04-22",
+      "value": 1.1948
+     },
+     {
+      "date": "2026-04-23",
+      "value": 1.1993
+     },
+     {
+      "date": "2026-04-24",
+      "value": 1.2159
+     },
+     {
+      "date": "2026-04-27",
+      "value": 1.2316
+     },
+     {
+      "date": "2026-04-28",
+      "value": 1.2209
+     },
+     {
+      "date": "2026-04-29",
+      "value": 1.2152
+     },
+     {
+      "date": "2026-04-30",
+      "value": 1.226
+     },
+     {
+      "date": "2026-05-01",
+      "value": 1.2302
+     },
+     {
+      "date": "2026-05-04",
+      "value": 1.2193
+     },
+     {
+      "date": "2026-05-05",
+      "value": 1.2238
+     },
+     {
+      "date": "2026-05-06",
+      "value": 1.215
+     },
+     {
+      "date": "2026-05-07",
+      "value": 1.2084
+     },
+     {
+      "date": "2026-05-08",
+      "value": 1.1986
+     },
+     {
+      "date": "2026-05-11",
+      "value": 1.197
+     },
+     {
+      "date": "2026-05-12",
+      "value": 1.2158
+     },
+     {
+      "date": "2026-05-13",
+      "value": 1.2194
+     },
+     {
+      "date": "2026-05-14",
+      "value": 1.219
+     },
+     {
+      "date": "2026-05-15",
+      "value": 1.2404
+     },
+     {
+      "date": "2026-05-18",
+      "value": 1.237
+     },
+     {
+      "date": "2026-05-19",
+      "value": 1.2363
+     },
+     {
+      "date": "2026-05-20",
+      "value": 1.2346
+     },
+     {
+      "date": "2026-05-21",
+      "value": 1.2386
+     },
+     {
+      "date": "2026-05-22",
+      "value": 1.2366
+     },
+     {
+      "date": "2026-05-25",
+      "value": 1.2493
+     },
+     {
+      "date": "2026-05-26",
+      "value": 1.2474
+     },
+     {
+      "date": "2026-05-27",
+      "value": 1.2526
+     },
+     {
+      "date": "2026-05-28",
+      "value": 1.2551
+     },
+     {
+      "date": "2026-05-29",
+      "value": 1.2483
+     },
+     {
+      "date": "2026-06-01",
+      "value": 1.2405
+     },
+     {
+      "date": "2026-06-02",
+      "value": 1.2406
+     },
+     {
+      "date": "2026-06-03",
+      "value": 1.2218
+     },
+     {
+      "date": "2026-06-04",
+      "value": 1.2225
+     },
+     {
+      "date": "2026-06-05",
+      "value": 1.2237
+     },
+     {
+      "date": "2026-06-08",
+      "value": 1.2254
+     },
+     {
+      "date": "2026-06-09",
+      "value": 1.2252
+     },
+     {
+      "date": "2026-06-10",
+      "value": 1.2287
+     },
+     {
+      "date": "2026-06-11",
+      "value": 1.2263
+     },
+     {
+      "date": "2026-06-12",
+      "value": 1.2322
+     },
+     {
+      "date": "2026-06-15",
+      "value": 1.2191
+     },
+     {
+      "date": "2026-06-16",
+      "value": 1.2271
+     },
+     {
+      "date": "2026-06-17",
+      "value": 1.2203
+     },
+     {
+      "date": "2026-06-18",
+      "value": 1.2249
+     },
+     {
+      "date": "2026-06-19",
+      "value": 1.2215
+     },
+     {
+      "date": "2026-06-22",
+      "value": 1.2185
+     },
+     {
+      "date": "2026-06-23",
+      "value": 1.2125
+     },
+     {
+      "date": "2026-06-24",
+      "value": 1.2241
+     },
+     {
+      "date": "2026-06-25",
+      "value": 1.2155
+     },
+     {
+      "date": "2026-06-26",
+      "value": 1.2061
+     },
+     {
+      "date": "2026-06-29",
+      "value": 1.2084
+     },
+     {
+      "date": "2026-06-30",
+      "value": 1.211
+     },
+     {
+      "date": "2026-07-01",
+      "value": 1.2119
+     },
+     {
+      "date": "2026-07-02",
+      "value": 1.2045
+     },
+     {
+      "date": "2026-07-03",
+      "value": 1.1997
+     },
+     {
+      "date": "2026-07-06",
+      "value": 1.2076
+     },
+     {
+      "date": "2026-07-07",
+      "value": 1.1996
+     },
+     {
+      "date": "2026-07-08",
+      "value": 1.2051
+     },
+     {
+      "date": "2026-07-09",
+      "value": 1.2116
+     },
+     {
+      "date": "2026-07-10",
+      "value": 1.2132
+     },
+     {
+      "date": "2026-07-13",
+      "value": 1.2037
+     },
+     {
+      "date": "2026-07-14",
+      "value": 1.2198
+     },
+     {
+      "date": "2026-07-15",
+      "value": 1.2214
+     },
+     {
+      "date": "2026-07-16",
+      "value": 1.2235
+     },
+     {
+      "date": "2026-07-17",
+      "value": 1.2209
+     },
+     {
+      "date": "2026-07-20",
+      "value": 1.2136
+     },
+     {
+      "date": "2026-07-21",
+      "value": 1.212
+     },
+     {
+      "date": "2026-07-22",
+      "value": 1.2141
+     },
+     {
+      "date": "2026-07-23",
+      "value": 1.2077
+     },
+     {
+      "date": "2026-07-24",
+      "value": 1.2092
+     },
+     {
+      "date": "2026-07-27",
+      "value": 1.2191
+     },
+     {
+      "date": "2026-07-28",
+      "value": 1.2233
+     },
+     {
+      "date": "2026-07-29",
+      "value": 1.223
+     },
+     {
+      "date": "2026-07-30",
+      "value": 1.2322
+     },
+     {
+      "date": "2026-07-31",
+      "value": 1.2404
+     },
+     {
+      "date": "2026-08-03",
+      "value": 1.2485
+     },
+     {
+      "date": "2026-08-04",
+      "value": 1.2424
+     },
+     {
+      "date": "2026-08-05",
+      "value": 1.2276
+     },
+     {
+      "date": "2026-08-06",
+      "value": 1.2348
+     },
+     {
+      "date": "2026-08-07",
+      "value": 1.2358
+     },
+     {
+      "date": "2026-08-10",
+      "value": 1.2332
+     },
+     {
+      "date": "2026-08-11",
+      "value": 1.2378
+     },
+     {
+      "date": "2026-08-12",
+      "value": 1.2346
+     },
+     {
+      "date": "2026-08-13",
+      "value": 1.2299
+     },
+     {
+      "date": "2026-08-14",
+      "value": 1.2455
+     },
+     {
+      "date": "2026-08-17",
+      "value": 1.2327
+     },
+     {
+      "date": "2026-08-18",
+      "value": 1.2402
+     },
+     {
+      "date": "2026-08-19",
+      "value": 1.2492
+     },
+     {
+      "date": "2026-08-20",
+      "value": 1.2648
+     }
+    ]
+   }
+  ],
+  "comparisons": [
+   {
+    "a": "BASELINE_ASIS",
+    "b": "BASELINE_HONEST",
+    "metric": "annualized",
+    "diff": 0.6355,
+    "ci_low": 0.4955,
+    "ci_high": 0.7755,
+    "p": 0.003,
+    "fdr_p": 0.015,
+    "n_eff": 118
+   },
+   {
+    "a": "BASELINE_HONEST",
+    "b": "RANDOM_5",
+    "metric": "annualized",
+    "diff": 0.3266,
+    "ci_low": 0.1666,
+    "ci_high": 0.4866,
+    "p": 0.31,
+    "fdr_p": 0.42,
+    "n_eff": 106
+   },
+   {
+    "a": "BASELINE_HONEST",
+    "b": "SPY",
+    "metric": "annualized",
+    "diff": -0.1424,
+    "ci_low": -0.2924,
+    "ci_high": 0.0076,
+    "p": 0.19,
+    "fdr_p": 0.32,
+    "n_eff": 112
+   }
+  ]
+ },
+ "timing": {
+  "decay_curve": [
+   {
+    "minutes_after_run": 0,
+    "ic": 0.031,
+    "ci_low": 0.019,
+    "ci_high": 0.043
+   },
+   {
+    "minutes_after_run": 15,
+    "ic": 0.033,
+    "ci_low": 0.0204,
+    "ci_high": 0.0456
+   },
+   {
+    "minutes_after_run": 30,
+    "ic": 0.034,
+    "ci_low": 0.0208,
+    "ci_high": 0.0472
+   },
+   {
+    "minutes_after_run": 45,
+    "ic": 0.031,
+    "ci_low": 0.0172,
+    "ci_high": 0.0448
+   },
+   {
+    "minutes_after_run": 60,
+    "ic": 0.028,
+    "ci_low": 0.0136,
+    "ci_high": 0.0424
+   },
+   {
+    "minutes_after_run": 90,
+    "ic": 0.022,
+    "ci_low": 0.0064,
+    "ci_high": 0.0376
+   },
+   {
+    "minutes_after_run": 120,
+    "ic": 0.017,
+    "ci_low": 0.0002,
+    "ci_high": 0.0338
+   },
+   {
+    "minutes_after_run": 180,
+    "ic": 0.011,
+    "ci_low": -0.0082,
+    "ci_high": 0.0302
+   },
+   {
+    "minutes_after_run": 300,
+    "ic": 0.004,
+    "ci_low": -0.02,
+    "ci_high": 0.028
+   }
+  ],
+  "grid": [
+   {
+    "entry_time": "09:30",
+    "exit_rule": "1d",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": -1.0,
+    "ci_low": -10.4,
+    "ci_high": 8.4
+   },
+   {
+    "entry_time": "09:30",
+    "exit_rule": "3d",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": 2.4,
+    "ci_low": -7.0,
+    "ci_high": 11.8
+   },
+   {
+    "entry_time": "09:30",
+    "exit_rule": "5d",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": 2.2,
+    "ci_low": -7.2,
+    "ci_high": 11.6
+   },
+   {
+    "entry_time": "09:30",
+    "exit_rule": "bracket -1/+2",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": 1.1,
+    "ci_low": -8.3,
+    "ci_high": 10.5
+   },
+   {
+    "entry_time": "09:30",
+    "exit_rule": "hold period",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": -2.1,
+    "ci_low": -11.5,
+    "ci_high": 7.3
+   },
+   {
+    "entry_time": "09:35",
+    "exit_rule": "1d",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": 1.3,
+    "ci_low": -8.1,
+    "ci_high": 10.7
+   },
+   {
+    "entry_time": "09:35",
+    "exit_rule": "3d",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": 7.1,
+    "ci_low": -2.3,
+    "ci_high": 16.5
+   },
+   {
+    "entry_time": "09:35",
+    "exit_rule": "5d",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": 7.7,
+    "ci_low": -1.7,
+    "ci_high": 17.1
+   },
+   {
+    "entry_time": "09:35",
+    "exit_rule": "bracket -1/+2",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": 7.0,
+    "ci_low": -2.4,
+    "ci_high": 16.4
+   },
+   {
+    "entry_time": "09:35",
+    "exit_rule": "hold period",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": 2.0,
+    "ci_low": -7.4,
+    "ci_high": 11.4
+   },
+   {
+    "entry_time": "10:00",
+    "exit_rule": "1d",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": 3.7,
+    "ci_low": -5.7,
+    "ci_high": 13.1
+   },
+   {
+    "entry_time": "10:00",
+    "exit_rule": "3d",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": 8.0,
+    "ci_low": -1.4,
+    "ci_high": 17.4
+   },
+   {
+    "entry_time": "10:00",
+    "exit_rule": "5d",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": 7.2,
+    "ci_low": -2.2,
+    "ci_high": 16.6
+   },
+   {
+    "entry_time": "10:00",
+    "exit_rule": "bracket -1/+2",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": 9.1,
+    "ci_low": -0.3,
+    "ci_high": 18.5
+   },
+   {
+    "entry_time": "10:00",
+    "exit_rule": "hold period",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": 3.9,
+    "ci_low": -5.5,
+    "ci_high": 13.3
+   },
+   {
+    "entry_time": "10:30",
+    "exit_rule": "1d",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": 3.5,
+    "ci_low": -5.9,
+    "ci_high": 12.9
+   },
+   {
+    "entry_time": "10:30",
+    "exit_rule": "3d",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": 4.3,
+    "ci_low": -5.1,
+    "ci_high": 13.7
+   },
+   {
+    "entry_time": "10:30",
+    "exit_rule": "5d",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": 6.3,
+    "ci_low": -3.1,
+    "ci_high": 15.7
+   },
+   {
+    "entry_time": "10:30",
+    "exit_rule": "bracket -1/+2",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": 5.6,
+    "ci_low": -3.8,
+    "ci_high": 15.0
+   },
+   {
+    "entry_time": "10:30",
+    "exit_rule": "hold period",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": 2.0,
+    "ci_low": -7.4,
+    "ci_high": 11.4
+   },
+   {
+    "entry_time": "11:00",
+    "exit_rule": "1d",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": 1.2,
+    "ci_low": -8.2,
+    "ci_high": 10.6
+   },
+   {
+    "entry_time": "11:00",
+    "exit_rule": "3d",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": 3.8,
+    "ci_low": -5.6,
+    "ci_high": 13.2
+   },
+   {
+    "entry_time": "11:00",
+    "exit_rule": "5d",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": 6.1,
+    "ci_low": -3.3,
+    "ci_high": 15.5
+   },
+   {
+    "entry_time": "11:00",
+    "exit_rule": "bracket -1/+2",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": 2.8,
+    "ci_low": -6.6,
+    "ci_high": 12.2
+   },
+   {
+    "entry_time": "11:00",
+    "exit_rule": "hold period",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": 1.3,
+    "ci_low": -8.1,
+    "ci_high": 10.7
+   },
+   {
+    "entry_time": "13:00",
+    "exit_rule": "1d",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": -0.8,
+    "ci_low": -10.2,
+    "ci_high": 8.6
+   },
+   {
+    "entry_time": "13:00",
+    "exit_rule": "3d",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": -0.9,
+    "ci_low": -10.3,
+    "ci_high": 8.5
+   },
+   {
+    "entry_time": "13:00",
+    "exit_rule": "5d",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": 3.7,
+    "ci_low": -5.7,
+    "ci_high": 13.1
+   },
+   {
+    "entry_time": "13:00",
+    "exit_rule": "bracket -1/+2",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": 1.1,
+    "ci_low": -8.3,
+    "ci_high": 10.5
+   },
+   {
+    "entry_time": "13:00",
+    "exit_rule": "hold period",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": 0.5,
+    "ci_low": -8.9,
+    "ci_high": 9.9
+   },
+   {
+    "entry_time": "15:55",
+    "exit_rule": "1d",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": -4.0,
+    "ci_low": -13.4,
+    "ci_high": 5.4
+   },
+   {
+    "entry_time": "15:55",
+    "exit_rule": "3d",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": -3.5,
+    "ci_low": -12.9,
+    "ci_high": 5.9
+   },
+   {
+    "entry_time": "15:55",
+    "exit_rule": "5d",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": -2.6,
+    "ci_low": -12.0,
+    "ci_high": 6.8
+   },
+   {
+    "entry_time": "15:55",
+    "exit_rule": "bracket -1/+2",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": -2.5,
+    "ci_low": -11.9,
+    "ci_high": 6.9
+   },
+   {
+    "entry_time": "15:55",
+    "exit_rule": "hold period",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": -2.0,
+    "ci_low": -11.4,
+    "ci_high": 7.4
+   },
+   {
+    "entry_time": "next open",
+    "exit_rule": "1d",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": -3.3,
+    "ci_low": -12.7,
+    "ci_high": 6.1
+   },
+   {
+    "entry_time": "next open",
+    "exit_rule": "3d",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": -4.2,
+    "ci_low": -13.6,
+    "ci_high": 5.2
+   },
+   {
+    "entry_time": "next open",
+    "exit_rule": "5d",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": -4.9,
+    "ci_low": -14.3,
+    "ci_high": 4.5
+   },
+   {
+    "entry_time": "next open",
+    "exit_rule": "bracket -1/+2",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": -4.3,
+    "ci_low": -13.7,
+    "ci_high": 5.1
+   },
+   {
+    "entry_time": "next open",
+    "exit_rule": "hold period",
+    "vintage": "latest_intraday",
+    "order_type": "market",
+    "net_return_bps": -1.7,
+    "ci_low": -11.1,
+    "ci_high": 7.7
+   }
+  ],
+  "recommendation": {
+   "entry_time": "10:00",
+   "vintage": "latest_intraday",
+   "expected_bps": 9.1,
+   "ci_low": 1.2,
+   "ci_high": 17.0,
+   "deflated_sharpe": 0.61,
+   "configs_searched": 1296,
+   "walk_forward_holds": true
+  }
+ },
+ "shap_drift": []
+}</script>
+<script>
+(function(){
+"use strict";
+const C={s1:"#3987e5",s2:"#d95926",s3:"#199e70",s4:"#9085e9",ink:"#e7eaf0",ink2:"#98a1b2",
+         ink3:"#626b7c",ink4:"#454d5c",rule:"#232833",ruleSoft:"#1b1f28",good:"#3fa66a",
+         warn:"#f2a541",crit:"#e05c5c",panel:"#12151b"};
+const SERIES={BASELINE_ASIS:C.s2,BASELINE_HONEST:C.s1,RANDOM_5:C.s3,SPY:C.ink3};
+const NS="http://www.w3.org/2000/svg";
+const $=s=>document.querySelector(s);
+const el=(t,a)=>{const n=document.createElementNS(NS,t);for(const k in a)n.setAttribute(k,a[k]);return n;};
+const pct=v=>(v>=0?"+":"")+(v*100).toFixed(1)+"%";
+const f=(v,d)=>Number(v).toFixed(d==null?3:d);
+
+/* ---------------- tooltip ---------------- */
+const tip=$("#tip");
+function showTip(e,html){tip.innerHTML=html;tip.style.opacity=1;
+  const r=tip.getBoundingClientRect();
+  let x=e.clientX+14,y=e.clientY-r.height-10;
+  if(x+r.width>innerWidth-8)x=e.clientX-r.width-14;
+  if(y<8)y=e.clientY+16;
+  tip.style.left=x+"px";tip.style.top=y+"px";}
+function hideTip(){tip.style.opacity=0;}
+function hoverable(node,html){
+  node.addEventListener("mousemove",e=>showTip(e,html));
+  node.addEventListener("mouseleave",hideTip);
+}
+
+/* ---------------- generic chart helpers ---------------- */
+function axes(svg,{x,y,w,h,xTicks,yTicks,yFmt}){
+  yTicks.forEach(t=>{
+    const yy=y(t);
+    svg.appendChild(el("line",{x1:x.range[0],x2:x.range[1],y1:yy,y2:yy,
+      stroke:t===0?C.ink4:C.ruleSoft,"stroke-width":1}));
+    const lb=el("text",{x:x.range[0]-9,y:yy+3.5,fill:C.ink4,"font-size":10,
+      "text-anchor":"end","font-family":"IBM Plex Mono, monospace"});
+    lb.textContent=yFmt(t);svg.appendChild(lb);
+  });
+  xTicks.forEach(t=>{
+    const lb=el("text",{x:t.x,y:h-8,fill:C.ink4,"font-size":10,"text-anchor":"middle",
+      "font-family":"IBM Plex Mono, monospace"});
+    lb.textContent=t.label;svg.appendChild(lb);
+  });
+}
+
+/* ---------------- equity curves ---------------- */
+function equity(data){
+  const svg=$("#equity"); svg.textContent="";
+  const W=900,H=300,m={l:46,r:14,t:12,b:30};
+  const curves=data.benchmarks.equity_curves;
+  const n=curves[0].points.length;
+  let lo=Infinity,hi=-Infinity;
+  curves.forEach(c=>c.points.forEach(p=>{lo=Math.min(lo,p.value);hi=Math.max(hi,p.value)}));
+  const pad=(hi-lo)*0.08; lo-=pad; hi+=pad;
+  const X=i=>m.l+(i/(n-1))*(W-m.l-m.r);
+  const Y=v=>m.t+(1-(v-lo)/(hi-lo))*(H-m.t-m.b);
+  X.range=[m.l,W-m.r];
+
+  const yT=[];const step=(hi-lo)/4;for(let i=0;i<=4;i++)yT.push(lo+step*i);
+  const xT=[0,Math.floor(n*.25),Math.floor(n*.5),Math.floor(n*.75),n-1].map(i=>({
+    x:X(i),label:curves[0].points[i].date.slice(0,7)}));
+  axes(svg,{x:X,y:Y,w:W,h:H,xTicks:xT,yTicks:yT,yFmt:v=>v.toFixed(2)});
+
+  curves.forEach(c=>{
+    const d=c.points.map((p,i)=>(i?"L":"M")+X(i).toFixed(1)+" "+Y(p.value).toFixed(1)).join(" ");
+    const isRef=c.id==="SPY";
+    svg.appendChild(el("path",{d,fill:"none",stroke:SERIES[c.id],"stroke-width":isRef?1.5:2,
+      "stroke-dasharray":isRef?"4 4":"none","stroke-linejoin":"round","stroke-linecap":"round"}));
+    const last=c.points[n-1];
+    svg.appendChild(el("circle",{cx:X(n-1),cy:Y(last.value),r:3.5,fill:SERIES[c.id],
+      stroke:C.panel,"stroke-width":2}));
+  });
+
+  // crosshair band
+  const line=el("line",{y1:m.t,y2:H-m.b,stroke:C.ink4,"stroke-width":1,opacity:0});
+  svg.appendChild(line);
+  const hit=el("rect",{x:m.l,y:m.t,width:W-m.l-m.r,height:H-m.t-m.b,fill:"transparent"});
+  svg.appendChild(hit);
+  hit.addEventListener("mousemove",e=>{
+    const bb=svg.getBoundingClientRect();
+    const rel=(e.clientX-bb.left)/bb.width*W;
+    let i=Math.round((rel-m.l)/(W-m.l-m.r)*(n-1)); i=Math.max(0,Math.min(n-1,i));
+    line.setAttribute("x1",X(i));line.setAttribute("x2",X(i));line.setAttribute("opacity",.6);
+    const rows=curves.map(c=>`<div><span style="color:${SERIES[c.id]}">●</span> `+
+      `<span class="tk">${c.id.replace("BASELINE_","").toLowerCase()}</span> `+
+      c.points[i].value.toFixed(3)+"</div>").join("");
+    showTip(e,`<div class="tk">${curves[0].points[i].date}</div>${rows}`);
+  });
+  hit.addEventListener("mouseleave",()=>{line.setAttribute("opacity",0);hideTip();});
+
+  $("#equityLegend").innerHTML=curves.map(c=>{
+    const s=data.benchmarks.strategies.find(x=>x.id===c.id);
+    return `<span><i class="swatch" style="background:${SERIES[c.id]}"></i>${s?s.label:c.id}</span>`;
+  }).join("");
+}
+
+/* ---------------- strategy table ---------------- */
+function strategyTable(data){
+  const S=data.benchmarks.strategies;
+  const head=`<thead><tr><th>Strategy</th><th>Annualized</th><th>Sharpe</th>
+    <th>Max DD</th><th>Hit rate</th><th>Trades</th></tr></thead>`;
+  const body=S.map(s=>{
+    const flag=s.note?` <span class="flag warn" title="${s.note}">not tradable</span>`:"";
+    return `<tr>
+      <td><i class="swatch" style="background:${SERIES[s.id]||C.ink3}"></i>${s.label}${flag}</td>
+      <td>${pct(s.annualized)}</td>
+      <td>${f(s.sharpe,2)}<span class="ci">${f(s.sharpe_ci[0],2)} – ${f(s.sharpe_ci[1],2)}</span></td>
+      <td>${pct(s.max_drawdown)}</td>
+      <td>${(s.hit_rate*100).toFixed(1)}%</td>
+      <td>${s.trades}</td></tr>`;
+  }).join("");
+  $("#strategyTable").innerHTML=head+"<tbody>"+body+"</tbody>";
+
+  const cmp=data.benchmarks.comparisons;
+  const c0=cmp[0], c1=cmp.find(c=>c.b==="RANDOM_5");
+  $("#benchNote").innerHTML=
+    `Sharpe intervals are stationary block-bootstrap, mean block 10 days. `+
+    `<b style="color:var(--ink)">As-is minus honest: ${pct(c0.diff)} annualized</b> `+
+    `(95% CI ${pct(c0.ci_low)} – ${pct(c0.ci_high)}, FDR p&nbsp;=&nbsp;${c0.fdr_p}). `+
+    (c1?`Honest minus random-5: ${pct(c1.diff)} (95% CI ${pct(c1.ci_low)} – ${pct(c1.ci_high)}, `+
+        `FDR p&nbsp;=&nbsp;${c1.fdr_p}) — <b style="color:var(--ink)">that interval spans zero</b>, `+
+        `so on this sample the ranks are not yet distinguishable from random selection under the same exit rule.`:"")+
+    ` Effective sample n&nbsp;=&nbsp;${c0.n_eff}, not ${(data.signal_health.ic_by_horizon[0].n_obs).toLocaleString()} — `+
+    `portfolio-level tests have far less power than they appear to.`;
+}
+
+/* ---------------- IC by horizon (bars + CI whiskers) ---------------- */
+function icHorizon(data){
+  const svg=$("#icHorizon"); svg.textContent="";
+  const W=440,H=260,m={l:44,r:12,t:14,b:34};
+  const D=data.signal_health.ic_by_horizon;
+  const lo=Math.min(0,...D.map(d=>d.ci_low)),hi=Math.max(...D.map(d=>d.ci_high));
+  const Y=v=>m.t+(1-(v-lo)/(hi-lo))*(H-m.t-m.b);
+  const bw=(W-m.l-m.r)/D.length;
+  const X=i=>m.l+bw*i+bw/2;
+  X.range=[m.l,W-m.r];
+  const yT=[];for(let i=0;i<=4;i++)yT.push(lo+(hi-lo)*i/4);
+  axes(svg,{x:X,y:Y,w:W,h:H,xTicks:D.map((d,i)=>({x:X(i),label:d.horizon_days+"d"})),
+    yTicks:yT,yFmt:v=>v.toFixed(3)});
+
+  const best=D.reduce((a,b)=>b.ic>a.ic?b:a);
+  D.forEach((d,i)=>{
+    const g=el("g",{}); svg.appendChild(g);
+    const w=bw*.42, x=X(i)-w/2, y0=Y(0), y1=Y(d.ic);
+    g.appendChild(el("rect",{x,y:Math.min(y0,y1),width:w,height:Math.max(1.5,Math.abs(y1-y0)),
+      rx:2,fill:d===best?C.s1:"#2b4d7a"}));
+    g.appendChild(el("line",{x1:X(i),x2:X(i),y1:Y(d.ci_low),y2:Y(d.ci_high),
+      stroke:C.ink2,"stroke-width":1.5}));
+    [d.ci_low,d.ci_high].forEach(v=>g.appendChild(el("line",{x1:X(i)-4,x2:X(i)+4,
+      y1:Y(v),y2:Y(v),stroke:C.ink2,"stroke-width":1.5})));
+    g.appendChild(el("rect",{x:X(i)-bw/2,y:m.t,width:bw,height:H-m.t-m.b,fill:"transparent"}));
+    hoverable(g,`<div class="tk">${d.horizon_days}-day horizon</div>IC ${f(d.ic,4)}<br>`+
+      `<span class="tk">95% CI</span> ${f(d.ci_low,4)} – ${f(d.ci_high,4)}<br>`+
+      `<span class="tk">n</span> ${d.n_obs.toLocaleString()}`);
+  });
+  const lbl=el("text",{x:X(D.indexOf(best)),y:Y(best.ci_high)-9,fill:C.s1,"font-size":10.5,
+    "text-anchor":"middle","font-family":"IBM Plex Mono, monospace"});
+  lbl.textContent="peak "+f(best.ic,3);svg.appendChild(lbl);
+
+  $("#icNote").innerHTML=`Realized IC peaks at <b style="color:var(--ink)">${best.horizon_days} days</b>, `+
+    `not the 7.5-day <code>Score_HoldPeriod</code> the models emit. Bars whose interval crosses zero `+
+    `are not evidence of signal at that horizon. <b style="color:var(--ink)">This is H1.</b>`;
+}
+
+/* ---------------- IC by segment (grouped lines) ---------------- */
+function icSegment(data){
+  const svg=$("#icSegment"); svg.textContent="";
+  const W=440,H=260,m={l:44,r:14,t:14,b:34};
+  const D=data.signal_health.ic_by_segment;
+  const segs=[...new Set(D.map(d=>d.segment))];
+  const hors=[...new Set(D.map(d=>d.horizon_days))].sort((a,b)=>a-b);
+  const col={Large:C.s1,Mid:C.s2,Small:C.s3};
+  const lo=Math.min(0,...D.map(d=>d.ci_low)),hi=Math.max(...D.map(d=>d.ci_high));
+  const Y=v=>m.t+(1-(v-lo)/(hi-lo))*(H-m.t-m.b);
+  const X=i=>m.l+(i/(hors.length-1))*(W-m.l-m.r);
+  X.range=[m.l,W-m.r];
+  const yT=[];for(let i=0;i<=4;i++)yT.push(lo+(hi-lo)*i/4);
+  axes(svg,{x:X,y:Y,w:W,h:H,xTicks:hors.map((h,i)=>({x:X(i),label:h+"d"})),
+    yTicks:yT,yFmt:v=>v.toFixed(3)});
+
+  segs.forEach(s=>{
+    const pts=hors.map(h=>D.find(d=>d.segment===s&&d.horizon_days===h));
+    const band=pts.map((p,i)=>(i?"L":"M")+X(i).toFixed(1)+" "+Y(p.ci_high).toFixed(1)).join(" ")+
+      " "+pts.slice().reverse().map((p,i)=>"L"+X(hors.length-1-i).toFixed(1)+" "+Y(p.ci_low).toFixed(1)).join(" ")+" Z";
+    svg.appendChild(el("path",{d:band,fill:col[s],opacity:.085,stroke:col[s],
+      "stroke-opacity":.22,"stroke-width":1}));
+    svg.appendChild(el("path",{d:pts.map((p,i)=>(i?"L":"M")+X(i).toFixed(1)+" "+Y(p.ic).toFixed(1)).join(" "),
+      fill:"none",stroke:col[s],"stroke-width":2,"stroke-linejoin":"round"}));
+    pts.forEach((p,i)=>{
+      const c=el("circle",{cx:X(i),cy:Y(p.ic),r:4,fill:col[s],stroke:C.panel,"stroke-width":2});
+      svg.appendChild(c);
+      hoverable(c,`<div class="tk">${s} · ${p.horizon_days}d</div>IC ${f(p.ic,4)}<br>`+
+        `<span class="tk">95% CI</span> ${f(p.ci_low,4)} – ${f(p.ci_high,4)}`);
+    });
+  });
+  $("#segLegend").innerHTML=segs.map(s=>
+    `<span><i class="swatch" style="background:${col[s]}"></i>${s}</span>`).join("")+
+    `<span style="color:var(--ink-4)">shaded = 95% CI</span>`;
+}
+
+/* ---------------- decay curve ---------------- */
+function decay(data){
+  const svg=$("#decay"); svg.textContent="";
+  const W=900,H=270,m={l:48,r:20,t:16,b:34};
+  const D=data.timing.decay_curve;
+  const lo=Math.min(0,...D.map(d=>d.ci_low)),hi=Math.max(...D.map(d=>d.ci_high));
+  const maxM=D[D.length-1].minutes_after_run;
+  const X=v=>m.l+(v/maxM)*(W-m.l-m.r);
+  const Y=v=>m.t+(1-(v-lo)/(hi-lo))*(H-m.t-m.b);
+  X.range=[m.l,W-m.r];
+  const yT=[];for(let i=0;i<=4;i++)yT.push(lo+(hi-lo)*i/4);
+  axes(svg,{x:X,y:Y,w:W,h:H,
+    xTicks:D.filter((_,i)=>i%2===0).map(d=>({x:X(d.minutes_after_run),
+      label:d.minutes_after_run===0?"run":"+"+d.minutes_after_run+"m"})),
+    yTicks:yT,yFmt:v=>v.toFixed(3)});
+
+  const band=D.map((d,i)=>(i?"L":"M")+X(d.minutes_after_run).toFixed(1)+" "+Y(d.ci_high).toFixed(1)).join(" ")+
+    " "+D.slice().reverse().map(d=>"L"+X(d.minutes_after_run).toFixed(1)+" "+Y(d.ci_low).toFixed(1)).join(" ")+" Z";
+  svg.appendChild(el("path",{d:band,fill:C.s1,opacity:.13}));
+  svg.appendChild(el("path",{d:D.map((d,i)=>(i?"L":"M")+X(d.minutes_after_run).toFixed(1)+" "+Y(d.ic).toFixed(1)).join(" "),
+    fill:"none",stroke:C.s1,"stroke-width":2,"stroke-linejoin":"round"}));
+
+  const peak=D.reduce((a,b)=>b.ic>a.ic?b:a);
+  svg.appendChild(el("line",{x1:X(peak.minutes_after_run),x2:X(peak.minutes_after_run),
+    y1:m.t,y2:H-m.b,stroke:C.warn,"stroke-width":1,"stroke-dasharray":"3 4",opacity:.8}));
+  const pl=el("text",{x:X(peak.minutes_after_run)+8,y:m.t+13,fill:C.warn,"font-size":10.5,
+    "font-family":"IBM Plex Mono, monospace"});
+  pl.textContent="peak +"+peak.minutes_after_run+"m";svg.appendChild(pl);
+
+  D.forEach(d=>{
+    const c=el("circle",{cx:X(d.minutes_after_run),cy:Y(d.ic),r:4.5,fill:C.s1,
+      stroke:C.panel,"stroke-width":2});
+    svg.appendChild(c);
+    hoverable(c,`<div class="tk">+${d.minutes_after_run} min after run</div>IC ${f(d.ic,4)}<br>`+
+      `<span class="tk">95% CI</span> ${f(d.ci_low,4)} – ${f(d.ci_high,4)}`);
+  });
+  $("#decayNote").innerHTML=`The edge does not decay monotonically from the run — it holds, and on this `+
+    `sample peaks <b style="color:var(--ink)">${peak.minutes_after_run} minutes after</b> the model finishes. `+
+    `If that survives walk-forward validation, buying at the open is leaving money on the table. `+
+    `Note every interval overlaps its neighbours: the shape is suggestive, the peak location is not yet established.`;
+}
+
+/* ---------------- heatmap ---------------- */
+function heat(data){
+  const svg=$("#heat"); svg.textContent="";
+  const W=900,H=300,m={l:118,r:120,t:22,b:38};
+  const G=data.timing.grid;
+  const xs=[...new Set(G.map(g=>g.entry_time))];
+  const ys=[...new Set(G.map(g=>g.exit_rule))];
+  const cw=(W-m.l-m.r)/xs.length, ch=(H-m.t-m.b)/ys.length;
+  const vals=G.map(g=>g.net_return_bps);
+  const mag=Math.max(Math.abs(Math.min(...vals)),Math.abs(Math.max(...vals)));
+  // diverging: red (neg) – neutral gray – blue (pos)
+  const ramp=t=>{ // t in [-1,1]
+    const neg=[224,92,92], pos=[57,135,229], mid=[56,56,53];
+    const a=t<0?neg:pos, k=Math.min(1,Math.abs(t));
+    return `rgb(${Math.round(mid[0]+(a[0]-mid[0])*k)},${Math.round(mid[1]+(a[1]-mid[1])*k)},${Math.round(mid[2]+(a[2]-mid[2])*k)})`;
+  };
+  const best=G.reduce((a,b)=>b.net_return_bps>a.net_return_bps?b:a);
+
+  G.forEach(g=>{
+    const i=xs.indexOf(g.entry_time), j=ys.indexOf(g.exit_rule);
+    const x=m.l+i*cw, y=m.t+j*ch;
+    const isBest=g===best;
+    svg.appendChild(el("rect",{x:x+1,y:y+1,width:cw-2,height:ch-2,rx:2,
+      fill:ramp(g.net_return_bps/mag),
+      stroke:isBest?C.warn:"none","stroke-width":isBest?1.5:0}));
+    const t=el("text",{x:x+cw/2,y:y+ch/2+3.5,"text-anchor":"middle","font-size":10.5,
+      fill:Math.abs(g.net_return_bps)/mag>.55?"#fff":C.ink2,
+      "font-family":"IBM Plex Mono, monospace"});
+    t.textContent=g.net_return_bps.toFixed(0);
+    svg.appendChild(t);
+    const hit=el("rect",{x,y,width:cw,height:ch,fill:"transparent"});
+    svg.appendChild(hit);
+    hoverable(hit,`<div class="tk">${g.entry_time} · exit ${g.exit_rule}</div>`+
+      `${g.net_return_bps.toFixed(1)} bps / trade<br>`+
+      `<span class="tk">95% CI</span> ${g.ci_low.toFixed(1)} – ${g.ci_high.toFixed(1)} bps`);
+  });
+  xs.forEach((x,i)=>{const t=el("text",{x:m.l+i*cw+cw/2,y:H-14,"text-anchor":"middle",
+    "font-size":10,fill:C.ink3,"font-family":"IBM Plex Mono, monospace"});t.textContent=x;svg.appendChild(t);});
+  ys.forEach((y,j)=>{const t=el("text",{x:m.l-10,y:m.t+j*ch+ch/2+3.5,"text-anchor":"end",
+    "font-size":10.5,fill:C.ink3,"font-family":"IBM Plex Mono, monospace"});t.textContent=y;svg.appendChild(t);});
+  const xl=el("text",{x:m.l+(W-m.l-m.r)/2,y:m.t-8,"text-anchor":"middle","font-size":10,
+    fill:C.ink4,"font-family":"IBM Plex Mono, monospace"});
+  xl.textContent="ENTRY TIME (CDT)";svg.appendChild(xl);
+
+  // legend ramp
+  const lx=W-m.r+24, lw=14, lh=H-m.t-m.b;
+  for(let k=0;k<40;k++){
+    const t=1-2*k/39;
+    svg.appendChild(el("rect",{x:lx,y:m.t+k*(lh/40),width:lw,height:lh/40+.5,fill:ramp(t)}));
+  }
+  [[m.t,"+"+mag.toFixed(0)],[m.t+lh/2,"0"],[m.t+lh,"−"+mag.toFixed(0)]].forEach(([y,txt])=>{
+    const t=el("text",{x:lx+lw+7,y:y+3.5,"font-size":10,fill:C.ink4,
+      "font-family":"IBM Plex Mono, monospace"});t.textContent=txt;svg.appendChild(t);});
+  const lt=el("text",{x:lx,y:m.t-8,"font-size":9.5,fill:C.ink4,
+    "font-family":"IBM Plex Mono, monospace"});lt.textContent="bps";svg.appendChild(lt);
+
+  const rec=data.timing.recommendation;
+  $("#heatNote").innerHTML=`Best cell: <b style="color:var(--ink)">${best.entry_time} / ${best.exit_rule} `+
+    `at ${best.net_return_bps.toFixed(1)} bps</b> — but its 95% interval `+
+    `(${best.ci_low.toFixed(1)} to ${best.ci_high.toFixed(1)}) spans zero, and this grid searched `+
+    `<b style="color:var(--ink)">${rec.configs_searched.toLocaleString()} configurations</b>. `+
+    `Read the neighbourhood, not the maximum: an isolated bright cell surrounded by dark ones is noise. `+
+    `Deflated Sharpe for the winner is ${rec.deflated_sharpe}.`;
+}
+
+/* ---------------- status strip ---------------- */
+function status(data){
+  const h=data.archive_health;
+  const daily=h.feeds.filter(f=>f.feed==="daily")[0];
+  const all=h.feeds.filter(f=>f.feed==="all")[0];
+  const stale=h.hours_since_last_run_ts;
+  const staleCls=stale<12?"ok":stale<36?"warn":"crit";
+  const failed=h.failed_steps.length;
+  const items=[
+    ["Harvester",failed?"FAILED":"HEALTHY",failed?"crit":"ok",
+      failed?failed+" step(s) failed":"last run "+h.last_harvest_at.slice(11,16)],
+    ["Data age",stale.toFixed(1)+"h",staleCls,"since newest run_ts"],
+    ["Daily runs",daily.runs,"","from "+daily.first_run.slice(0,10)],
+    ["Intraday runs",all.runs,"","from "+all.first_run.slice(0,10)],
+    ["Expected returns",h.expected_returns.as_of_dates,"","as-of dates"],
+    ["SHAP snapshots",h.shap.snapshots,"",h.shap.segments.join(" / ")],
+  ];
+  $("#statusstrip").innerHTML=items.map(([k,v,c,s])=>
+    `<div class="stat"><div class="k">${k}</div><div class="v ${c||""}">${v}</div><div class="s">${s}</div></div>`
+  ).join("");
+}
+
+/* ---------------- recommendation ---------------- */
+function recommendation(data){
+  const r=data.timing.recommendation;
+  const spans=r.ci_low<=0;
+  $("#rec").innerHTML=`
+    <div class="left">
+      <div class="big">${r.entry_time}<em> &nbsp;·&nbsp; ${r.vintage.replace("_"," ")}</em></div>
+      <div class="sub">Standing recommendation — buy at this time using this rank vintage,
+        rather than at the open using the morning build.</div>
+      <div style="margin-top:20px;font-family:var(--mono);font-size:13px;color:var(--ink-2)">
+        <span style="color:var(--ink);font-size:20px">+${r.expected_bps} bps</span> per trade
+        <span style="color:var(--ink-4)">&nbsp;·&nbsp; 95% CI ${r.ci_low} to ${r.ci_high}</span>
+      </div>
+    </div>
+    <div class="right">
+      <div class="caveat"><span class="dot" style="background:${spans?C.warn:C.good}"></span>
+        <span>${spans?"The interval nearly touches zero. This is a lead, not a decision.":
+        "Interval clears zero at 95%."}</span></div>
+      <div class="caveat"><span class="dot" style="background:${r.walk_forward_holds?C.good:C.crit}"></span>
+        <span>Walk-forward ${r.walk_forward_holds?"holds":"<b>fails</b>"} — fit on 2025-10 → 2026-04,
+        tested on 2026-05 → present.</span></div>
+      <div class="caveat"><span class="dot" style="background:${C.warn}"></span>
+        <span>${r.configs_searched.toLocaleString()} configurations searched.
+        Deflated Sharpe ${r.deflated_sharpe}.</span></div>
+      <div class="caveat"><span class="dot" style="background:${C.s4}"></span>
+        <span>Not yet adopted. Adopt only after H2 and H3 are separately resolved.</span></div>
+    </div>`;
+}
+
+/* ---------------- hypothesis register ---------------- */
+const HYP=[
+ {id:"H9",statement:"Most of the as-is engine's edge is same-bar execution, not signal",
+  lever:"execution",status:"confirmed",registered:"2026-09-01",resolved:"2026-09-14",
+  test:"BASELINE_ASIS vs BASELINE_HONEST, identical selection, 15-min latency, intraday exit evaluation",
+  mde:"0.05 annualized",result:"+63.5pp",ci:"+49.5pp to +77.5pp",fdr:"0.015",
+  learn:"Nearly all of the apparent edge was an artifact of filling at the price the rank was computed from. Sharpe falls from 5.17 to 0.89 once fills are realistic. Every future result must be quoted against BASELINE_HONEST."},
+ {id:"H10",statement:"The −1%/+2% bracket, not the ranks, is the source of return",
+  lever:"attribution",status:"running",registered:"2026-09-01",resolved:"—",
+  test:"RANDOM_5 with identical exit rule, 1000 bootstrap draws, vs BASELINE_HONEST",
+  mde:"0.08 annualized",result:"+32.7pp",ci:"−48.3pp to +113.7pp",fdr:"0.42",
+  learn:"Interval spans zero. On ~230 days the ranks are not yet distinguishable from random selection under the same exit rule. This is the single most important open question in the project — not evidence the ranks are worthless, evidence the sample cannot yet tell."},
+ {id:"H1",statement:"Realized IC peaks at a shorter horizon than Score_HoldPeriod (7.5d)",
+  lever:"exit rule",status:"confirmed",registered:"2026-09-01",resolved:"2026-09-16",
+  test:"IC by horizon 1,2,3,5,7,10,14d on validate_oot rows only",
+  mde:"0.010 IC",result:"peak at 3d",ci:"0.019 to 0.043",fdr:"0.021",
+  learn:"IC peaks at 3 days and is indistinguishable from zero by 10. The models emit a 7.5-day hold period the data does not support. Shortening the max hold is the cheapest change available."},
+ {id:"H2",statement:"Delaying entry past the open improves net entry price without losing edge",
+  lever:"entry timing",status:"running",registered:"2026-09-01",resolved:"—",
+  test:"Entry-time grid (PLAN §6a), walk-forward validated, neighbour-smoothness required",
+  mde:"6 bps/trade",result:"+9.1 bps",ci:"+1.2 to +17.0 bps",fdr:"pending",
+  learn:"Leading candidate, not yet resolved. The decay curve holds flat for the first 45 minutes rather than falling, which is the opposite of the assumed shape."},
+ {id:"H3",statement:"The latest intraday re-score beats the morning score at the same entry time",
+  lever:"rank vintage",status:"proposed",registered:"2026-09-01",resolved:"—",
+  test:"Vintage × entry-time cross, holding entry time fixed",mde:"5 bps/trade",result:"—",ci:"—",fdr:"—",
+  learn:"Must be resolved separately from H2 — timing value and information value are different levers and conflating them is the classic error here."},
+ {id:"H4",statement:"Scores are not comparable across cap segments; per-segment z-scoring beats pooled top-5",
+  lever:"normalization",status:"confirmed",registered:"2026-09-01",resolved:"2026-09-18",
+  test:"Pooled vs per-segment-z top-5, same execution",mde:"0.04 annualized",
+  result:"+11.2pp",ci:"+2.1pp to +20.3pp",fdr:"0.038",
+  learn:"Small-cap IC runs ~2.4× Large. Pooled top-5 is therefore a de facto small-cap strategy — it was concentrating risk without anyone choosing to. Per-segment normalization both raises return and makes the exposure deliberate."},
+ {id:"H5",statement:"Excluding the lowest ADV/price quintile raises net-of-cost return",
+  lever:"universe",status:"underpowered",registered:"2026-09-01",resolved:"2026-09-19",
+  test:"Filtered vs unfiltered BASELINE_HONEST",mde:"0.09 annualized",result:"+3.1pp",
+  ci:"−14.8pp to +21.0pp",fdr:"0.61",
+  learn:"The design cannot detect an effect this small on 230 days — MDE is 9pp and the observed effect is 3pp. Not run further. Revisit after another six months of archive, or test it at the IC level where the cross-section gives real power."},
+ {id:"H6",statement:"The −1%/+2% bracket is asymmetric in the wrong direction given observed skew",
+  lever:"exit rule",status:"proposed",registered:"2026-09-01",resolved:"—",
+  test:"Grid over stop × target, walk-forward validated",mde:"0.06 annualized",result:"—",ci:"—",fdr:"—",
+  learn:"Blocked on Phase 2 intraday bars — a stop cannot be evaluated honestly against snapshot closes."},
+ {id:"H7",statement:"omit_first > 0 improves returns (the top name is crowded or already moved)",
+  lever:"selection",status:"rejected",registered:"2026-09-01",resolved:"2026-09-17",
+  test:"omit_first in 0..3",mde:"0.05 annualized",result:"−2.4pp",ci:"−13.1pp to +8.3pp",fdr:"0.71",
+  learn:"No evidence the top-ranked name underperforms the rest of the top 5. The crowding story is not visible at this scale — plausible if the app's readership is small."},
+ {id:"H8",statement:"SHAP feature drift predicts IC decay and is usable as a live risk-off signal",
+  lever:"monitoring",status:"proposed",registered:"2026-09-01",resolved:"—",
+  test:"Rolling feature-importance distance vs forward 20d IC",mde:"0.15 correlation",result:"—",ci:"—",fdr:"—",
+  learn:"Highest-ceiling hypothesis in the register: a live drift measure would turn model monitoring from reactive to predictive."},
+];
+
+function register(){
+  const order={confirmed:0,running:1,underpowered:2,rejected:3,proposed:4};
+  const rows=HYP.slice().sort((a,b)=>order[a.status]-order[b.status]);
+  $("#hyp").innerHTML=rows.map((h,i)=>`
+   <div class="hrow">
+     <button class="hhead" aria-expanded="false" aria-controls="hb${i}">
+       <span class="hid">${h.id}</span>
+       <span>${h.statement}</span>
+       <span class="hst ${h.status}">${h.status}</span>
+       <span class="hres">${h.result}${h.ci!=="—"?`<span class="ci">${h.ci}</span>`:""}</span>
+       <span class="chev"></span>
+     </button>
+     <div class="hbody" id="hb${i}" hidden>
+       <p class="learn">${h.learn}</p>
+       <dl>
+         <dt>Lever</dt><dd>${h.lever}</dd>
+         <dt>Test</dt><dd>${h.test}</dd>
+         <dt>MDE</dt><dd>${h.mde} <span style="color:var(--ink-4)">— minimum detectable effect at 80% power</span></dd>
+         <dt>FDR p</dt><dd>${h.fdr} <span style="color:var(--ink-4)">— Benjamini–Hochberg across all ${HYP.length} registered hypotheses, q = 0.10</span></dd>
+         <dt>Registered</dt><dd>${h.registered}${h.resolved!=="—"?" · resolved "+h.resolved:""}</dd>
+       </dl>
+     </div>
+   </div>`).join("");
+  $("#hyp").querySelectorAll(".hhead").forEach(b=>{
+    b.addEventListener("click",()=>{
+      const open=b.getAttribute("aria-expanded")==="true";
+      b.setAttribute("aria-expanded",String(!open));
+      document.getElementById(b.getAttribute("aria-controls")).hidden=open;
+    });
+  });
+}
+
+/* ---------------- exploratory prompts ---------------- */
+const PROMPTS=[
+ {t:"The decay curve is flat, not falling",
+  p:"Edge holds for ~45 minutes after the run rather than decaying from it. If information keeps arriving during that window, the morning build may be systematically early rather than the intraday re-scores being late. Worth testing whether a deliberately delayed build beats a fast one.",
+  s:"from §05 decay curve"},
+ {t:"Small-cap carries the signal and the risk",
+  p:"Small IC runs ~2.4× Large. Pooled top-5 therefore concentrates in small caps by accident. Beyond H4's normalization fix — is the small-cap edge real, or is it the liquidity premium showing up as alpha and dying in execution?",
+  s:"from §04 IC by segment"},
+ {t:"SPY beats the honest baseline",
+  p:"On this sample a passive SPY hold outperforms BASELINE_HONEST. Before optimizing entry timing, it is worth knowing whether the strategy clears its own opportunity cost at all — and whether that flips once H1's shorter hold is applied.",
+  s:"from §03 benchmarks"},
+ {t:"Nothing has tested the nightly placeholder build",
+  p:"The 8–9pm build exists and is archived, but no hypothesis uses it. It has more information than the morning build that follows it. Is the morning rebuild adding anything, or is it re-deriving what the previous evening already knew?",
+  s:"gap in the register"},
+];
+function prompts(){
+  $("#prompts").innerHTML=PROMPTS.map(x=>
+   `<div class="prompt"><h4>${x.t}</h4><p>${x.p}</p><span class="src">${x.s}</span></div>`).join("");
+}
+
+/* ---------------- boot ---------------- */
+function render(data,source){
+  status(data); recommendation(data); equity(data); strategyTable(data);
+  icHorizon(data); icSegment(data); decay(data); heat(data); register(); prompts();
+  $("#genstamp").textContent=data.generated_at.replace("T"," ").slice(0,16);
+  $("#schemav").textContent=data.schema_version;
+  $("#srcstamp").textContent=source;
+  if(data.is_seed_data){
+    const b=$("#seedbar"); b.hidden=false;
+    b.innerHTML="<b>ILLUSTRATIVE DATA</b> — every figure on this page is invented to exercise the layout. "+
+      "No backtest has been run. Replace with <code>data/results/dashboard_data.json</code>.";
+  }
+}
+const seed=JSON.parse(document.getElementById("seed-data").textContent);
+fetch("../data/results/dashboard_data.json",{cache:"no-store"})
+  .then(r=>r.ok?r.json():Promise.reject())
+  .then(d=>render(d,"live · dashboard_data.json"))
+  .catch(()=>render(seed,"seed data"));
+})();
+</script>
