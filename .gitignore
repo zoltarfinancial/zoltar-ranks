@@ -18,6 +18,15 @@ data/build/*
 # data/results/review_state.json* stays ignored -- that one IS derived.
 !data/review/
 !data/review/**
+#
+# And data/fleet/ -- node cards and heartbeats. Same reason as data/review/:
+# not derived output, but the evidence that a node exists and is alive. Without
+# this re-inclusion `git add data/fleet` silently adds nothing, so a node
+# registers locally, looks joined, and stays invisible to every other machine --
+# a declaration standing in for evidence, which is the failure this fleet design
+# exists to prevent. Found on ZoltarOne's first join, 2026-09-04.
+!data/fleet/
+!data/fleet/**
 
 # Secrets. .env.example IS tracked; .env never is.
 .env

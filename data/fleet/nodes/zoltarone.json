@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "probe_version": 1,
+  "node_id": "zoltarone",
+  "hostname": "DESKTOP-7FJV5QQ",
+  "alias": "ZoltarOne",
+  "probed_at": "2026-09-04T17:47:58-05:00",
+  "os": {
+    "system": "Windows",
+    "release": "10",
+    "version": "10.0.19045",
+    "arch": "AMD64"
+  },
+  "cpu": {
+    "model": "Intel(R) Core(TM) i5-6300U CPU @ 2.40GHz",
+    "physical_cores": 2,
+    "logical_cores": 4,
+    "max_clock_mhz": 2501,
+    "passmark": null
+  },
+  "memory": {
+    "total_gb": 31.4,
+    "free_gb": 21.4,
+    "modules": [
+      {
+        "gb": 16.0,
+        "speed_mhz": 1600,
+        "slot": "ChannelA-DIMM0",
+        "vendor": "Micron"
+      },
+      {
+        "gb": 16.0,
+        "speed_mhz": 1600,
+        "slot": "ChannelB-DIMM0",
+        "vendor": "Micron"
+      }
+    ]
+  },
+  "disks": [
+    {
+      "kind": "physical",
+      "model": "512GB SATA Flash Drive",
+      "media_type": "SSD",
+      "bus": "SATA",
+      "total_gb": 447.1
+    },
+    {
+      "kind": "physical",
+      "model": "Samsung SSD 850 EVO 1TB",
+      "media_type": "SSD",
+      "bus": "SATA",
+      "total_gb": 931.5
+    },
+    {
+      "kind": "volume",
+      "mount": "C:\\",
+      "total_gb": 930.8,
+      "free_gb": 863.6
+    },
+    {
+      "kind": "volume",
+      "mount": "D:\\",
+      "total_gb": 0.0,
+      "free_gb": 0.0
+    },
+    {
+      "kind": "volume",
+      "mount": "E:\\",
+      "total_gb": 0.0,
+      "free_gb": 0.0
+    },
+    {
+      "kind": "volume",
+      "mount": "F:\\",
+      "total_gb": 446.4,
+      "free_gb": 390.1
+    }
+  ],
+  "gpu": [
+    {
+      "name": "Intel(R) HD Graphics 520",
+      "vram_gb": 1.0,
+      "driver": "20.19.15.4531"
+    }
+  ],
+  "software": {
+    "python": "3.14.7",
+    "python_exe": "C:\\Python314\\python.exe",
+    "git": "git version 2.55.0.windows.5",
+    "node": "v24.20.0",
+    "modules": {
+      "duckdb": null,
+      "pandas": null,
+      "pyarrow": null,
+      "numpy": null,
+      "psutil": null,
+      "yaml": null,
+      "requests": null
+    }
+  },
+  "repo": {
+    "path": "C:\\Shared\\ZoltarUnlimited\\zoltar-ranks",
+    "remote": "https://github.com/zoltarfinancial/zoltar-ranks",
+    "branch": "fleet/join-zoltarone",
+    "head_sha": "5844a4e",
+    "head_at": "2026-09-02T16:43:54-05:00",
+    "dirty": true
+  },
+  "power": {
+    "has_battery": true,
+    "on_ac": true,
+    "charge_pct": 100
+  },
+  "declared": {
+    "roles": [
+      "orchestrator",
+      "dashboard",
+      "harvest"
+    ],
+    "always_on": true,
+    "owner": "andrew",
+    "notes": "ThinkPad L460 20FVS0LM00; joined 2026-09-04"
+  },
+  "tags": [
+    "ram-32g+",
+    "disk-200g+",
+    "has-repo",
+    "on-ac"
+  ]
+}
