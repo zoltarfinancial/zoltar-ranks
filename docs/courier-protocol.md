@@ -64,6 +64,30 @@ ZoltarLead's mirror inverts these: it *owns* the `claude-code` lane and works on
 the trunk legitimately, and is instead denied `dashboard/` and
 `data/review/cycles/`, which are Cowork's.
 
+### A guard asymmetry you have to know about
+
+`lane_guard` is bound to the **`Write|Edit` matcher**, not to path semantics. The
+consequence, verified on ZoltarOne 2026-09-04:
+
+| Operation on `bridge/inbox/<item>.md` | Result |
+|---|---|
+| Edit or Write the file | **denied** — correct, an inbox item is never altered |
+| Bash `mv` into `bridge/processed/` | **allowed** — correct, the protocol requires it |
+
+Both outcomes are right, but they are right *by matcher scope rather than by
+rule*. The guard does not understand "content may not change, location may". It
+only sees that `mv` is not a `Write`.
+
+**What this means in practice:** move an inbox item with `mv`. An agent that
+tries to relocate one by writing a copy through the Write tool and deleting the
+original will be denied on the write half, and is liable to conclude the
+protocol contradicts the guard. It does not — the tool choice is the whole
+difference.
+
+Anyone hardening this later should make the rule explicit rather than emergent:
+deny *content changes* to `bridge/inbox/`, permit relocation into
+`bridge/processed/`, and stop depending on which tool happens to be used.
+
 ## Lane assignment
 
 Decided 2026-09-04: **A with B underneath.**

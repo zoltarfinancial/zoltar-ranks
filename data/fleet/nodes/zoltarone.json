@@ -4,7 +4,7 @@
   "node_id": "zoltarone",
   "hostname": "DESKTOP-7FJV5QQ",
   "alias": "ZoltarOne",
-  "probed_at": "2026-09-04T17:47:58-05:00",
+  "probed_at": "2026-09-04T18:09:51-05:00",
   "os": {
     "system": "Windows",
     "release": "10",
@@ -20,7 +20,7 @@
   },
   "memory": {
     "total_gb": 31.4,
-    "free_gb": 21.4,
+    "free_gb": 21.3,
     "modules": [
       {
         "gb": 16.0,
@@ -55,7 +55,7 @@
       "kind": "volume",
       "mount": "C:\\",
       "total_gb": 930.8,
-      "free_gb": 863.6
+      "free_gb": 863.3
     },
     {
       "kind": "volume",
@@ -89,22 +89,22 @@
     "git": "git version 2.55.0.windows.5",
     "node": "v24.20.0",
     "modules": {
-      "duckdb": null,
-      "pandas": null,
-      "pyarrow": null,
-      "numpy": null,
-      "psutil": null,
-      "yaml": null,
-      "requests": null
+      "duckdb": "1.5.5",
+      "pandas": "3.0.5",
+      "pyarrow": "25.0.1",
+      "numpy": "2.5.2",
+      "psutil": "7.2.2",
+      "yaml": "6.0.3",
+      "requests": "2.34.2"
     }
   },
   "repo": {
     "path": "C:\\Shared\\ZoltarUnlimited\\zoltar-ranks",
     "remote": "https://github.com/zoltarfinancial/zoltar-ranks",
     "branch": "fleet/join-zoltarone",
-    "head_sha": "5844a4e",
-    "head_at": "2026-09-02T16:43:54-05:00",
-    "dirty": true
+    "head_sha": "ba9018b",
+    "head_at": "2026-09-04T17:57:25-05:00",
+    "dirty": false
   },
   "power": {
     "has_battery": true,
@@ -117,14 +117,15 @@
       "dashboard",
       "harvest"
     ],
-    "always_on": true,
+    "always_on": false,
     "owner": "andrew",
-    "notes": "ThinkPad L460 20FVS0LM00; joined 2026-09-04"
+    "notes": "ThinkPad L460 20FVS0LM00 s/n PF0LAXHE. always_on NOT declared: powercfg measured STANDBYIDLE AC=1800s (sleeps after 30min on AC), HIBERNATEIDLE AC=10800s. Re-probe with --always-on once the power policy is actually changed."
   },
   "tags": [
     "ram-32g+",
     "disk-200g+",
     "has-repo",
+    "duckdb",
     "on-ac"
   ]
 }
