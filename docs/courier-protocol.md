@@ -88,6 +88,37 @@ Anyone hardening this later should make the rule explicit rather than emergent:
 deny *content changes* to `bridge/inbox/`, permit relocation into
 `bridge/processed/`, and stop depending on which tool happens to be used.
 
+## Unattended heartbeat (ZoltarOne)
+
+`ZoltarOne` runs a scheduled task, `\Zoltar\ZoltarOne-FleetHeartbeat`, driving
+`C:\Shared\ZoltarUnlimited\heartbeat_task.py`. Node-local and **not committed** —
+it hardcodes one node's id and OneDrive path — but other agents need to know it
+exists and what it guarantees.
+
+- **Triggers:** hourly, plus at-startup with a 1-minute delay. The boot trigger
+  is what turns a reboot into a liveness test rather than an outage.
+- **Principal:** S4U, so it runs whether or not a user is logged on, with no
+  stored password, while keeping the user context that makes the OneDrive folder
+  writable.
+- **`-StartWhenAvailable`**, so a missed run fires as soon as the machine is back.
+- **It stamps on failure too.** If the probe is missing, times out, or throws, the
+  wrapper still writes a heartbeat carrying `degraded: true` and an `error`
+  string. "No heartbeat" and "heartbeat saying the probe broke" are different
+  facts, and the second is the one worth having.
+- **Publishes twice:** `data/fleet/heartbeat/zoltarone.json` in the clone, for a
+  courier to commit later, and the OneDrive `fleet\heartbeat\zoltarone.json`,
+  readable by both Cowork brains immediately with no clone and no git.
+- **It never runs git.** An unattended push is not something a scheduled task
+  should do, so a fresh heartbeat in the repo still needs a courier session to
+  land it.
+- `boot_at` is stamped on every heartbeat, so a reader can tell a post-reboot
+  stamp from a pre-reboot one without guessing from timestamps.
+
+**Reading it:** a heartbeat whose `at` is older than roughly two hours means the
+task did not fire — the node is down, asleep, or the task is broken. Do not read
+`degraded: true` as "node down"; it means the node is alive enough to report that
+something else is wrong, which is strictly more information than silence.
+
 ## Lane assignment
 
 Decided 2026-09-04: **A with B underneath.**
