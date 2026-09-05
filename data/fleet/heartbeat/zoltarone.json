@@ -1,22 +1,24 @@
 {
   "schema_version": 1,
   "node_id": "zoltarone",
-  "at": "2026-09-04T18:11:15-05:00",
+  "at": "2026-09-05T00:20:05-05:00",
   "load": {
-    "cpu_pct": 9.4,
-    "ram_free_gb": 21.3
+    "cpu_pct": 23.5,
+    "ram_free_gb": 24.5
   },
   "power": {
     "has_battery": true,
     "on_ac": true,
-    "charge_pct": 100
+    "charge_pct": 99
   },
   "repo": {
     "branch": "fleet/join-zoltarone",
-    "head_sha": "c34ff94",
-    "dirty": false
+    "head_sha": "fd09723",
+    "dirty": true
   },
   "agents": [
     "zoltarone/claude-code"
-  ]
+  ],
+  "boot_at": "2026-09-04T23:23:00.5005270-05:00",
+  "degraded": false
 }

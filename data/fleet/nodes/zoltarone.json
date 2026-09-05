@@ -2,9 +2,9 @@
   "schema_version": 1,
   "probe_version": 1,
   "node_id": "zoltarone",
-  "hostname": "DESKTOP-7FJV5QQ",
+  "hostname": "ZoltarOne",
   "alias": "ZoltarOne",
-  "probed_at": "2026-09-04T18:09:51-05:00",
+  "probed_at": "2026-09-05T00:19:38-05:00",
   "os": {
     "system": "Windows",
     "release": "10",
@@ -20,7 +20,7 @@
   },
   "memory": {
     "total_gb": 31.4,
-    "free_gb": 21.3,
+    "free_gb": 24.6,
     "modules": [
       {
         "gb": 16.0,
@@ -55,7 +55,7 @@
       "kind": "volume",
       "mount": "C:\\",
       "total_gb": 930.8,
-      "free_gb": 863.3
+      "free_gb": 863.6
     },
     {
       "kind": "volume",
@@ -102,14 +102,14 @@
     "path": "C:\\Shared\\ZoltarUnlimited\\zoltar-ranks",
     "remote": "https://github.com/zoltarfinancial/zoltar-ranks",
     "branch": "fleet/join-zoltarone",
-    "head_sha": "ba9018b",
-    "head_at": "2026-09-04T17:57:25-05:00",
-    "dirty": false
+    "head_sha": "fd09723",
+    "head_at": "2026-09-04T18:11:17-05:00",
+    "dirty": true
   },
   "power": {
     "has_battery": true,
     "on_ac": true,
-    "charge_pct": 100
+    "charge_pct": 99
   },
   "declared": {
     "roles": [
@@ -117,9 +117,9 @@
       "dashboard",
       "harvest"
     ],
-    "always_on": false,
+    "always_on": true,
     "owner": "andrew",
-    "notes": "ThinkPad L460 20FVS0LM00 s/n PF0LAXHE. always_on NOT declared: powercfg measured STANDBYIDLE AC=1800s (sleeps after 30min on AC), HIBERNATEIDLE AC=10800s. Re-probe with --always-on once the power policy is actually changed."
+    "notes": "ThinkPad L460 20FVS0LM00 s/n PF0LAXHE. always_on re-declared 2026-09-05 after powercfg RE-MEASURED STANDBYIDLE AC=0 and HIBERNATEIDLE AC=0 (never sleeps on AC), per Andrew's 18:50 policy change. Hostname renamed desktop-7fjv5qq -> ZoltarOne at the 23:23 reboot."
   },
   "tags": [
     "ram-32g+",
