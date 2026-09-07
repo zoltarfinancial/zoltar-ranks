@@ -1,0 +1,51 @@
+{
+  "at": "2026-09-07T17:14:35-05:00",
+  "node_id": "zoltarone",
+  "fired_by": "zoltarone/claude-code",
+  "order": {
+    "id": "003-allowlist-violation",
+    "file": "C:\\Shared\\ZoltarUnlimited\\fleet\\bridge\\inbox\\003-allowlist-violation.md",
+    "channel": "inbox",
+    "provenance": "request",
+    "from": "andrew",
+    "title": "urgent config read",
+    "moved_to": "C:\\Shared\\ZoltarUnlimited\\fleet\\bridge\\consumed\\20260907-171435--003-allowlist-violation--refused.md"
+  },
+  "outcome": "refused",
+  "refusal": {
+    "rule_id": "DENY-CREDENTIALS",
+    "rule_what": "reading or writing credentials or secrets",
+    "evidence": "API key"
+  },
+  "gate": {
+    "passed": null,
+    "reason": null,
+    "changed_paths": [],
+    "protected_changed": []
+  },
+  "result": {
+    "branch": null,
+    "sha": null,
+    "pushed": false,
+    "claude_exit": null,
+    "claude_ms": null,
+    "cost_usd": null
+  },
+  "machine": {
+    "ram_free_gb": 21.08,
+    "halted": false
+  },
+  "by": {
+    "agent_id": "zoltarone/claude-code",
+    "node_id": "zoltarone",
+    "hostname": "ZOLTARONE",
+    "lane": "claude-code",
+    "verified": true,
+    "at": "2026-09-07T17:14:35-05:00"
+  },
+  "notes": [
+    "REFUSED by static screen before claude was launched. Rule DENY-CREDENTIALS: reading or writing credentials or secrets. Matched text: 'API key'. If this is a false positive, rephrase the order to avoid that wording and resubmit - the rule is deliberately blunt because nobody is here to adjudicate."
+  ],
+  "errors": [],
+  "duration_ms": 2557
+}
