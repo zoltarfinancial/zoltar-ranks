@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
   "node_id": "zoltarone",
-  "at": "2026-09-07T13:00:01-05:00",
+  "at": "2026-09-07T17:00:01-05:00",
   "load": {
-    "cpu_pct": 0.0,
-    "ram_free_gb": 21.4
+    "cpu_pct": 7.7,
+    "ram_free_gb": 21.0
   },
   "power": {
     "has_battery": true,
@@ -12,8 +12,8 @@
     "charge_pct": 98
   },
   "repo": {
-    "branch": "fleet/join-zoltarone",
-    "head_sha": "20e6423",
+    "branch": "orders/zo-001-count-docs-20260907-165945",
+    "head_sha": "68ef701",
     "dirty": true
   },
   "agents": [
