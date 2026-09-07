@@ -1,0 +1,52 @@
+{
+  "at": "2026-09-07T17:30:05-05:00",
+  "node_id": "zoltarone",
+  "fired_by": "zoltarone/claude-code",
+  "order": {
+    "id": "005-halt-resume",
+    "file": "C:\\Shared\\ZoltarUnlimited\\fleet\\bridge\\inbox\\005-halt-resume.md",
+    "channel": "inbox",
+    "provenance": "request",
+    "from": "andrew",
+    "title": "list the executor kit files",
+    "moved_to": "C:\\Shared\\ZoltarUnlimited\\fleet\\bridge\\consumed\\20260907-173005--005-halt-resume--7ae97d9.md"
+  },
+  "outcome": "executed",
+  "refusal": {
+    "rule_id": null,
+    "rule_what": null,
+    "evidence": null
+  },
+  "gate": {
+    "passed": true,
+    "reason": null,
+    "changed_paths": [
+      "ORDER_RESULT.md",
+      "data/fleet/heartbeat/"
+    ],
+    "protected_changed": []
+  },
+  "result": {
+    "branch": "orders/zo-005-halt-resume-20260907-172934",
+    "sha": "7ae97d910681646e93ccaacedd45d0546062385c",
+    "pushed": true,
+    "claude_exit": 0,
+    "claude_ms": 27187,
+    "cost_usd": 0.21744999999999998
+  },
+  "machine": {
+    "ram_free_gb": 20.98,
+    "halted": false
+  },
+  "by": {
+    "agent_id": "zoltarone/claude-code",
+    "node_id": "zoltarone",
+    "hostname": "ZOLTARONE",
+    "lane": "claude-code",
+    "verified": true,
+    "at": "2026-09-07T17:30:05-05:00"
+  },
+  "notes": [],
+  "errors": [],
+  "duration_ms": 32835
+}
