@@ -1,0 +1,51 @@
+{
+  "at": "2026-09-07T17:10:06-05:00",
+  "node_id": "zoltarone",
+  "fired_by": "zoltarone/claude-code",
+  "order": {
+    "id": "002-inbox-channel",
+    "file": "C:\\Shared\\ZoltarUnlimited\\fleet\\bridge\\inbox\\002-inbox-channel.md",
+    "channel": "inbox",
+    "provenance": "request",
+    "from": "zoltarone/cowork",
+    "title": "list the fleet node cards",
+    "moved_to": "C:\\Shared\\ZoltarUnlimited\\fleet\\bridge\\consumed\\20260907-171006--002-inbox-channel--f527fb9.md"
+  },
+  "outcome": "executed",
+  "refusal": {
+    "rule_id": null,
+    "rule_what": null,
+    "evidence": null
+  },
+  "gate": {
+    "passed": true,
+    "reason": null,
+    "changed_paths": [
+      "ORDER_RESULT.md"
+    ],
+    "protected_changed": []
+  },
+  "result": {
+    "branch": "orders/zo-002-inbox-channel-20260907-170935",
+    "sha": "f527fb930486f8d46e2ab52e0b8b9c087598d163",
+    "pushed": true,
+    "claude_exit": 0,
+    "claude_ms": 27904,
+    "cost_usd": 0.207521
+  },
+  "machine": {
+    "ram_free_gb": 20.99,
+    "halted": false
+  },
+  "by": {
+    "agent_id": "zoltarone/claude-code",
+    "node_id": "zoltarone",
+    "hostname": "ZOLTARONE",
+    "lane": "claude-code",
+    "verified": true,
+    "at": "2026-09-07T17:10:06-05:00"
+  },
+  "notes": [],
+  "errors": [],
+  "duration_ms": 33893
+}
