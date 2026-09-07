@@ -27,6 +27,7 @@ data/build/*
 # exists to prevent. Found on ZoltarOne's first join, 2026-09-04.
 !data/fleet/
 !data/fleet/**
+
 # Secrets. .env.example IS tracked; .env never is.
 .env
 .env.local

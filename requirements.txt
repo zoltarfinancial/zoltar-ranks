@@ -6,6 +6,26 @@
 # Verified 2026-09-02 on python 3.11 / pandas 3.0.2 / numpy 2.4.4: every upstream
 # pickle in production/ reads cleanly with correct dtypes and zero nulls.
 # pandas 3 is fine for this repo. See docs/FINDINGS.md.
+#
+# ---------------------------------------------------------------------------
+# python 3.14 status, 2026-09-04, node zoltarone (ThinkPad L460, Windows 10):
+#
+# RESOLVES on 3.14.7, native cp314 wheels, no source builds:
+#     duckdb 1.5.5   pandas 3.0.5   pyarrow 25.0.1   numpy 2.5.2
+#     pyyaml 6.0.3   psutil 7.2.2   requests 2.34.2
+# All satisfy the pins above. `dashboard/emit_build_status.py --check` parses
+# manifest.yaml and runs end to end with these.
+#
+# NOT VERIFIED on 3.14 -- these were never installed or exercised here:
+#     python-dotenv  scipy  statsmodels  matplotlib  jinja2
+#     pytest  pytest-json-report  robin-stocks  alpaca-py  yfinance
+#
+# And "resolves and imports" is NOT the verification the note above describes.
+# The 3.11 line was earned by reading every production/ pickle and checking
+# dtypes and nulls. Nobody has done that on 3.14. Until someone runs
+# `pytest tests -q` on this interpreter, treat 3.14 as UNVERIFIED for results,
+# not as a second verified platform.
+# ---------------------------------------------------------------------------
 
 pandas>=2.2,<4
 numpy>=1.26,<3

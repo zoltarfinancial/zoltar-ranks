@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "node_id": "zoltarone",
+  "at": "2026-09-07T17:00:01-05:00",
+  "load": {
+    "cpu_pct": 7.7,
+    "ram_free_gb": 21.0
+  },
+  "power": {
+    "has_battery": true,
+    "on_ac": true,
+    "charge_pct": 98
+  },
+  "repo": {
+    "branch": "orders/zo-001-count-docs-20260907-165945",
+    "head_sha": "68ef701",
+    "dirty": true
+  },
+  "agents": [
+    "zoltarone/claude-code"
+  ],
+  "boot_at": "2026-09-04T23:23:00.5023470-05:00",
+  "degraded": false
+}
