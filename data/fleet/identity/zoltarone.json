@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "node_id": "zoltarone",
+  "alias": "ZoltarOne",
+  "attested_hostnames": [
+    "ZOLTARONE",
+    "ZoltarOne"
+  ],
+  "_former_hostnames": {
+    "DESKTOP-7FJV5QQ": {
+      "retired_at": "2026-09-04T23:23:00-05:00",
+      "_note": "Renamed at the 23:23 reboot on 2026-09-04. Retained because the node card, every heartbeat stamp before that reboot, six bridge/outbox reports and data/fleet/hostmap.json on fleet/join-zoltargenesis all carry this name. Those records are not rewritten, so the map must still resolve them."
+    },
+    "l460": {
+      "retired_at": "2026-09-04T13:45:00-05:00",
+      "_note": "Never a hostname -- an early node_id, killed by 20260904-1345-naming-and-bus. Listed so a lookup of the string resolves instead of dead-ending."
+    }
+  },
+  "rename_pending": null,
+  "workspace_root": "C:\\Shared\\ZoltarUnlimited",
+  "repo_root": "C:\\Shared\\ZoltarUnlimited\\zoltar-ranks",
+  "onedrive_mirror": "C:\\Users\\zolta\\OneDrive\\ZoltarUnlimited",
+  "lanes": {
+    "owns": [
+      "data/fleet/",
+      "the ZoltarUnlimited workspace"
+    ],
+    "denied": [
+      "src/",
+      "scripts/",
+      "tests/",
+      "docs/",
+      "config/",
+      "data/build/manifest.yaml",
+      "dashboard/"
+    ],
+    "denied_exceptions": [
+      "docs/courier-protocol.md"
+    ],
+    "trunk": "never -- main is Andrew's, applied outside every agent session",
+    "_assignment": "A with B underneath, decided 2026-09-04T18:50. This node works items assigned claude-code@zoltarone."
+  },
+  "agents": [
+    "zoltarone/claude-code",
+    "zoltarone/cowork"
+  ],
+  "transports": {
+    "git": {
+      "remote": "https://github.com/zoltarfinancial/zoltar-ranks",
+      "role": "source of truth; the one that must not fail",
+      "note": "push works via Git Credential Manager; gh is installed but unauthenticated"
+    },
+    "onedrive": {
+      "path": "C:\\Users\\zolta\\OneDrive\\ZoltarUnlimited\\fleet",
+      "account": "zoltarfinancial@ (fleet account)",
+      "role": "the only surface all four agents can read and write",
+      "measured_latency_one_way": "3-18 minutes, never seconds",
+      "LIMITATION": "OneDrive has NO service on this machine. It starts only from HKCU\\...\\Run and a scheduled task with a LOGON trigger. With AutoAdminLogon=0, an unattended reboot means it never starts and this mirror stops syncing until a human logs in."
+    },
+    "bridge": {
+      "path": "C:\\Shared\\ZoltarUnlimited\\bridge",
+      "role": "node-local channel to zoltarone/cowork, which has no shell"
+    }
+  },
+  "verification_rule": {
+    "compare": "live hostname against attested_hostnames",
+    "case_sensitivity": "CASE-INSENSITIVE. This machine reports itself two ways in one session: $env:COMPUTERNAME uppercase, hostname.exe and DNS mixed-case.",
+    "states": {
+      "true": "a live read matched an attested hostname",
+      "false": "a live read matched nothing attested",
+      "null": "the hostname could not be read at all"
+    },
+    "never": "null must NEVER be collapsed into false. Unreadable and mismatched are different facts.",
+    "v1_fallback": "A consumer MUST also accept singular `attested_hostname`. ZoltarLead is unmigrated, and a guard that only knows v2 fails closed on it."
+  },
+  "_evidence": {
+    "measured_at": "2026-09-07T13:19:58-05:00",
+    "measured_by": "zoltarone/claude-code, live on the machine",
+    "reads": {
+      "$env:COMPUTERNAME": "ZOLTARONE",
+      "hostname.exe": "ZoltarOne",
+      "[System.Net.Dns]::GetHostName()": "ZoltarOne",
+      "registry ActiveComputerName": "ZOLTARONE",
+      "registry ComputerName": "ZOLTARONE"
+    },
+    "distinct_case_insensitive": [
+      "zoltarone"
+    ],
+    "agreement": "ALL AGREE case-insensitively",
+    "rename_state": "no rename staged -- ActiveComputerName == ComputerName"
+  },
+  "_provenance": {
+    "authored_by": "zoltarone/claude-code",
+    "why": "The 2026-09-07 prompt names ZoltarGenesis's fleet/identity.json as the reference template for schema v2. That file is NOT in git on any ref -- verified by searching every commit reachable from --all for 'fleet/identity.json', 'identity-kit', and 'node-identity-protocol'; zero hits. So this file was written from the prompt's enumerated field list and could NOT be cross-checked against the reference.",
+    "risk": "Field NAMES here match the prompt. Field SEMANTICS may diverge from ZoltarGenesis's file. Reconcile before any consumer treats the two as interchangeable.",
+    "precedent": "KB handoff__described-intent-as-completed-state (rev 15, raised as F-ZG-13): read the artifact a brief describes before acting on the description; if only the brief has the fields, the migration was described, not performed."
+  }
+}
