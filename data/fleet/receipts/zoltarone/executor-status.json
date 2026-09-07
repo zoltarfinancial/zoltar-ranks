@@ -1,0 +1,50 @@
+{
+  "at": "2026-09-07T17:24:32-05:00",
+  "node_id": "zoltarone",
+  "fired_by": "zoltarone/claude-code",
+  "order": {
+    "id": null,
+    "file": null,
+    "channel": null,
+    "provenance": null,
+    "from": null,
+    "title": null
+  },
+  "outcome": "halted",
+  "refusal": {
+    "rule_id": null,
+    "rule_what": null,
+    "evidence": null
+  },
+  "gate": {
+    "passed": null,
+    "reason": null,
+    "changed_paths": [],
+    "protected_changed": []
+  },
+  "result": {
+    "branch": null,
+    "sha": null,
+    "pushed": false,
+    "claude_exit": null,
+    "claude_ms": null,
+    "cost_usd": null
+  },
+  "machine": {
+    "ram_free_gb": null,
+    "halted": true
+  },
+  "by": {
+    "agent_id": "zoltarone/claude-code",
+    "node_id": "zoltarone",
+    "hostname": "ZOLTARONE",
+    "lane": "claude-code",
+    "verified": true,
+    "at": "2026-09-07T17:24:32-05:00"
+  },
+  "notes": [
+    "fleet\\HALT present - executor stopped before touching anything. No order read, none consumed. HALT says: stopping - proving the kill switch, zoltarone/claude-code 17:19:35"
+  ],
+  "errors": [],
+  "duration_ms": 68
+}
