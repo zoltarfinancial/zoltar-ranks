@@ -1,0 +1,53 @@
+{
+  "at": "2026-09-07T17:05:08-05:00",
+  "node_id": "zoltarone",
+  "fired_by": "zoltarone/claude-code",
+  "order": {
+    "id": "001-count-docs",
+    "file": "C:\\Shared\\ZoltarUnlimited\\zoltar-ranks\\orders\\zoltarone\\001-count-docs.md",
+    "channel": "git",
+    "provenance": "authorised",
+    "from": "andrew",
+    "title": "count the documentation files",
+    "moved_to": "C:\\Shared\\ZoltarUnlimited\\fleet\\bridge\\consumed\\20260907-170508--001-count-docs--e21b118.md"
+  },
+  "outcome": "executed",
+  "refusal": {
+    "rule_id": null,
+    "rule_what": null,
+    "evidence": null
+  },
+  "gate": {
+    "passed": true,
+    "reason": null,
+    "changed_paths": [
+      "ORDER_RESULT.md"
+    ],
+    "protected_changed": []
+  },
+  "result": {
+    "branch": "orders/zo-001-count-docs-20260907-170435",
+    "sha": "e21b1181fc8eaac341847db6c06590a8902d0b9e",
+    "pushed": true,
+    "claude_exit": 0,
+    "claude_ms": 30317,
+    "cost_usd": 0.267988
+  },
+  "machine": {
+    "ram_free_gb": 20.83,
+    "halted": false
+  },
+  "by": {
+    "agent_id": "zoltarone/claude-code",
+    "node_id": "zoltarone",
+    "hostname": "ZOLTARONE",
+    "lane": "claude-code",
+    "verified": true,
+    "at": "2026-09-07T17:05:08-05:00"
+  },
+  "notes": [
+    "clone is on branch 'fleet/join-zoltarone', not main; fetched but did not pull"
+  ],
+  "errors": [],
+  "duration_ms": 36063
+}
