@@ -31,10 +31,11 @@ import traceback
 from datetime import datetime, timezone
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-import fleet_identity as fi                                    # noqa: E402
-
+# One module object, always. See the note in fleet_msg.py.
 REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+from scripts import fleet_identity as fi                          # noqa: E402
 STAMP_DIR = REPO_ROOT / "data" / "fleet" / "heartbeat"
 PROBE = REPO_ROOT / "dashboard" / "fleet_probe.py"
 NODE_ID = "zoltarlead"

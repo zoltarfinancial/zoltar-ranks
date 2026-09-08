@@ -40,3 +40,8 @@ __pycache__/
 *.egg-info/
 /build/
 /dist/
+
+# Fleet bus. The MESSAGES and RECEIPTS are the record and are tracked; the
+# per-node INGEST LEDGER is receiver-local derived state (observed_at is this
+# machine's clock, assigned on ingest) and would conflict on every sync.
+fleet/ingest/
