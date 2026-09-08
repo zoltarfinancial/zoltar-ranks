@@ -1,0 +1,34 @@
+{
+ "cycle_id": "c-0003",
+ "opened_at": "2026-09-03T11:10:00-05:00",
+ "opened_by": "cowork",
+ "quiet": false,
+ "state_snapshot": {
+  "head_sha": "5844a4e",
+  "gate": "green",
+  "blocking": 0,
+  "phase": "1a",
+  "phase_pct": 95,
+  "note": "harvest_premarket filled overnight; all three harvest jobs healthy, all seven contract gates pass, no blocking-severity row remains. B1 and B3 stay open at normal severity."
+ },
+ "assessment": "The board is green for the first time. harvest_premarket filled on schedule overnight, so all three harvest jobs are healthy, all seven contract gates pass and nothing of blocker severity is outstanding: machine state is no longer what limits this build. What limits it now is attention. Nothing has landed since 5844a4e yesterday afternoon, all three 'now' items are pull-based and waiting on a Claude Code session that has not started, and the only item with an external clock is c-0002.1, whose 1-minute bar window closes around 2026-09-18 - roughly fifteen days of runway, after which the intraday alignment anchor cannot be measured at all and Phase 6 has no proven origin. Separately, this fire found that the heartbeat has lost its own shell on zoltarlead: it can read the repo and write files but cannot run review.py or emit_build_status.py --check, so this cycle was composed by hand, no quiet beat can be recorded, and c-0003 has not been validated by check - the next party to run the suite is validating it on the brain's behalf.",
+ "items": [
+  {
+   "id": "c-0003.1",
+   "kind": "risk",
+   "for": "andrew",
+   "priority": "next",
+   "title": "The heartbeat session has no shell on zoltarlead, so it cannot seal or validate a cycle",
+   "why": "The review protocol is the one place in the console that accepts writing, and its trustworthiness rests on cycles being sealed by review.py and audited by check rather than typed. This fire could read all five inputs but had no device_bash on zoltarlead, so open-cycle, beat and emit_build_status.py --check were all unavailable. Two consequences, and the second is the dangerous one: the pulse strip goes flat even on fires that did their job, and cycle files enter the repo unvalidated. That is evidence replaced by claim in the exact place built to stop it, which is the failure this project keeps rediscovering.",
+   "acceptance": "A scheduled heartbeat fire can run 'python dashboard/review.py beat --quiet' and 'python dashboard/emit_build_status.py --check' on zoltarlead and see 'review protocol  0 blocking'. Concretely: the Cowork scheduled task 'Zoltar build heartbeat' has a working shell on the device, and data/review/heartbeat.jsonl gains a line written by the CLI rather than by hand. Until then, check c-0003 by running the suite once: tests/test_review_protocol.py either passes on data/review/cycles/c-0003.json or names what is wrong with it, and a 'note' event on this item records which.",
+   "depends_on": [],
+   "estimate": "15m",
+   "refs": [
+    "data/review/cycles/c-0003.json",
+    "data/review/heartbeat.jsonl",
+    "dashboard/review.py",
+    "tests/test_review_protocol.py"
+   ]
+  }
+ ]
+}

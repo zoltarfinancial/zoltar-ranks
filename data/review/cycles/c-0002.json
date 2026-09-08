@@ -1,0 +1,49 @@
+{
+ "cycle_id": "c-0002",
+ "opened_at": "2026-09-02T16:51:32-05:00",
+ "opened_by": "cowork",
+ "quiet": false,
+ "state_snapshot": {
+  "head_sha": "c294faa+",
+  "gate": "amber",
+  "blocking": 1,
+  "phase": "1a",
+  "phase_pct": 95,
+  "note": "All seven contract gates pass for the first time; the only blocking row is harvest_premarket, which fills before 09:00 tomorrow."
+ },
+ "assessment": "Three of four items closed in one session and all seven contract gates pass — including the two that had no engine to guard, now proven against engines built to violate them. The board did the job it was built for twice: c-0001.1's stated rationale was wrong and Claude Code checked the premise before doing the work rather than after, and the same-bar twin it found while recomputing H11 is a rule-3 violation that would have shipped as a flattering number. Two findings were raised rather than absorbed silently; both are folded here. The critical path now runs through Phase 2, whose daily anchor is proven and whose intraday anchor has a hard deadline — yfinance serves 1-minute bars for ~30 days and the dense era starts 2026-08-19.",
+ "items": [
+  {
+   "id": "c-0002.1",
+   "kind": "work_order",
+   "for": "claude-code",
+   "priority": "now",
+   "title": "Measure the intraday alignment anchor before the 1-minute bar window closes",
+   "why": "The daily anchor is proven at 98.8% vs 2.9%, but Phase 6 is an intraday timing study and it joins the same two clock domains at minute resolution, where a one-bar offset manufactures a clean spurious result instead of degrading a real one. This is the only item on the board with an external deadline: yfinance serves 1-minute bars for roughly 30 days and the dense intraday era starts 2026-08-19, so the measurement becomes impossible around 2026-09-18. Everything else can wait; this cannot.",
+   "acceptance": "src/zoltar_ranks/analysis/alignment_anchor.py measures the intraday anchor at 1-minute resolution over the dense era and records a verdict in docs/FINDINGS.md with a Wilson interval, using the same PASS/reconcile discipline as the daily anchor. tests/test_alignment_anchor.py pins the intraday verdict alongside the daily one. If it fails, rule 9 applies — Phase 6 stops rather than the anchor being widened.",
+   "depends_on": [],
+   "estimate": "1d",
+   "refs": [
+    "docs/ALIGNMENT_ANCHOR.md",
+    "src/zoltar_ranks/analysis/alignment_anchor.py",
+    "docs/FINDINGS.md"
+   ]
+  },
+  {
+   "id": "c-0002.2",
+   "kind": "work_order",
+   "for": "claude-code",
+   "priority": "next",
+   "title": "Move the twin-commit exclusion out of H11 and into shared available_at logic",
+   "why": "You found that a forward-stamped evening retrain pairs with its own twin pushed 13 seconds later in the same commit, returning exactly 0.000% — 27 of 138 runs, satisfying rule 5 and the letter of rule 3 while biasing every statistic in the flattering direction. It is fixed inside the H11 power calculation. Left there, every future study re-derives it or silently inherits the bias, and the one that forgets will be the one that produces a headline number. This is the single most transferable thing found so far.",
+   "acceptance": "The twin-commit exclusion lives in the shared available_at path (src/zoltar_ranks/analysis/execution.py or the ranks_pit view), not in h11_power.py; h11_power.py consumes it rather than implementing it; a contract test asserts a same-commit twin pair can never reach a backtest input path, and it FAILS against a fixture that admits one. Recomputing H11 reproduces the published MDE unchanged.",
+   "depends_on": [],
+   "estimate": "4h",
+   "refs": [
+    "src/zoltar_ranks/analysis/execution.py",
+    "src/zoltar_ranks/analysis/h11_power.py",
+    "tests/test_execution_gates.py"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,36 @@
+{
+  "cycle_id": "c-0007",
+  "opened_at": "2026-09-07T07:15:00-05:00",
+  "opened_by": "cowork",
+  "quiet": false,
+  "state_snapshot": {
+    "head_sha": "5844a4e",
+    "gate": "amber",
+    "blocking": 0,
+    "phase": "1a",
+    "phase_pct": 90
+  },
+  "assessment": "Nothing moved over the weekend, and after five days that is the finding rather than the weather. Head is still 5844a4e from 2026-09-02T16:43:54, so all seven contract tests remain unwitnessed since 2026-09-02T16:43:33 - five of them blocker severity - and that alone is why the gate is amber; everything else in machine state is clean, with all three harvest jobs healthy (evening ran through 21:30 on Friday, so the symptom behind c-0005.1 is fully cleared), 0 blocking, 0 unverified and 0 unmet dependencies. What changed over the weekend is not the state but the clock: c-0002.1 measures the intraday alignment anchor from yfinance 1-minute bars that only exist about thirty days back, so the window closes around 2026-09-18 and the runway is now roughly eleven days - it is the one item on this board whose cost is irreversible, since every other open item merely waits while this one expires. c-0001.4 has been open five days and is still the one-line answer that lets Phase 3 be scoped honestly. The build is not damaged and it is not drifting; it is idle, and for the first time the idleness is buying a permanent loss rather than a delay.",
+  "items": [
+    {
+      "id": "c-0007.1",
+      "kind": "decision",
+      "for": "andrew",
+      "priority": "next",
+      "title": "Name a date before 2026-09-18 for the session that runs c-0002.1, or decide to let the 1-minute window close.",
+      "why": "The charter's fourth success criterion is a specific recommended execution change with an interval around it, and Phase 6 cannot produce one without a proven intraday origin - which is exactly what c-0002.1 measures. It reads yfinance 1-minute bars, which exist for roughly thirty days back with the dense era starting 2026-08-19, so after about 2026-09-18 the anchor cannot be measured at all, at any price or effort. Nothing has been committed since 2026-09-02 and every open work order is pull-based, so this is not a scheduling detail: it is the point where queue starvation stops costing time and starts costing evidence that cannot be recreated. This supersedes c-0004.1, which named the same starvation while its cost was still only delay, with the dated choice that is now actually in front of us.",
+      "acceptance": "A reply event on c-0007.1 in data/review/inbox.jsonl that names either (a) a date before 2026-09-18 on which a Claude Code session will run c-0002.1, or (b) an explicit decision to let the 1-minute window close. If (a), the anchor measurement lands and `python dashboard/emit_build_status.py --check` still reports 0 blocking. If (b), the next cycle re-scopes Phase 6's origin without an intraday anchor and the consequence is written into docs/FINDINGS.md so no later study assumes an anchor that was never measured.",
+      "depends_on": [
+        "c-0002.1",
+        "c-0004.1"
+      ],
+      "estimate": "5m for the answer",
+      "refs": [
+        "data/review/charter.json",
+        "docs/FINDINGS.md",
+        "c-0002.1",
+        "c-0004.1"
+      ]
+    }
+  ]
+}
