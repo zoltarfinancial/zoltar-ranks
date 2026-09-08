@@ -1,0 +1,72 @@
+{
+  "schema_version": 2,
+  "node_id": "zoltarlead",
+  "alias": "ZoltarLead",
+
+  "attested_hostnames": [
+    "ZOLTARLEAD",
+    "ZoltarLead"
+  ],
+  "_hostname_evidence": {
+    "measured_at": "2026-09-08T00:35:00-05:00",
+    "measured_by": "zoltarlead/claude-code, live on the machine",
+    "env_COMPUTERNAME": "ZOLTARLEAD",
+    "hostname_exe": "ZoltarLead",
+    "dns_GetHostName": "ZoltarLead",
+    "_note": "Three reads, two spellings, agreeing case-insensitively -- exactly the disagreement docs/identity-kit/README.md predicts. Both spellings are attested so a case-sensitive consumer cannot trip on a healthy node. This is the FIRST time this hostname has been recorded anywhere in the fleet: data/fleet/hostmap.json carried zoltarlead under `unknown` with hostname:null and the note that the machine writing every review cycle was the one the fleet could not identify."
+  },
+  "_rename_check": {
+    "ActiveComputerName": "ZOLTARLEAD",
+    "ComputerName": "ZOLTARLEAD",
+    "staged_rename": false,
+    "_note": "Registry read, both keys agree, so no rename is staged for the next reboot. Checked because ZoltarGenesis and ZoltarOne were both renamed mid-fleet and their cards attested the old name afterwards (F-ZG-13)."
+  },
+
+  "_former_hostnames": [],
+  "renamed_at": null,
+  "rename_pending": null,
+
+  "workspace_root": "C:\\Shared\\ClaudeWork",
+  "repo_root": "C:\\Shared\\ClaudeWork\\zoltar-ranks",
+  "onedrive_mirror": "C:\\Users\\owner\\OneDrive\\ZoltarUnlimited",
+  "_path_note": "ZoltarLead does NOT use C:\\Shared\\ZoltarUnlimited. That path is ZoltarOne's clone root and ZoltarGenesis's workspace; it does not exist on this machine. Every identity-kit default assumes it, so heartbeat.ps1 must be run with -Workspace and -RepoRoot overridden here.",
+
+  "lanes": {
+    "owns": ["src/", "scripts/", "tests/", "docs/", "config/"],
+    "denied": ["dashboard/"],
+    "trunk": "never -- main is Andrew's. Branches only; an assignee grants no trunk access.",
+    "_assignment": "This node works items assigned claude-code@zoltarlead. NOTE: that field does not exist in deployed review.py, which has only `for: cowork|claude-code|andrew`. Decision A is unenforceable as deployed; cowork owns the fix."
+  },
+  "agents": ["zoltarlead/claude-code", "zoltarlead/cowork"],
+
+  "transports": {
+    "git": {
+      "state": "ok",
+      "remote": "https://github.com/zoltarfinancial/zoltar-ranks",
+      "_evidence": "Fetch and push both verified 2026-09-08: pushed fleet/rejoin-zoltarlead = fdd4ac2 and confirmed by git ls-remote. NOTE .git/FETCH_HEAD did not exist before this session -- this clone had never fetched in its life, which is the root cause of the mutual-silence finding."
+    },
+    "onedrive": {
+      "state": "ok",
+      "root": "C:\\Users\\owner\\OneDrive\\ZoltarUnlimited\\fleet",
+      "tenant": "zoltarfinancial@",
+      "_evidence": "Directory exists and carries andrew/, heartbeat/, nodes/ and per-agent dirs for zoltarlead-cowork, zoltarone-claude-code, zoltarone-cowork, zoltartwo-claude-code. So this node IS on the OneDrive bus.",
+      "_gap": "fleet/zoltarlead-claude-code/ contains ONLY README.md. This lane has never written a message on this transport, or any other. Absent too: heartbeat/zoltarlead.json and nodes/zoltarlead.json, while zoltarone and zoltartwo have both."
+    },
+    "artifact_db": {
+      "state": "absent-by-design",
+      "_reason": "No Artifact tool exists in Claude Code. The worker lane cannot reach the console db; only zoltarlead/cowork can. Anything the board must see goes via the bridge for the brain to post."
+    }
+  },
+
+  "environment": {
+    "powershell": "5.1.26100.9168 (Desktop edition)",
+    "_powershell_warning": "NOT PowerShell 7. docs/identity-kit/verify-guard.ps1 uses ProcessStartInfo.ArgumentList, which is .NET Core only, so it FAILS SILENTLY on this node. This is the live state here, not a hypothetical.",
+    "python": "3.14.7 via `python` and `py -3` and .venv\\Scripts\\python.exe",
+    "_python_warning": "`python3` IS ABSENT -- it resolves to the Microsoft Store alias stub. This is the MIRROR IMAGE of ZoltarGenesis, where bare `python` is 2.7 and python3 is correct. Neither invocation is portable across this fleet."
+  },
+
+  "verification_rule": "The card supplies meaning, the live hostname supplies proof, the match is what makes it evidence. Compare the live hostname case-insensitively against ANY entry in attested_hostnames; if that key is absent or empty, fall back to v1's singular attested_hostname. verified is three-state: true on a match, false on a mismatch, null when the hostname could not be read at all. Never collapse false and null -- a copied workspace and an unreadable hostname are different facts.",
+
+  "_schema_note": "v2. Consumers MUST keep the v1 fallback: ZoltarOne migrated but a guard that only understands v2 fails closed on any node that has not, which is how a guard quietly stays off (F-ZG-13).",
+  "_authored_by": "zoltarlead/claude-code, 2026-09-08, from live reads on the machine. Adopted from docs/identity-kit/ on origin/fleet/join-zoltargenesis rather than re-derived -- two independent implementations of an attestation mechanism is how they diverge."
+}

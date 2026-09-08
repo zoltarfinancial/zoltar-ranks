@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "node_id": "zoltarlead",
+  "agent_id": "zoltarlead/claude-code",
+  "at": "2026-09-08T00:38:10-05:00",
+  "fire_kind": "scheduled",
+  "outcome": "ok",
+  "errors": [],
+  "notices": [],
+  "by": {
+    "agent_id": "zoltarlead/claude-code",
+    "node_id": "zoltarlead",
+    "hostname": "ZOLTARLEAD",
+    "lane": "claude-code",
+    "verified": true,
+    "at": "2026-09-08T00:38:10-05:00",
+    "identity_file": "C:\\Shared\\ClaudeWork\\zoltar-ranks\\data\\fleet\\identity\\zoltarlead.json",
+    "identity_schema": 2,
+    "hostname_reads": {
+      "env_COMPUTERNAME": "ZOLTARLEAD",
+      "socket_gethostname": "ZoltarLead",
+      "platform_node": "ZoltarLead"
+    },
+    "reason": null
+  },
+  "repo": {
+    "branch": "fleet/rejoin-zoltarlead",
+    "head_sha": "fdd4ac2",
+    "dirty": true
+  },
+  "probe": {
+    "ran": true,
+    "returncode": 0
+  }
+}
