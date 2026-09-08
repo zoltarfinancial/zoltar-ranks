@@ -100,8 +100,9 @@ class Handler(SimpleHTTPRequestHandler):
         return self._json(200, {"ok": True, "output": out.strip(), "state": state})
 
     def _review(self, *argv: str) -> tuple[int, str]:
-        p = subprocess.run([sys.executable, str(REVIEW_PY), *argv],
-                           cwd=REPO, capture_output=True, text=True, timeout=60)
+        p = subprocess.run([sys.executable, str(REVIEW_PY), *argv], cwd=REPO,
+                           capture_output=True, text=True, encoding="utf-8",
+                           errors="replace", timeout=60)
         return p.returncode, (p.stdout or "") + (p.stderr or "")
 
     def log_message(self, fmt, *a):

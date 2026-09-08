@@ -82,6 +82,25 @@ def load_manifest(quiet: bool = False) -> dict:
     sys.exit(f"No manifest found at {y}. Run: python {Path(__file__).name} --init")
 
 
+def _utf8_console() -> None:
+    """Windows defaults stdout to cp1252, and this tool prints the charter.
+
+    The charter's critical path contains U+2192, so a plain `print` raised
+    UnicodeEncodeError and `review.py next` -- the first command anyone runs --
+    exited 1 on Windows. Forcing the streams here rather than relying on
+    PYTHONIOENCODING means the fix travels with the file: a scheduled task, a
+    git hook and a fresh clone all get it without anyone remembering to set an
+    environment variable. `errors="replace"` so a console that genuinely cannot
+    render a glyph degrades to a placeholder instead of failing the run --
+    reporting must never be the thing that breaks the harvest.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
+
+
 def now() -> datetime:
     return datetime.now().astimezone()
 
@@ -115,7 +134,8 @@ def mtime(p: Path) -> datetime | None:
 def git(*args: str) -> str:
     try:
         return subprocess.run(["git", *args], cwd=REPO, capture_output=True,
-                              text=True, timeout=20).stdout.strip()
+                              text=True, encoding="utf-8", errors="replace",
+                              timeout=20).stdout.strip()
     except Exception:
         return ""
 
@@ -688,7 +708,8 @@ def check() -> int:
     else:
         try:
             r = subprocess.run([sys.executable, str(review_py), "check"], cwd=REPO,
-                               capture_output=True, text=True, timeout=60)
+                               capture_output=True, text=True, encoding="utf-8",
+                               errors="replace", timeout=60)
             tail = [l.strip() for l in (r.stdout or "").splitlines() if l.strip()]
             summary = next((l for l in reversed(tail) if "blocking" in l), "no summary")
             (bad if r.returncode else ok)("review protocol", summary
@@ -724,6 +745,7 @@ STARTER = {
 
 
 def main() -> None:
+    _utf8_console()
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--init", action="store_true", help="write a starter manifest and exit")
     ap.add_argument("--check", action="store_true",

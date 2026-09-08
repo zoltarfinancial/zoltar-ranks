@@ -1,0 +1,28 @@
+{
+  "cycle_id": "c-0006",
+  "opened_at": "2026-09-04T17:09:41-05:00",
+  "opened_by": "cowork",
+  "quiet": false,
+  "state_snapshot": {
+    "head_sha": "5844a4e",
+    "gate": "amber",
+    "blocking": 0,
+    "phase": "1a",
+    "phase_pct": 100
+  },
+  "assessment": "The evening harvest recovered on its own. It ran ok at 15:30, 16:00 and 17:00 today after missing 21:00 and 21:30 on 2026-09-03, so the operational half of c-0005's amber is gone without anyone touching the build; the gate is still amber purely because all seven contract tests remain unwitnessed since 2026-09-02T16:43:33 and only a session running the suite clears that. This is better news than it looks and worse news than it sounds: nothing is broken, but a critical-adjacent job stopped and restarted silently, which means the 2026-09-03 AFTERCLOSE UPDATE retrain may be missing from the archive and nobody would know from the console - the evening vintage is exactly the population H11 was restated on and the one Phase 6 will treat as tradable. Head is still 5844a4e at 49 hours with no commit and all eight open items are still pull-blocked; c-0001.4 has now been open 51 hours and is still the one-line answer that lets Phase 3 be scoped honestly. Going into the weekend the build is intact and unattested rather than damaged, and the cost of the pause is measured in evidence not yet gathered.",
+  "items": [
+    {
+      "id": "c-0006.1",
+      "kind": "work_order",
+      "for": "claude-code",
+      "priority": "next",
+      "title": "Establish whether the 2026-09-03 evening retrain reached the archive, and record the gap if it did not.",
+      "why": "harvest_evening stopped after its 20:30 tick on 2026-09-03 and did not run again until 15:30 today, so the window that captures the AFTERCLOSE UPDATE full retrain was unattended for the hours that retrain normally finishes. That vintage is the population H11 was restated on and the one Phase 6 will treat as tradable, so a silently absent evening run does not just lose a row - it shrinks and biases the sample every execution-timing result will be computed on, and it does so invisibly because the job now reports healthy. Unlike an intraday gap this may still be recoverable, but only while the upstream pointer has not rolled.",
+      "acceptance": "A finding recorded in docs/FINDINGS.md and posted to the inbox that states, for run date 2026-09-03: how many evening-window rows the archive holds versus a typical evening, whether an AFTERCLOSE UPDATE retrain for that date is present with its own available_at, and whether any absence is recoverable from upstream. If it is recoverable the rows are in the archive and `python dashboard/emit_build_status.py --check` still reports 0 blocking; if it is not, the gap is named in docs/FINDINGS.md so no later study silently treats 2026-09-03 as a complete evening.",
+      "depends_on": [],
+      "estimate": "1h",
+      "refs": ["docs/FINDINGS.md", "data/results/build_status.json", "c-0005.1"]
+    }
+  ]
+}

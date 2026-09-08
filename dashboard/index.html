@@ -45,18 +45,26 @@ a{color:var(--s1)}
 .railfoot{margin-top:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink-4);line-height:1.7}
 
 /* ---------- main ---------- */
-main{padding:0 0 90px}
-.wrap{max-width:1080px;padding:0 40px}
-@media (max-width:900px){.wrap{padding:0 20px}}
+/* Every wide thing on this page - charts, tables - carries its own
+   overflow-x:auto container, so nothing needs the document to scroll sideways.
+   clip, not hidden: it does not create a scroll container, so the sticky
+   attention bar inside still sticks. */
+main{padding:0 0 90px;min-width:0;overflow-x:clip}
+.wrap{max-width:1080px;margin:0 auto;padding:0 40px}
+@media (max-width:900px){.wrap{padding:0 20px}
+  .status{padding:0}.stat{padding-left:20px;padding-right:20px}}
 
 .seedbar{background:rgba(242,165,65,.09);border-bottom:1px solid rgba(242,165,65,.3);
   padding:9px 40px;font-family:var(--mono);font-size:11.5px;color:var(--accent);letter-spacing:.02em}
 .seedbar b{font-weight:600}
 
 /* status strip */
-.status{display:flex;flex-wrap:wrap;gap:0;border-bottom:1px solid var(--rule);
+.statusband{border-bottom:1px solid var(--rule)}
+.status{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));
+  max-width:1080px;margin:0 auto;padding:0 20px;
   font-family:var(--mono);font-size:11.5px}
-.stat{padding:14px 22px 13px;border-right:1px solid var(--rule-soft);min-width:132px}
+.stat{padding:14px 20px 13px;border-right:1px solid var(--rule-soft);min-width:0}
+.stat:last-child{border-right:0}
 .stat .k{color:var(--ink-4);font-size:10px;letter-spacing:.11em;text-transform:uppercase}
 .stat .v{color:var(--ink);font-size:16px;font-weight:500;margin-top:4px;font-variant-numeric:tabular-nums}
 .stat .v.ok{color:var(--good)} .stat .v.warn{color:var(--warn)} .stat .v.crit{color:var(--crit)}
@@ -109,7 +117,13 @@ tbody tr:last-child td{border-bottom:0}
 .tablewrap{overflow-x:auto}
 
 /* charts */
+/* These are fixed-viewBox SVGs: scaling the box scales the 10.5px tick labels
+   with it, and below ~1000px they render at 4px. Give each chart a floor and
+   let its own container scroll, so the labels stay the size they were drawn. */
+.chartwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .chart{width:100%;display:block;overflow:visible}
+.chartwrap > .chart.wide{min-width:860px}
+.chartwrap > .chart.half{min-width:400px}
 .legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--ink-2)}
 .legend span{display:flex;align-items:center;gap:7px}
 .note{font-size:12px;color:var(--ink-3);margin-top:12px;line-height:1.55;max-width:70ch}
@@ -119,8 +133,8 @@ tbody tr:last-child td{border-bottom:0}
 .hrow{border-bottom:1px solid var(--rule-soft);padding:0}
 .hhead{display:grid;grid-template-columns:52px minmax(0,1fr) 96px 132px 78px;gap:14px;align-items:center;
   padding:15px 4px;cursor:pointer;background:none;border:0;width:100%;text-align:left;color:inherit;font:inherit}
-@media (max-width:860px){.hhead{grid-template-columns:44px minmax(0,1fr) 84px;}
-  .hhead .hres,.hhead .hfdr{display:none}}
+@media (max-width:860px){.hhead{grid-template-columns:40px minmax(0,1fr) 104px}
+  .hhead .hres,.hhead .hfdr,.hhead .chev{display:none}}
 .hhead:hover{background:var(--panel)}
 .hid{font-family:var(--mono);font-size:12.5px;color:var(--ink-3);font-weight:500}
 .hst{font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;
@@ -180,13 +194,19 @@ tbody tr:last-child td{border-bottom:0}
 .gate.green .gk{color:var(--good)} .gate.amber .gk{color:var(--warn)} .gate.red .gk{color:var(--crit)}
 .gate .gt{color:var(--ink-2);font-size:13px;line-height:1.5}
 .gate .gt b{color:var(--ink);font-weight:500}
+@media (max-width:640px){.gate{flex-direction:column;align-items:flex-start;gap:9px}
+  .gate .gk{font-size:18px}}
 
 /* job heartbeat rows */
 .jobs{border-top:1px solid var(--rule)}
 .job{display:grid;grid-template-columns:minmax(0,1fr) 190px 132px 92px;gap:16px;align-items:center;
   padding:14px 4px;border-bottom:1px solid var(--rule-soft)}
 @media (max-width:860px){.job{grid-template-columns:minmax(0,1fr) 92px;row-gap:9px}
-  .job .beat,.job .jlast{grid-column:1/-1}}
+  .job .beat,.job .jlast{grid-column:1/-1}
+  .job .jlast{text-align:left}}
+@media (max-width:560px){.job{grid-template-columns:minmax(0,1fr)}
+  .job > *{grid-column:1/-1}.job .jst{text-align:left}}
+.job .jcad,.job .jlast{overflow-wrap:anywhere}
 .job .jname{font-size:13.5px;color:var(--ink);display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
 .job .jname .why{display:block;flex-basis:100%;color:var(--ink-3);font-size:11.5px;line-height:1.45;margin-top:3px;max-width:58ch}
 .job .jcad{font-family:var(--mono);font-size:10px;color:var(--ink-4);letter-spacing:.06em}
@@ -194,9 +214,9 @@ tbody tr:last-child td{border-bottom:0}
 .job .jlast em{font-style:normal;display:block;color:var(--ink-4);font-size:10px;margin-top:2px}
 .job .jst{text-align:right}
 .beat{display:flex;gap:2px;align-items:flex-end;height:22px}
-.beat i{flex:1;min-width:2px;border-radius:1px;background:var(--rule);height:5px;display:block}
+.beat i{flex:1;min-width:2px;border-radius:1px;background:#2c3342;height:7px;display:block}
 .beat i.ok{background:var(--good);height:16px} .beat i.miss{background:rgba(224,92,92,.55);height:16px}
-.beat i.err{background:var(--crit);height:16px} .beat i.na{background:var(--rule-soft);height:5px}
+.beat i.err{background:var(--crit);height:16px} .beat i.na{background:#1f2532;height:7px}
 .beatkey{font-family:var(--mono);font-size:10px;color:var(--ink-4);margin-top:10px;
   display:flex;gap:16px;flex-wrap:wrap}
 .beatkey span{display:flex;align-items:center;gap:6px}
@@ -207,7 +227,7 @@ tbody tr:last-child td{border-bottom:0}
 .prow{border-bottom:1px solid var(--rule-soft)}
 .phead{display:grid;grid-template-columns:46px minmax(0,1fr) 128px 104px 96px 26px;gap:14px;align-items:center;
   padding:15px 4px;cursor:pointer;background:none;border:0;width:100%;text-align:left;color:inherit;font:inherit}
-@media (max-width:860px){.phead{grid-template-columns:40px minmax(0,1fr) 90px 26px}
+@media (max-width:860px){.phead{grid-template-columns:38px minmax(0,1fr) 96px 22px}
   .phead .pbarwrap,.phead .pown{display:none}}
 .phead:hover{background:var(--panel)}
 .phead[aria-expanded="true"] .chev{transform:rotate(45deg)}
@@ -255,7 +275,6 @@ tbody tr:last-child td{border-bottom:0}
   letter-spacing:.05em}
 
 /* feed contract table */
-#buildstrip .stat{flex:1}
 #feedtable th:nth-child(2),#feedtable td:nth-child(2){padding-right:18px}
 #feedtable th:nth-child(3),#feedtable td:nth-child(3){width:104px;padding-right:20px}
 #feedtable th:nth-child(4),#feedtable td:nth-child(4){padding-left:4px}
@@ -347,12 +366,12 @@ button.act.primary:hover{background:rgba(57,135,229,.12)}
 #review .rvcycle p{margin:0;font-size:13.5px;line-height:1.6;color:var(--ink)}
 #review .rvbar{display:flex;align-items:center;justify-content:space-between;gap:16px;
   flex-wrap:wrap;margin-bottom:12px}
-#review .rvfilters{display:flex;gap:6px;flex-wrap:wrap}
-#review .rvf{font:11px/1 var(--mono);letter-spacing:.06em;padding:7px 11px;
+.rvfilters{display:flex;gap:6px;flex-wrap:wrap}
+.rvf{font:11px/1 var(--mono);letter-spacing:.06em;padding:7px 11px;
   border:1px solid var(--rule);border-radius:5px;background:transparent;
   color:var(--ink-2);cursor:pointer}
-#review .rvf.on{border-color:var(--s1);color:var(--ink)}
-#review .rvf .c{color:var(--ink-3);margin-left:6px}
+.rvf.on{border-color:var(--s1);color:var(--ink)}
+.rvf .c{color:var(--ink-3);margin-left:6px}
 #review .rvsrc{font:10px/1 var(--mono);color:var(--ink-3)}
 #review .rvitem{border:1px solid var(--rule);border-left-width:2px;border-radius:8px;
   padding:16px 18px;margin-bottom:10px;background:rgba(255,255,255,.012)}
@@ -392,6 +411,7 @@ button.act.primary:hover{background:rgba(57,135,229,.12)}
 #review .rvb:hover{color:var(--ink);border-color:var(--ink-3)}
 #review .rvb.go{border-color:var(--s1);color:var(--s1)}
 #review .rvb.no{border-color:var(--crit);color:var(--crit)}
+#review .rvb.armed{border-color:var(--crit);color:var(--crit);background:rgba(224,92,92,.12)}
 #review .rvsay{font:11px/1 var(--mono);margin-left:4px}
 #review .rvsay.ok{color:var(--good)}
 #review .rvsay.bad{color:var(--crit)}
@@ -399,13 +419,168 @@ button.act.primary:hover{background:rgba(57,135,229,.12)}
   text-align:center;color:var(--ink-3);font-size:13px}
 #review #rvout{width:100%;min-height:80px;margin-top:12px}
 
+/* ---------------- attention bar ---------------- */
+.attn{position:sticky;top:0;z-index:40;background:var(--panel);
+  border-bottom:1px solid var(--rule);padding:11px 40px;display:flex;
+  align-items:baseline;gap:10px 20px;flex-wrap:wrap}
+@media (max-width:900px){.attn{padding:11px 20px;position:static}}
+.attn .ak{font:9.5px/1.6 var(--mono);letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-4);flex:0 0 auto}
+.attn .arow{display:flex;gap:8px;flex-wrap:wrap;flex:1 1 auto}
+.attn a.ai{display:inline-flex;align-items:center;gap:7px;text-decoration:none;
+  font:11.5px/1 var(--mono);letter-spacing:.02em;color:var(--ink-2);
+  border:1px solid var(--rule);border-radius:3px;padding:6px 9px 6px 8px;
+  background:var(--panel-2)}
+.attn a.ai:hover{color:var(--ink);border-color:var(--ink-4)}
+.attn a.ai b{font-weight:500;color:var(--ink)}
+.attn a.ai .d{width:6px;height:6px;border-radius:50%;flex:0 0 6px}
+.attn a.ai.crit{border-color:rgba(224,92,92,.4);background:rgba(224,92,92,.07)}
+.attn a.ai.crit .d{background:var(--crit)}
+.attn a.ai.warn{border-color:rgba(242,165,65,.38);background:rgba(242,165,65,.06)}
+.attn a.ai.warn .d{background:var(--warn)}
+.attn a.ai.ok .d{background:var(--good)}
+.attn .aclear{font:12px/1.5 var(--sans);color:var(--ink-2)}
+.attn .aclear b{color:var(--good);font-weight:500}
+.attn .astamp{font:10px/1.6 var(--mono);color:var(--ink-4);margin-left:auto;
+  letter-spacing:.04em;text-align:right}
+.attn .astamp.warn{color:var(--warn)}
+.attn .astamp.crit{color:var(--crit)}
+.attn .aunread{font:12px/1.5 var(--sans);color:var(--ink-3)}
+.attn .aunread b{color:var(--warn);font-weight:500}
+.exmark{font:10px/1.5 var(--mono);letter-spacing:.11em;color:var(--warn);
+  border:1px dashed rgba(242,165,65,.4);background:rgba(242,165,65,.06);
+  border-radius:4px;padding:8px 11px;margin:0 0 12px}
+.exmark code{letter-spacing:0}
+
+/* anchors clear the sticky attention bar */
+section{scroll-margin-top:var(--attnh,64px)}
+@media (max-width:900px){section{scroll-margin-top:12px}}
+
+/* ---------------- mobile navigation ---------------- */
+@media (max-width:900px){
+  /* A grid item defaults to min-width:auto, so the scrolling nav row sizes the
+     whole track and the page scrolls sideways. Both tracks must be allowed to
+     shrink below their content. */
+  .shell{grid-template-columns:minmax(0,1fr)}
+  .rail{position:static;height:auto;overflow:hidden;min-width:0;border-right:0;
+    border-bottom:1px solid var(--rule);padding:14px 20px 0;gap:14px}
+  main{min-width:0}
+  .rail .mark{font-size:11px}
+  .nav{flex-direction:row;overflow-x:auto;min-width:0;gap:6px;padding-bottom:12px;
+    padding-right:38px;
+    scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .nav::-webkit-scrollbar{display:none}
+  .nav .grp{display:none}
+  .nav a{flex:0 0 auto;margin-left:0;border:1px solid var(--rule);
+    background:var(--panel-2);padding:7px 11px;border-radius:14px;white-space:nowrap}
+  .nav a span.n{margin-right:1px}
+  .navwrap{position:relative;min-width:0;overflow:hidden}
+  .navwrap::after{content:"";position:absolute;top:0;right:0;bottom:12px;width:34px;
+    pointer-events:none;background:linear-gradient(90deg,rgba(18,21,27,0),var(--panel))}
+  .railfoot{display:none}
+}
+
+/* trunk state — a branch can look pushed and healthy while main is wrong */
+.git.waiting_trunk{color:var(--s4);border-color:rgba(144,133,233,.42);
+  background:rgba(144,133,233,.09)}
+#fleet .ncard.notrunk{border-left-color:var(--s4)}
+#fleet .ntrunk{font:11px/1.5 var(--mono);color:var(--s4);margin-top:9px}
+#fleet .ntrunk.on{color:var(--good)}
+.gate.unknown{border-left-color:var(--ink-4)}
+.gate.unknown .gk{color:var(--ink-3)}
+
+/* ---------------- 13 · fleet & bus ---------------- */
+#fleet .flbar{display:flex;align-items:center;justify-content:space-between;gap:16px;
+  flex-wrap:wrap;margin-bottom:14px}
+#fleet .flsrc{font:10px/1.5 var(--mono);color:var(--ink-3);letter-spacing:.04em;text-align:right}
+#fleet .flwho{display:flex;align-items:center;gap:8px;font:11px/1 var(--mono);
+  letter-spacing:.06em;color:var(--ink-3)}
+#fleet .flwho select,#fleet .bxrow select,#fleet .bxrow input{
+  background:#0a0c10;color:var(--ink);border:1px solid var(--rule);border-radius:4px;
+  padding:7px 9px;font:11.5px/1.2 var(--mono)}
+#fleet .flwho select:focus,#fleet .bxrow select:focus,#fleet .bxrow input:focus{
+  outline:2px solid var(--s1);outline-offset:-1px}
+#fleet .peers{font:10.5px/1 var(--mono);color:var(--ink-4);letter-spacing:.05em}
+#fleet .peers b{color:var(--s3);font-weight:500}
+
+#fleet .nodes{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+#fleet .ncard{background:var(--panel);border:1px solid var(--rule);border-radius:5px;
+  padding:16px 18px;border-left:2px solid var(--ink-4)}
+#fleet .ncard.online{border-left-color:var(--good)}
+#fleet .ncard.stale{border-left-color:var(--warn)}
+#fleet .ncard.offline{border-left-color:var(--crit);background:rgba(224,92,92,.05)}
+#fleet .ncard.faded{opacity:.55}
+#fleet .nh{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+#fleet .nname{font-size:14.5px;font-weight:600;color:var(--ink)}
+#fleet .nname em{font-style:normal;font-family:var(--mono);font-size:10.5px;
+  color:var(--ink-4);display:block;margin-top:2px;letter-spacing:.05em}
+#fleet .nage{font:11px/1.4 var(--mono);color:var(--ink-2);margin-top:9px;
+  font-variant-numeric:tabular-nums}
+#fleet .nage.bad{color:var(--crit)}
+#fleet .nage.warn{color:var(--warn)}
+#fleet .nclaim{font:11px/1.5 var(--mono);color:var(--ink-3);margin-top:8px}
+#fleet .ntags{display:flex;flex-wrap:wrap;gap:5px;margin-top:11px}
+#fleet .ntag{font:9.5px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;
+  padding:3px 6px;border-radius:2px;border:1px solid var(--rule);color:var(--ink-3)}
+#fleet .ntag.miss{color:var(--crit);border-color:rgba(224,92,92,.35);
+  background:rgba(224,92,92,.07)}
+#fleet .nagents{border-top:1px solid var(--rule-soft);margin-top:12px;padding-top:10px;
+  display:grid;gap:6px}
+#fleet .nag{display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  font:11.5px/1.5 var(--mono);color:var(--ink-2)}
+#fleet .nag .l{color:var(--ink-4);font-size:10px;letter-spacing:.06em;text-transform:uppercase}
+#fleet .nsync{font:10px/1.5 var(--mono);color:var(--ink-4);margin-top:10px;letter-spacing:.04em}
+#fleet .nsync.stale{color:var(--warn)}
+#fleet .ndecl{font:10.5px/1.5 var(--mono);color:var(--crit);margin-top:8px}
+
+#fleet .compose{background:var(--panel);border:1px solid var(--rule);border-radius:5px;
+  padding:16px 18px;margin-bottom:16px}
+#fleet .bxrow{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+#fleet .bxrow label{font:10px/1 var(--mono);letter-spacing:.11em;text-transform:uppercase;
+  color:var(--ink-4)}
+#fleet .compose input[type=text]{flex:1 1 220px}
+#fleet .compose textarea{width:100%;min-height:78px;background:#0a0c10;color:var(--ink);
+  border:1px solid var(--rule);border-radius:4px;padding:10px 12px;
+  font:12.5px/1.55 var(--sans);resize:vertical}
+#fleet .compose textarea:focus{outline:2px solid var(--s1);outline-offset:-1px}
+#fleet .chk{display:flex;align-items:center;gap:7px;font:11px/1 var(--mono);color:var(--ink-2)}
+
+#fleet .msgs{display:grid;gap:10px}
+#fleet .msg2{background:var(--panel);border:1px solid var(--rule);border-left-width:2px;
+  border-radius:0 5px 5px 0;padding:14px 16px}
+#fleet .msg2.tome{border-left-color:var(--s1)}
+#fleet .msg2.needsandrew{border-left-color:var(--warn)}
+#fleet .msg2.overdue{border-left-color:var(--crit);background:rgba(224,92,92,.05)}
+#fleet .msg2.plain{border-left-color:var(--rule)}
+#fleet .mh{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin-bottom:7px}
+#fleet .mfrom{font:11.5px/1 var(--mono);color:var(--ink);font-weight:500}
+#fleet .mto{font:11px/1 var(--mono);color:var(--ink-3)}
+#fleet .mat{font:10.5px/1 var(--mono);color:var(--ink-4);margin-left:auto}
+#fleet .msubj{font-size:14px;font-weight:500;color:var(--ink);margin:3px 0 6px;flex-basis:100%}
+#fleet .mbody{font-size:13px;line-height:1.6;color:var(--ink-2);white-space:pre-wrap;
+  max-width:80ch}
+#fleet .mfoot{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:11px}
+#fleet .git{font:9.5px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase;
+  padding:4px 7px;border-radius:2px;border:1px solid}
+#fleet .git.pending{color:var(--warn);border-color:rgba(242,165,65,.42);
+  background:rgba(242,165,65,.09)}
+#fleet .git.committed{color:var(--good);border-color:rgba(63,166,106,.42);
+  background:rgba(63,166,106,.09)}
+#fleet .git.na{color:var(--ink-3);border-color:var(--rule)}
+#fleet .mwarn{font:11.5px/1.5 var(--mono);color:var(--crit);margin-top:9px}
+#fleet .flempty{border:1px dashed var(--rule);border-radius:8px;padding:22px;
+  text-align:center;color:var(--ink-3);font-size:13px}
+#fleet .flnote{font-size:12px;color:var(--ink-3);margin-top:14px;line-height:1.55;max-width:76ch}
+#fleet .flsay{font:11px/1 var(--mono);margin-left:4px}
+#fleet .flsay.ok{color:var(--good)} #fleet .flsay.bad{color:var(--crit)}
+
 </style>
 
 <div id="tip"></div>
 <div class="shell">
   <aside class="rail">
     <div class="mark">Zoltar<small>Research Console</small></div>
-    <nav class="nav">
+    <div class="navwrap"><nav class="nav">
       <div class="grp" style="border-top:0;margin-top:0;padding-top:0">Research</div>
       <a href="#health"><span class="n">01</span> Archive health</a>
       <a href="#question"><span class="n">02</span> The open question</a>
@@ -420,7 +595,8 @@ button.act.primary:hover{background:rgba(57,135,229,.12)}
       <a href="#gates" class="live"><span class="n">10</span> Contract gates</a>
       <a href="#handoff" class="live"><span class="n">11</span> Feeds &amp; handoff</a>
       <a href="#review" class="live"><span class="n">12</span> Review &amp; work orders</a>
-    </nav>
+      <a href="#fleet" class="live"><span class="n">13</span> Fleet &amp; bus</a>
+    </nav></div>
     <div class="railfoot">
       <span id="genstamp">—</span><br>
       schema v<span id="schemav">—</span><br>
@@ -429,11 +605,12 @@ button.act.primary:hover{background:rgba(57,135,229,.12)}
   </aside>
 
   <main>
+    <div class="attn" id="attn"></div>
     <div class="seedbar" id="seedbar" hidden></div>
 
     <section id="health" style="padding-top:0">
-      <div class="status" id="statusstrip"></div>
-      <div class="status" id="buildstrip"></div>
+      <div class="statusband"><div class="status" id="statusstrip"></div></div>
+      <div class="statusband"><div class="status" id="buildstrip"></div></div>
     </section>
 
     <div class="wrap">
@@ -454,8 +631,8 @@ button.act.primary:hover{background:rgba(57,135,229,.12)}
           worth knowing.</p>
         <div class="panel">
           <h3>Growth of 1.00</h3>
-          <svg id="equity" class="chart" viewBox="0 0 900 300" role="img"
-               aria-label="Equity curves for four strategies"></svg>
+          <div class="chartwrap"><svg id="equity" class="chart wide" viewBox="0 0 900 300" role="img"
+               aria-label="Equity curves for four strategies"></svg></div>
           <div class="legend" id="equityLegend"></div>
         </div>
         <div class="panel" style="margin-top:18px">
@@ -474,14 +651,14 @@ button.act.primary:hover{background:rgba(57,135,229,.12)}
         <div class="grid2">
           <div class="panel">
             <h3>IC by holding horizon</h3>
-            <svg id="icHorizon" class="chart" viewBox="0 0 440 260" role="img"
-                 aria-label="Information coefficient by holding horizon with confidence intervals"></svg>
+            <div class="chartwrap"><svg id="icHorizon" class="chart half" viewBox="0 0 440 260" role="img"
+                 aria-label="Information coefficient by holding horizon with confidence intervals"></svg></div>
             <p class="note" id="icNote"></p>
           </div>
           <div class="panel">
             <h3>IC by cap segment</h3>
-            <svg id="icSegment" class="chart" viewBox="0 0 440 260" role="img"
-                 aria-label="Information coefficient by cap segment and horizon"></svg>
+            <div class="chartwrap"><svg id="icSegment" class="chart half" viewBox="0 0 440 260" role="img"
+                 aria-label="Information coefficient by cap segment and horizon"></svg></div>
             <div class="legend" id="segLegend"></div>
           </div>
         </div>
@@ -494,14 +671,14 @@ button.act.primary:hover{background:rgba(57,135,229,.12)}
           re-scores at ~30-minute resolution, so “score at 10:30, buy at 11:00” is measured, not reconstructed.</p>
         <div class="panel">
           <h3>Edge decay after run timestamp</h3>
-          <svg id="decay" class="chart" viewBox="0 0 900 270" role="img"
-               aria-label="Information coefficient versus minutes elapsed after the rank run"></svg>
+          <div class="chartwrap"><svg id="decay" class="chart wide" viewBox="0 0 900 270" role="img"
+               aria-label="Information coefficient versus minutes elapsed after the rank run"></svg></div>
           <p class="note" id="decayNote"></p>
         </div>
         <div class="panel" style="margin-top:18px">
           <h3>Net return by entry time × exit rule <span style="color:var(--ink-4)">(bps per trade, after costs)</span></h3>
-          <svg id="heat" class="chart" viewBox="0 0 900 300" role="img"
-               aria-label="Heatmap of net return in basis points by entry time and exit rule"></svg>
+          <div class="chartwrap"><svg id="heat" class="chart wide" viewBox="0 0 900 300" role="img"
+               aria-label="Heatmap of net return in basis points by entry time and exit rule"></svg></div>
           <p class="note" id="heatNote"></p>
         </div>
       </section>
@@ -653,6 +830,62 @@ button.act.primary:hover{background:rgba(57,135,229,.12)}
             </div>
           </div>
         </details>
+      </section>
+
+      <section id="fleet">
+        <div class="eyebrow">13 — Active build · fleet &amp; bus</div>
+        <h2>Two machines, four agents, one place they talk</h2>
+        <p class="lede">No agent in this system reaches both halves of it: the brains can write
+          this board but cannot run git, the workers can run git but cannot see this page. So git
+          is the source of truth, this board is the live mirror, and every message carries a
+          git-state chip saying whether a courier has landed it yet.</p>
+
+        <div id="fleetgate"></div>
+
+        <h3 style="margin:26px 0 12px">13a · Node &amp; agent roster</h3>
+        <div class="flbar">
+          <span class="peers" id="flpeers"></span>
+          <span class="flsrc" id="flnodesrc">—</span>
+        </div>
+        <div id="fleetblock"></div>
+        <div class="nodes" id="flnodes"></div>
+        <p class="flnote" id="flnodenote"></p>
+
+        <h3 style="margin:30px 0 12px">13b · The bus</h3>
+        <div class="flbar">
+          <div class="flwho">
+            <label for="flwho">Posting as</label>
+            <select id="flwho"></select>
+          </div>
+          <span class="flsrc" id="flbussrc">—</span>
+        </div>
+
+        <div class="compose" id="flcompose">
+          <div class="bxrow">
+            <label for="flto">To</label>
+            <select id="flto"></select>
+            <label for="flkind">Kind</label>
+            <select id="flkind"></select>
+            <label for="flref">Ref</label>
+            <input type="text" id="flref" placeholder="a message id, c-0007.2, or a sha" style="flex:0 1 230px">
+          </div>
+          <div class="bxrow">
+            <input type="text" id="flsubject" placeholder="Subject — one line">
+          </div>
+          <textarea id="flbody" placeholder="Message. The bus is how we talk; work is issued only through cycles in §12."></textarea>
+          <div class="btnrow">
+            <span class="chk"><input type="checkbox" id="flneeds"> <label for="flneeds" style="letter-spacing:.04em;text-transform:none;font-size:11px;color:var(--ink-2)">Needs a reply from Andrew</label></span>
+            <span class="chk"><input type="checkbox" id="flgit"> <label for="flgit" style="letter-spacing:.04em;text-transform:none;font-size:11px;color:var(--ink-2)">Must land in git</label></span>
+            <button class="act primary" id="flpost" type="button">Post to the bus</button>
+            <span class="flsay" id="flsay"></span>
+          </div>
+        </div>
+
+        <div class="flbar">
+          <div class="rvfilters" id="flfilters"></div>
+        </div>
+        <div class="msgs" id="flmsgs"></div>
+        <p class="flnote" id="flbusnote"></p>
       </section>
 
     </div>
@@ -5983,7 +6216,10 @@ function heat(data){
    says so - the field name predates the fix. Never label it run_ts blindly:
    run_ts is forward-stamped for the evening retrain and can be in the future. */
 function freshLabel(h){
-  const basis=h.freshness_basis||"run_ts";
+  /* Defaulting the basis to "run_ts" asserts the one thing the comment above
+     forbids. An undeclared basis is an undeclared basis. */
+  const basis=h.freshness_basis;
+  if(!basis) return "basis not declared by the exporter";
   let s="since newest "+basis;
   const rt=h.last_run_ts?new Date(h.last_run_ts):null;
   if(rt&&!isNaN(rt)&&rt>new Date())s+=" \u00b7 run_ts stamped "+h.last_run_ts.slice(5,10);
@@ -5996,13 +6232,28 @@ function status(data){
   /* schema v2 renamed this to hours_since_fresh and kept the old key as a
      deprecated alias for one version. Read the new name first so the v3 removal
      is a no-op here. */
-  const stale=(h.hours_since_fresh!==undefined?h.hours_since_fresh:h.hours_since_last_run_ts);
-  const staleCls=stale<12?"ok":stale<36?"warn":"crit";
+  const atEmit=(h.hours_since_fresh!==undefined?h.hours_since_fresh:h.hours_since_last_run_ts);
+  /* That figure is the age the exporter measured WHEN IT RAN. Printed raw it
+     freezes: a feed generated three days ago still reads 3.2h. The age a person
+     needs is that number plus the age of the feed carrying it. */
+  const feedAge=hoursSince(data.generated_at);
+  const stale=(typeof atEmit==="number")
+    ? atEmit+(feedAge!=null&&feedAge>0?feedAge:0) : null;
+  const staleCls=stale==null?"crit":stale<12?"ok":stale<36?"warn":"crit";
+  const staleSub=stale==null?"the feed reports no age"
+    :(feedAge!=null&&feedAge>1
+        ? atEmit.toFixed(1)+"h at emit + "+feedAge.toFixed(1)+"h since \u00b7 "+freshLabel(h)
+        : freshLabel(h));
   const failed=h.failed_steps.length;
+  /* An empty failed_steps[] means "nothing failed" and "nothing was checked"
+     identically, so the colour comes from when the harvester last actually ran. */
+  const hAge=hoursSince(h.last_harvest_at);
+  const hv=failed?"FAILED":hAge==null?"NEVER RUN":hAge>36?"STALE":"HEALTHY";
+  const hc=failed?"crit":hAge==null?"crit":hAge>36?"crit":hAge>18?"warn":"ok";
   const items=[
-    ["Harvester",failed?"FAILED":"HEALTHY",failed?"crit":"ok",
-      failed?failed+" step(s) failed":"last run "+h.last_harvest_at.slice(11,16)],
-    ["Data age",stale.toFixed(1)+"h",staleCls,freshLabel(h)],
+    ["Harvester",hv,hc,
+      failed?failed+" step(s) failed":hAge==null?"no run recorded":agoText(h.last_harvest_at)],
+    ["Data age",stale==null?"—":stale.toFixed(1)+"h",staleCls,staleSub],
     ["Daily runs",daily.runs,"","from "+daily.first_run.slice(0,10)],
     ["Intraday runs",all.runs,"","from "+all.first_run.slice(0,10)],
     ["Expected returns",h.expected_returns.as_of_dates,"","as-of dates"],
@@ -6149,7 +6400,7 @@ const BUILD_KEY="zoltar.build_status.v1";
 const BUILD_DOC="state/build_status";
 const BUILD_FILE="../data/results/build_status.json";
 let dbRefP=null;
-let BUILD=null;
+let BUILD=null, BUILD_SOURCE=null;
 
 const tsShort=s=>s?String(s).replace("T"," ").slice(0,16):"—";
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -6158,6 +6409,20 @@ function hoursSince(iso){
   if(!iso) return null;
   const t=Date.parse(iso); if(isNaN(t)) return null;
   return (Date.now()-t)/36e5;
+}
+/* A bare "09-02 11:35" makes the reader do date arithmetic to judge staleness,
+   and never escalates. Relative age does the job the page exists to do. */
+function ageStamp(iso){
+  const h=hoursSince(iso);
+  if(h==null) return "—";
+  if(h<1) return Math.max(1,Math.round(h*60))+"m ago";
+  if(h<48) return h.toFixed(1)+"h ago";
+  return Math.round(h/24)+"d ago";
+}
+function ageCls(iso,warnH,critH){
+  const h=hoursSince(iso);
+  if(h==null) return "crit";
+  return h>(critH||72)?"crit":h>(warnH||24)?"warn":"";
 }
 function agoText(iso){
   const h=hoursSince(iso);
@@ -6215,10 +6480,13 @@ function buildJobs(b){
 
   const js=b.jobs||[];
   const missing=js.filter(j=>j.status==="not_built").length;
-  const bad=js.filter(j=>j.status==="failed"||j.status==="late").length;
+  /* partial means the job fired for some of its windows and not others. It was
+     counted in neither bucket, so a job that missed six of fifteen windows
+     reported as nothing wrong. */
+  const bad=js.filter(j=>j.status==="failed"||j.status==="late"||j.status==="partial").length;
   $("#jobNote").innerHTML=
     `${js.length} job${js.length===1?"":"s"} on the board · `+
-    `<b style="color:${bad?"var(--crit)":"var(--ink)"}">${bad}</b> failing or late · `+
+    `<b style="color:${bad?"var(--crit)":"var(--ink)"}">${bad}</b> failing, late or missing windows · `+
     `<b style="color:${missing?"var(--warn)":"var(--ink)"}">${missing}</b> not yet built. `+
     `A missed window on an append-only feed is recoverable; a missed window on the intraday buffer is not.`;
 }
@@ -6271,11 +6539,13 @@ function buildGates(b){
     return (r[a.status]??9)-(r[c.status]??9);
   });
   $("#gatecards").innerHTML=ts.map(t=>{
-    const cls=t.status==="pass"?"pass":t.status==="fail"?"fail":t.status==="stale"?"stale":"";
+    const age=hoursSince(t.last_run_at);
+    const old=t.status==="pass"&&(age==null||age>48);
+    const cls=old?"stale":t.status==="pass"?"pass":t.status==="fail"?"fail":t.status==="stale"?"stale":"";
     return `<div class="gcard ${cls}">
-      <div class="gh"><h4>${esc(t.name)}</h4>${pill(GATE_STATE,t.status)}</div>
+      <div class="gh"><h4>${esc(t.name)}</h4>${old?`<span class="pill warn">passed, then aged</span>`:pill(GATE_STATE,t.status)}</div>
       <p>${esc(t.detail||"")}</p>
-      <span class="gm">${esc(t.severity||"warning")} · guards ${esc(t.guards||"—")} · ${t.last_run_at?"last run "+tsShort(t.last_run_at):"never run"}</span>
+      <span class="gm">${esc(t.severity||"warning")} · guards ${esc(t.guards||"—")} · ${t.last_run_at?"last run "+tsShort(t.last_run_at)+" ("+ageStamp(t.last_run_at)+")":"never run"}</span>
     </div>`;
   }).join("")||`<div class="gcard"><h4>No gates reported.</h4></div>`;
 }
@@ -6315,20 +6585,33 @@ function buildActivity(b){
 
 /* ---- top strip tiles ---- */
 function buildStrip(b){
+  /* BUILD_SOURCE is set by renderBuild before this runs. */
   const js=b.jobs||[], ps=b.phases||[], gs=b.contract_tests||[];
-  const jbad=js.filter(j=>j.status==="failed"||j.status==="late"||j.status==="not_built").length;
+  const jbad=js.filter(j=>j.status==="failed"||j.status==="late"||j.status==="partial"||j.status==="not_built").length;
   const gbad=gs.filter(g=>g.status==="fail").length;
   const gmiss=gs.filter(g=>g.status==="not_built"||g.status==="stale").length;
   const cur=ps.find(p=>p.status==="in_progress")||ps.find(p=>p.status==="queued");
   const gate=(b.gate&&b.gate.state)||"amber";
+  /* "Gates failing 0" is green whether every gate passes or none has ever run,
+     which is the contradiction §10's own lede names. Count what is VERIFIED. */
+  /* status:"pass" is what the exporter wrote when it last ran. Age it against
+     the clock, the same way §12's heartbeat is aged. */
+  const GATE_STALE_H=48;
+  const aged=g=>{const a=hoursSince(g.last_run_at);return a==null||a>GATE_STALE_H;};
+  const gpass=gs.filter(g=>g.status==="pass"&&!aged(g)).length;
+  const gold=gs.filter(g=>g.status==="pass"&&aged(g)).length;
+  const gcls=gs.length?(gbad?"crit":(gmiss+gold)?"warn":"ok"):"crit";
   const items=[
     ["Build gate",gate.toUpperCase(),gate==="green"?"ok":gate==="amber"?"warn":"crit",(b.gate&&b.gate.headline)||""],
     ["Active phase",cur?cur.id:"—","",cur?cur.name.slice(0,34):"nothing in progress"],
-    ["Jobs at risk",jbad+" / "+js.length,jbad?"crit":"ok","failed, late or not built"],
-    ["Gates failing",gbad,gbad?"crit":"ok",gmiss+" more never run or stale"],
+    ["Jobs at risk",js.length?jbad+" / "+js.length:"—",js.length?(jbad?"crit":"ok"):"crit",
+      js.length?"failed, late, partial or not built":"no jobs reported"],
+    ["Gates verified",gs.length?gpass+" / "+gs.length:"—",gcls,
+      gs.length?(gbad?gbad+" failing \u00b7 ":"")+(gmiss+gold)+" never run or older than "+GATE_STALE_H+"h":"no gates reported"],
     ["Blocked",(b.blockers||[]).length,(b.blockers||[]).length?"warn":"ok",
       (b.blockers||[]).filter(x=>x.needs==="andrew").length+" need you"],
-    ["Status as of",tsShort(b.generated_at).slice(5),"",b.is_example?"example scaffold":"from the repo"]
+    /* renderBuild knows the real provenance. Do not restate it as "from the repo". */
+    ["Status as of",ageStamp(b.generated_at),ageCls(b.generated_at),BUILD_SOURCE||"provenance unknown"]
   ];
   $("#buildstrip").innerHTML=items.map(([k,v,c,s])=>
     `<div class="stat"><div class="k">${k}</div><div class="v ${c||""}">${esc(v)}</div><div class="s">${esc(s)}</div></div>`
@@ -6337,17 +6620,25 @@ function buildStrip(b){
 
 /* ---- render + persistence ---- */
 function renderBuild(b,source){
-  BUILD=b;
+  BUILD=b; BUILD_SOURCE=source;
   buildStrip(b); buildGate(b); buildJobs(b); buildPhases(b);
   buildGates(b); buildFeeds(b); buildBlockers(b); buildActivity(b);
   $("#buildsrc").textContent="Source: "+source+" · generated "+tsShort(b.generated_at)+
     " · schema v"+(b.schema_version||"?");
-  const bar=$("#seedbar");
-  if(b.is_example&&bar&&bar.hidden===false&&!bar.dataset.buildnote){
-    bar.dataset.buildnote="1";
-    bar.innerHTML+=" Build monitor (§08–§11) is on an example scaffold too — paste "+
-      "<code>build_status.json</code> under &ldquo;Update this monitor&rdquo;.";
-  }
+  try{flBlock();}catch(e){}
+  try{attn();}catch(e){}
+  /* Marked at the point of reading. A banner at the top of the page is not a
+     mark on the table someone is actually looking at 4,000px down. */
+  const note=b.is_example
+    ? `<div class="exmark">EXAMPLE SCAFFOLD \u2014 not your build. Every figure in this section is invented to exercise the layout. Paste <code>build_status.json</code> under &ldquo;Update this monitor&rdquo; in \u00a711.</div>`
+    : "";
+  ["#buildgate","#jobs","#phaselist","#gatecards","#feedtable"].forEach(sel=>{
+    const n=document.querySelector(sel); if(!n) return;
+    const host=sel==="#feedtable"?n.parentNode:n;
+    const prev=host.previousElementSibling;
+    if(prev&&prev.classList&&prev.classList.contains("exmark")) prev.remove();
+    if(note) host.insertAdjacentHTML("beforebegin",note);
+  });
 }
 
 function useDb(){
@@ -6505,7 +6796,7 @@ function nmDrop(sels,panel){
 const $$=s=>Array.from(document.querySelectorAll(s));
 const REVIEW_KEY="zoltar.review_state.v1";
 const REVIEW_DOC="state/review_state";
-let RV = null, RVFILTER = "open";
+let RV = null, RVFILTER = "open", RV_LATE = false;
 const RV_PARTY = "andrew";              // who this page posts as
 const RV_CLOSED = ["done", "rejected", "deferred", "answered"];
 
@@ -6516,30 +6807,67 @@ function rvCharter(s){
   const c=s.charter||{}, hb=s.heartbeat||{}, b=s.build||{};
   const beats=(hb.recent||[]).slice(-24)
     .map(x=>`<i class="${x.quiet?"q":"a"}" title="${rvEsc(x.at)}${x.quiet?" · quiet":""}"></i>`).join("");
-  const late=hb.late?`<b style="color:var(--crit)">LATE</b>`:`<b>${rvWhen(hb.next_expected_at)}</b>`;
+  /* hb.late is a boolean the exporter wrote at emit time; it never learns that
+     the deadline has since passed. Derive it. */
+  const dueT=Date.parse(hb.next_expected_at||"");
+  /* No declared deadline is not the same as no deadline: cadence plus the feed's
+     own emit time gives one, and a feed that omits the field must not therefore
+     read as on time. */
+  const cad=Number(hb.cadence_minutes)>0?Number(hb.cadence_minutes):null;
+  const emitT=Date.parse(s.generated_at||"");
+  const impliedT=(!isNaN(dueT))?dueT
+    :(cad&&!isNaN(emitT))?emitT+cad*60000:NaN;
+  const overdue=!isNaN(impliedT)&&impliedT<Date.now();
+  const implied=isNaN(dueT)&&!isNaN(impliedT);
+  const lateNow=hb.late||overdue;
+  const dueLabel=!isNaN(impliedT)
+    ? rvWhen(new Date(impliedT).toISOString())+(implied?" (implied by cadence)":"")
+    : "no deadline declared";
+  const late=lateNow
+    ? `<b style="color:var(--crit)">LATE</b> <span style="color:var(--ink-3)">due ${esc(dueLabel)} \u00b7 ${ageStamp(new Date(impliedT).toISOString())}</span>`
+    : isNaN(impliedT)
+      ? `<b style="color:var(--warn)">unknown</b> <span style="color:var(--ink-3)">the feed declares neither a deadline nor a cadence</span>`
+      : `<b>${esc(dueLabel)}</b>`;
+  RV_LATE=lateNow;
   $("#rvcharter").innerHTML=
     `<p class="rvgoal">${rvEsc(c.end_goal||"No charter — data/review/charter.json is missing.")}</p>`+
     `<div class="rvmeta">`+
       `<span>CRITICAL PATH <b>${rvEsc(c.critical_path||"—")}</b></span>`+
-      `<span>BUILD GATE <b style="color:${b.gate==="green"?"var(--good)":b.gate==="red"?"var(--crit)":"var(--warn)"}">${rvEsc((b.gate||"—").toUpperCase())}</b></span>`+
+      `<span>BUILD GATE <b style="color:${b.gate==="green"?"var(--good)":b.gate==="red"?"var(--crit)":"var(--warn)"}">${rvEsc((b.gate||"—").toUpperCase())}</b>`+
+        `<span style="color:var(--ink-4)"> as of ${rvEsc(rvWhen(s.generated_at))}, from the review feed</span></span>`+
       `<span>HEARTBEAT <span class="pulse">${beats||'<i></i>'}</span> next ${late}</span>`+
       `<span>CADENCE <b>${rvEsc(c.cadence_human||(hb.cadence_minutes+" min"))}</b></span>`+
     `</div>`;
 }
 
-function rvTiles(s){
+/* The feed ships a counts block. The item list beside it is derived. When they
+   disagree the derived number is the one with evidence behind it. */
+function rvCounts(s){
+  const items=s.items||[];
+  const open=items.filter(i=>RV_CLOSED.indexOf(i.status)<0);
+  const by=w=>open.filter(i=>i.waiting_on===w).length;
+  const d={open:open.length,"andrew":by("andrew"),"claude-code":by("claude-code"),
+           "cowork":by("cowork"),done:items.filter(i=>i.status==="done").length,
+           unverified:items.filter(i=>(i.done_unverified||[]).length).length,
+           raised:(s.raised||[]).length};
   const c=s.counts||{};
+  d.disagrees=Object.keys(d).some(k=>k!=="disagrees"&&c[k]!==undefined&&c[k]!==d[k]);
+  return d;
+}
+function rvTiles(s){
+  const c=rvCounts(s);
   const t=[
     ["Needs you",c["andrew"]||0,(c["andrew"]?"hot":"ok"),"decisions and answers"],
     ["Claude Code",c["claude-code"]||0,"","in flight"],
     ["Cowork",c["cowork"]||0,"","brain's own queue"],
     ["Open",c.open||0,"","across all cycles"],
-    ["Done",c.done||0,"ok","closed items"],
+    ["Done",c.done||0,c.done?"ok":"","closed items"],
     ["Unverified",c.unverified||0,(c.unverified?"bad":""),"claimed done, artifact missing"],
     ["Raised",c.raised||0,(c.raised?"hot":""),"not yet in a cycle"]
   ];
   $("#rvtiles").innerHTML=t.map(([k,v,cl,sub])=>
-    `<div class="rvtile"><div class="k">${k}</div><div class="v ${cl}">${v}</div><div class="s">${sub}</div></div>`).join("");
+    `<div class="rvtile"><div class="k">${k}</div><div class="v ${cl}">${v}</div><div class="s">${sub}</div></div>`).join("")+
+    (c.disagrees?`<div class="rvtile" style="grid-column:1/-1;border-right:0"><div class="k">Feed disagreement</div><div class="v hot" style="font-size:13px">counts block does not match items[]</div><div class="s">These tiles are derived from items[]. Re-run <code>review.py emit</code>.</div></div>`:"");
 }
 
 function rvCycle(s){
@@ -6554,7 +6882,7 @@ function rvCycle(s){
 }
 
 function rvFilters(s){
-  const c=s.counts||{};
+  const c=rvCounts(s);
   const f=[["open","Open",c.open||0],["andrew","Needs you",c["andrew"]||0],
            ["claude-code","Claude Code",c["claude-code"]||0],
            ["cowork","Cowork",c["cowork"]||0],["all","All",(s.items||[]).length]];
@@ -6632,14 +6960,29 @@ function rvRender(){
     :`<div class="rvempty">Nothing here. ${RVFILTER==="andrew"?"Nothing is waiting on you.":"Try another filter."}</div>`;
   $$("#rvitems .rvitem").forEach(card=>{
     const id=card.dataset.id, box=card.querySelector("textarea"), say=card.querySelector(".rvsay");
-    card.querySelectorAll(".rvb").forEach(b=>b.addEventListener("click",()=>
-      rvPost({item:id,type:b.dataset.t,by:RV_PARTY,text:box.value.trim()||null,
-              needs:b.dataset.t==="blocked"?"cowork":null},say)));
+    /* The log is append-only: a mis-tap on a phone cannot be taken back, only
+       answered with another entry. Confirm the two that close an item. */
+    const HEAVY={done:"Mark this done?",reject:"Reject this? It stays in the log either way."};
+    card.querySelectorAll(".rvb").forEach(b=>b.addEventListener("click",()=>{
+      const t=b.dataset.t;
+      if(HEAVY[t]&&b.dataset.armed!=="1"){
+        b.dataset.armed="1"; const was=b.textContent;
+        b.textContent="Confirm"; b.classList.add("armed");
+        say.textContent=HEAVY[t]; say.className="rvsay bad";
+        setTimeout(()=>{if(b.dataset.armed==="1"){b.dataset.armed="";b.textContent=was;
+          b.classList.remove("armed");say.textContent="";}},5000);
+        return;
+      }
+      b.dataset.armed=""; b.classList.remove("armed");
+      rvPost({item:id,type:t,by:RV_PARTY,text:box.value.trim()||null,
+              needs:t==="blocked"?"cowork":null},say);
+    }));
   });
   const cyc=(s.cycles||[]).map(c=>
     `<div class="rvev"><span class="t">${rvWhen(c.opened_at)}</span><span class="y">${rvEsc(c.cycle_id)}${c.quiet?" quiet":""}</span>`+
     `<span>${rvEsc(c.assessment||"")} <span class="t">(${c.n_items} item${c.n_items===1?"":"s"})</span></span></div>`).join("");
   $("#rvcycles").innerHTML=cyc||"<p>No cycles yet.</p>";
+  try{attn();}catch(e){}
 }
 
 async function rvPost(ev,say){
@@ -6682,6 +7025,10 @@ function rvWire(){
   });
   const c=$("#rvcopy");
   if(c) c.addEventListener("click",async()=>{
+    if(!$("#rvout").value.trim()){
+      $("#rvmsg").textContent="Nothing composed yet — the box is empty.";
+      $("#rvmsg").className="msg bad"; return;
+    }
     try{await navigator.clipboard.writeText($("#rvout").value);
         $("#rvmsg").textContent="Copied.";$("#rvmsg").className="msg ok";}
     catch(e){$("#rvmsg").textContent="Clipboard blocked — select the text above.";$("#rvmsg").className="msg bad";}
@@ -6723,11 +7070,555 @@ async function loadReview(){
         if(l){rvShow(JSON.parse(l),"saved in this browser"); return;}}catch(e){}
   }
   if(!RV){
-    $("#rvsrc").textContent="no feed";
+    /* Empty bordered panels above an empty-state message read as a broken
+       render. One message, no chrome. */
+    ["#rvcharter","#rvtiles","#rvcycle","#rvfilters","#rvsrc"].forEach(sel=>{
+      const n=$(sel); if(n) n.hidden=true;
+    });
     $("#rvitems").innerHTML=`<div class="rvempty">No review feed yet. Run
       <code>python dashboard/review.py emit</code>, or start
       <code>.\\dashboard\\serve.ps1</code> — which does it for you.</div>`;
   }
+}
+
+
+
+/* ================= ATTENTION BAR =================
+   Five surfaces answer five different questions and none of them answers the
+   one a person actually opens this page with: is anything waiting on me. This
+   bar aggregates only what is already derived elsewhere - it computes no state
+   of its own - and links straight to the section that owns each item. It shows
+   the good case explicitly rather than going blank, because an empty bar and a
+   broken bar look identical. */
+function attn(){
+  const box=$("#attn"); if(!box) return;
+  const items=[];
+  /* Four surfaces feed this bar. An all-clear is only honest over four that were
+     actually read; over an unread one it is the project's own failure mode. */
+  const unread=[];
+  if(!BUILD) unread.push("the build monitor");
+  if(!RV) unread.push("the review board");
+  if(!FL_NODES_LOADED) unread.push("the node roster");
+  else if(!FL_NODEDOCS.length) unread.push("the node roster (empty)");
+  if(!FL_BUS_LOADED) unread.push("the bus");
+  /* Invented figures must not reach the one element that is always on screen. */
+  if(BUILD&&BUILD.is_example) unread.push("the build monitor (example scaffold)");
+  const add=(cls,n,label,href)=>items.push(
+    `<a class="ai ${cls}" href="${href}"><span class="d"></span><b>${esc(String(n))}</b> ${esc(label)}</a>`);
+
+  /* §08-§11 - the emitted build state. An example scaffold contributes nothing
+     here: a grey "unread" line is honest, an amber "3 blocked on Andrew" that
+     nobody measured is not. */
+  if(BUILD&&!BUILD.is_example){
+    const g=(BUILD.gate&&BUILD.gate.state)||null;
+    if(g==="red") add("crit","","build gate RED","#pipeline");
+    else if(g==="amber") add("warn","","build gate amber","#pipeline");
+    const jbad=(BUILD.jobs||[]).filter(j=>j.status==="failed"||j.status==="late").length;
+    if(jbad) add("crit",jbad,jbad===1?"job failing or late":"jobs failing or late","#pipeline");
+    const jpart=(BUILD.jobs||[]).filter(j=>j.status==="partial").length;
+    if(jpart) add("crit",jpart,jpart===1?"job missing its window":"jobs missing their windows","#pipeline");
+    const gbad=(BUILD.contract_tests||[]).filter(t=>t.status==="fail").length;
+    if(gbad) add("crit",gbad,gbad===1?"contract gate failing":"contract gates failing","#gates");
+    const bandrew=(BUILD.blockers||[]).filter(b=>b.needs==="andrew").length;
+    if(bandrew) add("warn",bandrew,"blocked on Andrew","#blockers");
+  }
+
+  /* §12 - the review board */
+  if(RV){
+    const c=rvCounts(RV);
+    if(c["andrew"]) add("warn",c["andrew"],"items need Andrew","#rvitems");
+    if(c.unverified) add("crit",c.unverified,"claimed done, artifact missing","#rvitems");
+    if(c.raised) add("warn",c.raised,"raised, not yet in a cycle","#rvraised");
+    if(RV_LATE) add("crit","","heartbeat is late","#review");
+  }
+
+  /* §13 - the fleet */
+  const off=FL_NODEDOCS.filter(n=>flState(n).k==="offline").length;
+  const skewed=FL_NODEDOCS.filter(n=>flState(n).k==="skewed").length;
+  const stale=FL_NODEDOCS.filter(n=>flState(n).k==="stale").length;
+  const notrunk=FL_NODEDOCS.filter(n=>n.on_trunk===false).length;
+  const over=FL_MSGS.filter(flOverdue).length;
+  const waiting=FL_MSGS.filter(m=>m.git_state==="waiting_trunk").length;
+  if(skewed) add("crit",skewed,skewed===1?"heartbeat stamped in the future":"heartbeats stamped in the future","#flnodes");
+  const never=FL_NODEDOCS.filter(n=>!n.last_heartbeat_at).length;
+  if(off-never>0) add("crit",off-never,(off-never)===1?"node offline":"nodes offline","#flnodes");
+  if(never) add("crit",never,never===1?"node has never sent a heartbeat":"nodes have never sent a heartbeat","#flnodes");
+  if(stale) add("warn",stale,stale===1?"node stale":"nodes stale","#flnodes");
+  if(notrunk) add("warn",notrunk,notrunk===1?"node card not on main":"node cards not on main","#flnodes");
+  if(over) add("crit",over,over===1?"bus message overdue on Andrew":"bus messages overdue on Andrew","#flmsgs|overdue");
+  if(waiting) add("warn",waiting,waiting===1?"message waiting on a trunk apply":"messages waiting on a trunk apply","#flmsgs|pending");
+
+  const stamps=[];
+  if(BUILD&&BUILD.generated_at) stamps.push("build "+ageStamp(BUILD.generated_at));
+  if(RV&&RV.generated_at) stamps.push("review "+ageStamp(RV.generated_at));
+  if(FL_NODES_LOADED&&FL_BUS_LOADED) stamps.push("fleet connected");
+  else if(FL_NODES_LOADED||FL_BUS_LOADED) stamps.push("fleet partly connected");
+  /* The stamp concatenates three sources; colour it by the oldest of them. */
+  const ages=[BUILD&&BUILD.generated_at,RV&&RV.generated_at]
+    .filter(Boolean).map(hoursSince).filter(h=>h!=null);
+  const worst=ages.length?Math.max.apply(null,ages):null;
+  const stampCls=worst==null?"crit":worst>72?"crit":worst>24?"warn":"";
+
+  const body = items.length
+    ? `<span class="arow">${items.join("")}</span>`
+    : unread.length
+      ? `<span class="aunread"><b>${unread.length} of 4 surfaces unread</b> \u2014 ${esc(unread.join(", "))}. This bar cannot tell you the state.</span>`
+      : `<span class="aclear"><b>Nothing is waiting on anyone.</b> Every gate that exists passes, every node is inside its cadence, and no message is unanswered.</span>`;
+  const caveat = (items.length&&unread.length)
+    ? `<span class="aunread">${esc(unread.length)} of 4 surfaces unread \u2014 there may be more</span>` : "";
+
+  box.innerHTML=
+    `<span class="ak">Needs a person</span>`+body+caveat+
+    (stamps.length?`<span class="astamp ${stampCls}">${esc(stamps.join(" \u00b7 "))}</span>`:"");
+
+  /* A chip that lands on a section header still leaves the reader hunting. Take
+     them to the row, and set the filter that isolates it. */
+  /* The bar wraps to two rows once there is enough to say, so the offset an
+     anchor needs is whatever it happens to be right now. */
+  if(getComputedStyle(box).position==="sticky")
+    document.documentElement.style.setProperty("--attnh",(box.offsetHeight+10)+"px");
+  else document.documentElement.style.removeProperty("--attnh");
+  box.querySelectorAll("a.ai").forEach(a=>{
+    const raw=a.getAttribute("href");
+    if(raw.indexOf("|")<0) return;
+    const parts=raw.split("|");
+    a.setAttribute("href",parts[0]);
+    a.addEventListener("click",()=>{ FL_FILTER=parts[1]; try{flRenderBus();}catch(e){} });
+  });
+}
+
+/* ================= 13 · FLEET & BUS =================
+   Tier 2. This board is a MIRROR of git, never an origin. Two rules make that
+   legible rather than merely true:
+     1. Node state is derived from heartbeat age alone. A card declaring
+        always_on with a six-hour-old heartbeat renders offline, in red, with
+        the age. A declaration never colours a card.
+     2. Every bus message carries a git-state chip. Nothing renders as
+        committed without a sha, and a message a courier has not landed says
+        pending in amber. A board that cannot show its own staleness is
+        evidence replaced by claim wearing a friendlier face.
+   Seed rows live in the artifact store, written with write_db — never here. */
+
+const FL_NODES="fleet_live";
+const FL_BUS="bus";
+const FL_PARTIES=["andrew","zoltarlead/cowork","zoltarlead/claude-code",
+                  "zoltarone/cowork","zoltarone/claude-code"];
+const FL_KINDS=[["note","Note"],["question","Question"],["work_order","Work order"],
+                ["finding","Finding"],["decision","Decision"],["status","Status"],
+                ["ack","Acknowledgement"]];
+/* Kinds that assert something the project must be able to reproduce later start
+   life as pending: they are only real once a courier lands them in git. Talk is
+   n/a. The poster can override either way with the checkbox. */
+const FL_MUST_LAND={work_order:1,finding:1,decision:1};
+const FL_WHO_KEY="zoltar.fleet.who.v1";
+const FL_DAY_MS=864e5;
+
+let FL_ME="andrew", FL_NODEDOCS=[], FL_MSGS=[], FL_FILTER="all", FL_PEERS=[];
+let FL_NODES_LOADED=false, FL_BUS_LOADED=false;
+
+function flWho(){
+  try{const v=localStorage.getItem(FL_WHO_KEY); if(v&&FL_PARTIES.indexOf(v)>=0) return v;}catch(e){}
+  return "andrew";
+}
+function flSetWho(v){ FL_ME=v; try{localStorage.setItem(FL_WHO_KEY,v);}catch(e){} }
+function flNode(id){ return String(id||"").split("/")[0]; }
+
+function flAge(iso){
+  const h=hoursSince(iso);
+  if(h==null) return null;
+  const m=h*60;
+  if(h<0) return {h,txt:Math.abs(m).toFixed(0)+" min in the future"};
+  if(m<90) return {h,txt:Math.max(1,Math.round(m))+" min ago"};
+  if(h<48) return {h,txt:h.toFixed(1)+" h ago"};
+  return {h,txt:(h/24).toFixed(1)+" days ago"};
+}
+
+/* Heartbeat age only. cadence_minutes comes from the node's own doc; a node
+   that has not declared one is read at 60 minutes and the card says so. */
+function flState(n){
+  const cad=Number(n.cadence_minutes)>0?Number(n.cadence_minutes):60;
+  const a=flAge(n.last_heartbeat_at);
+  if(!a) return {k:"offline",label:"never seen",cls:"crit",age:"no heartbeat has ever landed",cad};
+  /* This project has already been bitten by a forward-stamped timestamp read as
+     an output. A heartbeat dated in the future is not the freshest possible
+     heartbeat; it is a clock or a stamp to distrust. */
+  if(a.h < -0.05) return {k:"skewed",label:"stamp in the future",cls:"crit",
+    age:"dated "+Math.abs(a.h).toFixed(1)+"h ahead of now — clock skew or a forward stamp",cad};
+  const mins=a.h*60;
+  if(mins<=cad)   return {k:"online", label:"online", cls:"ok",   age:a.txt,cad};
+  if(mins<=cad*3) return {k:"stale",  label:"stale",  cls:"warn", age:a.txt,cad};
+  return             {k:"offline",label:"offline",cls:"crit", age:a.txt,cad};
+}
+
+function flNodeCard(n){
+  const st=flState(n);
+  const cls=st.k==="skewed"?"offline":st.k;
+  const ageCls=(st.k==="offline"||st.k==="skewed")?"bad":st.k==="stale"?"warn":"";
+  const tags=(n.tags||[]).map(t=>`<span class="ntag">${esc(t)}</span>`).join("");
+  const miss=(n.modules_missing||[]).map(t=>
+    `<span class="ntag miss">no ${esc(t)}</span>`).join("");
+  const agents=(n.agents||[]).map(a=>{
+    const ag=typeof a==="string"?{agent_id:a}:a;
+    return `<div class="nag"><span>${esc(ag.agent_id||"—")}</span>`+
+           `<span class="l">${esc(ag.lane||"lane unassigned")}</span></div>`;
+  }).join("")||`<div class="nag"><span class="l">no agents reported</span></div>`;
+  const claims=(n.claims||[]).length
+    ? `holds ${(n.claims||[]).map(c=>esc(typeof c==="string"?c:(c.lane||"?"))).join(", ")}`
+    : "holds no lane";
+  const sync=flAge(n.synced_from_git_at);
+  const syncStale=!sync||sync.h*60>st.cad;
+  const declFight=(n.declared_always_on&&st.k!=="online"&&st.k!=="skewed")
+    ? `<div class="ndecl">Card declares always_on. The heartbeat does not support it — `+
+      `the state above is the measurement, the declaration is not.</div>` : "";
+  const probed=n.probed_at?`probed ${esc(String(n.probed_at).slice(0,16).replace("T"," "))}`
+                          :`<span style="color:var(--crit)">never probed</span>`;
+  const trunk=n.on_trunk===true
+    ? `<div class="ntrunk on">on main${n.head_sha?" · "+esc(n.head_sha):""}</div>`
+    : n.on_trunk===false
+      ? `<div class="ntrunk">Not on main${n.branch?" — lives on "+esc(n.branch):""}. `+
+        `${esc(n.trunk_note||"A card that is only on a branch is not registered with the fleet.")}</div>`
+      : "";
+  const declNote=n.declaration_note?`<div class="ndecl" style="color:var(--ink-3)">${esc(n.declaration_note)}</div>`:"";
+  return `<div class="ncard ${cls} ${n.on_trunk===false?"notrunk":""} ${syncStale?"faded":""}">
+    <div class="nh">
+      <div class="nname">${esc(n.alias||n.node_id||"—")}<em>${esc(n.node_id||"")}${n.hostname?" · "+esc(n.hostname):""}</em></div>
+      <span class="pill ${st.cls}">${esc(st.label)}</span>
+    </div>
+    <div class="nage ${ageCls}">heartbeat ${esc(st.age)} <span style="color:var(--ink-4)">· cadence ${st.cad}m${n.cadence_minutes?"":" (assumed)"}</span></div>
+    <div class="nclaim">${claims}</div>
+    ${declFight}${declNote}
+    ${trunk}
+    <div class="ntags">${tags}${miss}</div>
+    <div class="nagents">${agents}</div>
+    <div class="nsync ${syncStale?"stale":""}">${probed} · mirrored from git ${sync?esc(sync.txt):"never"}${syncStale?" — older than one cadence, read this card as stale":""}</div>
+  </div>`;
+}
+
+/* 13a is specified to render the fleet block of build_status.json. Until the
+   emitter writes one it must say so rather than borrow the mirror's numbers
+   and present them as derived state. */
+function flBlock(){
+  const f=BUILD&&BUILD.fleet;
+  const box=$("#fleetblock");
+  if(!box) return;
+  if(!f){
+    box.innerHTML=`<div style="border:1px dashed var(--rule);border-radius:8px;padding:18px 20px;margin:0 0 14px;background:rgba(255,255,255,.02)">
+      <div style="font:600 10px/1 var(--mono);letter-spacing:.14em;color:var(--ink-4);margin-bottom:10px">FLEET BLOCK NOT EMITTED YET</div>
+      <div style="color:var(--ink-3);font-size:13px;line-height:1.55">
+        <p style="margin:0 0 8px"><code>build_status.json</code> carries no <code>fleet</code> block, so there is no
+        git-derived roster to render. The cards below are the Tier&nbsp;2 mirror in the artifact store — live,
+        and not evidence.</p>
+        <p style="margin:0">Work-ordered to <code>zoltarlead/claude-code</code> through <code>review.py</code>:
+        the <code>fleet</code> block in <code>emit_build_status.py</code>, node-state derivation from heartbeat age,
+        and a heartbeat-age audit in <code>--check</code>.</p></div></div>`;
+    return;
+  }
+  const rows=(f.assignments||[]).map(a=>{
+    const n=FL_NODEDOCS.find(x=>x.node_id===a.node)||{};
+    const need=(a.requires||[]);
+    const gone=need.filter(m=>(n.modules_missing||[]).indexOf(m)>=0);
+    const st=n.node_id?flState(n):null;
+    const bad=gone.length||!st||st.k!=="online";
+    return `<tr><td>${esc(a.workload||"—")}</td>
+      <td style="text-align:left">${esc(a.node||"—")}</td>
+      <td>${bad?`<span class="pill crit">unassigned</span>`:`<span class="pill ok">assigned</span>`}</td>
+      <td style="text-align:left;font-family:var(--sans);font-size:12px;color:var(--ink-2)">${
+        gone.length?`requires ${gone.map(esc).join(", ")} — the node reports null for ${gone.length===1?"it":"them"}`
+        :(!st?"no node card":st.k!=="online"?`node is ${st.k}`:"eligible")}</td></tr>`;
+  }).join("");
+  box.innerHTML=`<div class="panel" style="margin-bottom:14px"><h3>Workload assignment · from build_status.json</h3>
+    <div class="tablewrap"><table><thead><tr><th>Workload</th><th style="text-align:left">Node</th>
+    <th style="text-align:right">State</th><th style="text-align:left">Why</th></tr></thead>
+    <tbody>${rows||`<tr><td colspan="4" style="text-align:left">The fleet block carries no assignments.</td></tr>`}</tbody></table></div>
+    <p class="note">A node whose card reports <code>null</code> for a module a workload requires is
+    <b style="color:var(--ink)">unassigned</b> for that workload, not healthy. Being awake is not being able.</p></div>`;
+}
+
+function flRenderNodes(){
+  const box=$("#flnodes"); if(!box) return;
+  const order={skewed:0,offline:1,stale:2,online:3};
+  const ns=FL_NODEDOCS.slice().sort((a,b)=>
+    (order[flState(a).k]??9)-(order[flState(b).k]??9));
+  box.innerHTML=ns.map(flNodeCard).join("")||
+    `<div class="flempty">No node cards in the store yet. They are seeded with <code>write_db</code> into <code>fleet_live</code>, never hardcoded in this page.</div>`;
+  flBlock();
+  /* A node that has never sent a heartbeat is offline, but calling it that
+     alongside "never probed" makes one machine look like two problems. */
+  const never=ns.filter(n=>!n.last_heartbeat_at).length;
+  const off=ns.filter(n=>flState(n).k==="offline").length-never;
+  const stale=ns.filter(n=>flState(n).k==="stale").length;
+  const unprobed=ns.filter(n=>!n.probed_at).length;
+  $("#flnodenote").innerHTML=
+    `${ns.length} node${ns.length===1?"":"s"} on the board · `+
+    (off?`<b style="color:var(--crit)">${off}</b> offline · `:"")+
+    (never?`<b style="color:var(--crit)">${never}</b> never seen · `:"")+
+    `<b style="color:${stale?"var(--warn)":"var(--ink)"}">${stale}</b> stale · `+
+    `<b style="color:${unprobed?"var(--warn)":"var(--ink)"}">${unprobed}</b> never probed. `+
+    `Every routing decision about a node that has not been probed is a declaration, not a fact.`;
+  flGate(); attn();
+}
+
+/* ---- the bus ---- */
+function flGitChip(m){
+  const g=m.git_state||"n/a";
+  if(g==="committed"&&m.committed_ref)
+    return `<span class="git committed">committed ${esc(m.committed_ref)}</span>`;
+  if(g==="committed")
+    /* Refuse to render a green chip without a sha. This is the whole mechanism. */
+    return `<span class="git pending">pending · marked committed with no sha</span>`;
+  if(g==="pending") return `<span class="git pending">pending · not yet in git</span>`;
+  /* A branch can look pushed and healthy while main is wrong, and that state was
+     invisible until it had a name. Trunk is applied by Andrew, outside every
+     agent session; no agent has an exception. */
+  if(g==="waiting_trunk")
+    return `<span class="git waiting_trunk">on a branch · waiting on a trunk apply</span>`;
+  return `<span class="git na">chat only</span>`;
+}
+
+function flOverdue(m){
+  if(m.needs_reply_from!=="andrew") return false;
+  const t=Date.parse(m.at||"");
+  if(isNaN(t)) return false;
+  const acked=FL_MSGS.some(x=>x.ref&&x.ref===m.id&&(x.from==="andrew"));
+  return !acked && (Date.now()-t)>FL_DAY_MS;
+}
+
+function flMsgHtml(m){
+  const mine=m.to===FL_ME||m.to==="all";
+  const overdue=flOverdue(m);
+  const cls=overdue?"overdue":(m.needs_reply_from==="andrew"?"needsandrew":(mine?"tome":"plain"));
+  return `<div class="msg2 ${cls}">
+    <div class="mh">
+      <span class="mfrom">${esc(m.from||"—")}</span>
+      <span class="mto">→ ${esc(m.to||"all")}</span>
+      <span class="rvchip">${esc((FL_KINDS.find(k=>k[0]===m.kind)||[0,String(m.kind||"note").replace("_"," ")])[1])}</span>
+      ${m.needs_reply_from?`<span class="rvchip who">needs ${esc(m.needs_reply_from)}</span>`:""}
+      <span class="mat">${esc(String(m.at||"").replace("T"," ").slice(0,16))} · <span title="reference this id in a reply to clear the flag">id ${esc(m.id||"?")}</span></span>
+      <div class="msubj">${esc(m.subject||"(no subject)")}</div>
+    </div>
+    <div class="mbody">${esc(m.body||"")}</div>
+    ${overdue?`<div class="mwarn">Waiting on Andrew for more than 24 hours. It clears when a message from Andrew carries <code>ref: ${esc(m.id||"")}</code> — the compose box's Ref field.</div>`:""}
+    <div class="mfoot">${flGitChip(m)}
+      ${m.ref?`<span class="git na">ref ${esc(m.ref)}</span>`:""}
+      ${m.synced_from_git_at?`<span class="git na">mirrored ${esc(String(m.synced_from_git_at).slice(5,16).replace("T"," "))}</span>`:""}
+    </div>
+  </div>`;
+}
+
+function flFilters(){
+  const mine=FL_MSGS.filter(m=>m.to===FL_ME||m.to==="all").length;
+  const needs=FL_MSGS.filter(m=>m.needs_reply_from==="andrew").length;
+  const pend=FL_MSGS.filter(m=>{const g=m.git_state||"n/a";return g==="pending"||g==="waiting_trunk";}).length;
+  const over=FL_MSGS.filter(flOverdue).length;
+  const f=[["all","All",FL_MSGS.length],["me","To me",mine],
+           ["andrew","Needs Andrew",needs],["overdue","Overdue",over],
+           ["pending","Pending in git",pend]];
+  $("#flfilters").innerHTML=f.map(([k,l,n])=>
+    `<button class="rvf ${FL_FILTER===k?"on":""}" data-f="${k}" type="button">${l}<span class="c">${n}</span></button>`).join("");
+  $$("#flfilters .rvf").forEach(b=>b.addEventListener("click",()=>{FL_FILTER=b.dataset.f;flRenderBus();}));
+}
+
+function flRenderBus(){
+  flFilters();
+  let ms=FL_MSGS.slice().sort((a,b)=>String(b.at||"").localeCompare(String(a.at||"")));
+  if(FL_FILTER==="me") ms=ms.filter(m=>m.to===FL_ME||m.to==="all");
+  else if(FL_FILTER==="andrew") ms=ms.filter(m=>m.needs_reply_from==="andrew");
+  else if(FL_FILTER==="overdue") ms=ms.filter(flOverdue);
+  else if(FL_FILTER==="pending") ms=ms.filter(m=>{const g=m.git_state||"n/a";return g==="pending"||g==="waiting_trunk";});
+  $("#flmsgs").innerHTML=ms.length?ms.map(flMsgHtml).join("")
+    :`<div class="flempty">Nothing on this filter.</div>`;
+  if(!FL_BUS_LOADED){
+    /* Three measured-looking zeros over a collection nobody read. */
+    $("#flbusnote").innerHTML=`The bus was not read in this view, so these are not counts of zero — `+
+      `they are the absence of counts.`;
+    return;
+  }
+  const pend=FL_MSGS.filter(m=>{const g=m.git_state||"n/a";return g==="pending"||g==="waiting_trunk";}).length;
+  const over=FL_MSGS.filter(flOverdue).length;
+  $("#flbusnote").innerHTML=
+    `${FL_MSGS.length} message${FL_MSGS.length===1?"":"s"} · `+
+    `<b style="color:${pend?"var(--warn)":"var(--ink)"}">${pend}</b> not yet landed in git · `+
+    `<b style="color:${over?"var(--crit)":"var(--ink)"}">${over}</b> overdue on Andrew. `+
+    `A <code>work_order</code> here is a request that a cycle be written in §12 — it is not itself a work order. `+
+    `Otherwise the immutability of cycles buys nothing.`;
+  flGate(); attn();
+}
+
+/* Fleet's own contribution to the build gate. Rendered here rather than written
+   into build_status.json, which is regenerated on every emit and never hand-edited. */
+function flGate(){
+  const g=$("#fleetgate"); if(!g) return;
+  const reds=[], ambers=[];
+  const held={};
+  FL_NODEDOCS.forEach(n=>(n.claims||[]).forEach(c=>{
+    const lane=typeof c==="string"?c:(c&&c.lane);
+    if(!lane) return; (held[lane]=held[lane]||[]).push(n.node_id);
+  }));
+  Object.keys(held).forEach(l=>{ if(held[l].length>1)
+    reds.push(`two nodes hold the ${l} lane (${held[l].join(", ")})`); });
+  const skew=FL_NODEDOCS.filter(n=>flState(n).k==="skewed");
+  if(skew.length) reds.push(`${skew.length} node heartbeat${skew.length===1?" is":"s are"} stamped in the future — the ages on this page cannot be trusted`);
+  const off=FL_NODEDOCS.filter(n=>flState(n).k==="offline");
+  const stale=FL_NODEDOCS.filter(n=>flState(n).k==="stale");
+  if(stale.length) ambers.push(`${stale.length} node${stale.length===1?"":"s"} stale`);
+  if(off.length) ambers.push(`${off.length} node${off.length===1?"":"s"} offline`);
+  const over=FL_MSGS.filter(flOverdue).length;
+  if(over) ambers.push(`${over} bus message${over===1?"":"s"} waiting on Andrew for over a day`);
+  const unprobed=FL_NODEDOCS.filter(n=>!n.probed_at).length;
+  if(unprobed) ambers.push(`${unprobed} node${unprobed===1?"":"s"} never probed`);
+  const notrunk=FL_NODEDOCS.filter(n=>n.on_trunk===false).length;
+  if(notrunk) ambers.push(`${notrunk} node card${notrunk===1?"":"s"} not on main — a branch looks healthy while trunk is wrong`);
+  const wt=FL_MSGS.filter(m=>m.git_state==="waiting_trunk").length;
+  if(wt) ambers.push(`${wt} message${wt===1?"":"s"} waiting on a trunk apply by Andrew`);
+  /* Green over an empty roster would be the exact failure this section exists to
+     catch: no evidence rendering as good news. No cards means unknown. */
+  if(!FL_NODES_LOADED||!FL_BUS_LOADED||!FL_NODEDOCS.length){
+    const gaps=[];
+    if(!FL_NODES_LOADED) gaps.push("the node roster could not be read");
+    else if(!FL_NODEDOCS.length) gaps.push("no node cards exist in the store");
+    if(!FL_BUS_LOADED) gaps.push("the bus could not be read");
+    g.innerHTML=`<div class="gate unknown"><div class="gk">unknown</div>
+      <div class="gt"><b>There is not enough here to derive a state from.</b><br>
+      ${esc(gaps.join(" · "))}. This is not a healthy fleet and not an unhealthy one — it is an unread one.<br>
+      <span style="color:var(--ink-4);font-size:11.5px;font-family:var(--mono)">Cards live in the published artifact's store. Seed them with write_db; never hardcode them in this page.</span></div></div>`;
+    return;
+  }
+  const state=reds.length?"red":ambers.length?"amber":"green";
+  const head=reds.length?reds[0]
+    :ambers.length?"The fleet is up but not yet trustworthy end to end."
+    :"Every node is inside its cadence and nothing is waiting on a person.";
+  const detail=(reds.concat(ambers)).join(" · ")||
+    "No lane is double-held, no heartbeat is late, no message is overdue.";
+  g.innerHTML=`<div class="gate ${state}"><div class="gk">${state}</div>
+    <div class="gt"><b>${esc(head)}</b><br>${esc(detail)}<br>
+    <span style="color:var(--ink-4);font-size:11.5px;font-family:var(--mono)">Derived in this page from heartbeat ages and the bus. It does not overwrite the §08 gate, which is emitted from the repo.</span></div></div>`;
+}
+
+/* ---- store + presence ---- */
+async function flPost(){
+  const say=$("#flsay");
+  const set=(t,c)=>{say.className="flsay "+(c||"");say.textContent=t;};
+  const subject=$("#flsubject").value.trim();
+  const body=$("#flbody").value.trim();
+  if(!subject){set("A message needs a subject.","bad");return;}
+  const db=await useDb();
+  if(!db){set("No store in this view — the message was not posted.","bad");return;}
+  const kind=$("#flkind").value;
+  const mustLand=$("#flgit").checked||!!FL_MUST_LAND[kind];
+  const doc={
+    at:new Date().toISOString(),
+    from:FL_ME,
+    to:$("#flto").value,
+    kind:kind,
+    subject:subject,
+    body:body,
+    ref:$("#flref").value.trim()||null,
+    needs_reply_from:$("#flneeds").checked?"andrew":null,
+    git_state:mustLand?"pending":"n/a",
+    committed_ref:null,
+    synced_from_git_at:null
+  };
+  set("posting…");
+  try{
+    await db.collection(FL_BUS).add(doc);
+    set("posted · pending until a courier lands it","ok");
+    $("#flsubject").value="";$("#flbody").value="";$("#flref").value="";
+    $("#flneeds").checked=false;$("#flgit").checked=false;
+  }catch(e){
+    set("not posted — "+((e&&e.code)||"unavailable")+". Nothing was written.","bad");
+  }
+}
+
+function flWire(){
+  const who=$("#flwho"), to=$("#flto"), kind=$("#flkind");
+  FL_ME=flWho();
+  who.innerHTML=FL_PARTIES.map(p=>`<option${p===FL_ME?" selected":""}>${esc(p)}</option>`).join("");
+  to.innerHTML=[`<option value="all">all</option>`].concat(
+    FL_PARTIES.map(p=>`<option>${esc(p)}</option>`)).join("");
+  kind.innerHTML=FL_KINDS.map(([v,l])=>
+    `<option value="${esc(v)}"${v==="note"?" selected":""}>${esc(l)}</option>`).join("");
+  const needsWrap=$("#flneeds").parentNode;
+  const syncNeeds=()=>{ needsWrap.hidden=(FL_ME==="andrew");
+    if(FL_ME==="andrew") $("#flneeds").checked=false; };
+  syncNeeds(); who.addEventListener("change",syncNeeds);
+  who.addEventListener("change",()=>{flSetWho(who.value);flRenderBus();});
+  $("#flpost").addEventListener("click",flPost);
+}
+
+async function flPresence(){
+  const room=await claudeRoom();
+  if(!room) return;
+  try{
+    room.presence({who:FL_ME});
+    room.onPeers(ps=>{
+      FL_PEERS=ps||[];
+      const n=FL_PEERS.length;
+      $("#flpeers").innerHTML=n>1
+        ? `<b>${n}</b> viewers have this board open right now`
+        : `you are the only viewer on this board right now`;
+    });
+  }catch(e){}
+}
+let flRoomP=null;
+function claudeRoom(){
+  if(flRoomP) return flRoomP;
+  flRoomP=(typeof claude!=="undefined"&&claude&&typeof claude.use==="function")
+    ? claude.use("room").catch(()=>null) : Promise.resolve(null);
+  return flRoomP;
+}
+
+async function loadFleet(){
+  flWire();
+  flRenderNodes(); flRenderBus();
+  const db=await useDb();
+  if(!db){
+    /* Opened from the repo over file://, the artifact store is unreachable by
+       construction. Say that, rather than render two empty panels that look
+       like a fleet with nothing in it. */
+    $("#flnodesrc").textContent="artifact store unreachable in this view";
+    $("#flbussrc").textContent="artifact store unreachable — the compose box cannot post";
+    const c=$("#flcompose"); if(c) c.style.opacity=".5";
+    const why=`<div class="flempty" style="text-align:left">
+      <b style="color:var(--ink)">This panel is empty because the store is not reachable here, not because the fleet is.</b><br>
+      13a and 13b read the published artifact's own database. Opened from the repo over
+      <code>file://</code>, or from any copy that is not the published artifact, there is no store to read —
+      so no node cards and no bus. Everything else on this page works from the files beside it.
+      Open the published console to see the fleet.</div>`;
+    $("#flnodes").innerHTML=why; $("#flmsgs").innerHTML=why;
+    $("#flnodenote").textContent=""; $("#flbusnote").textContent="";
+    try{flBlock();}catch(e){}
+    try{attn();}catch(e){}
+    return;
+  }
+  db.collection(FL_NODES).onSnapshot(snap=>{
+    FL_NODEDOCS=snap.docs.map(d=>Object.assign({node_id:d.id},d.data()||{}));
+    FL_NODES_LOADED=true;
+    /* "live" read as "this data is current". It only ever meant the read channel
+       was open. Say that, and put the real age beside it. */
+    const newest=FL_NODEDOCS.map(n=>n.last_heartbeat_at).filter(Boolean).sort().pop();
+    $("#flnodesrc").textContent="connected to the store · "+FL_NODEDOCS.length+
+      " node card"+(FL_NODEDOCS.length===1?"":"s")+
+      (newest?" · newest heartbeat "+ageStamp(newest):" · no heartbeat on any card")+
+      (snap.metadata&&snap.metadata.fromCache?" · reconnecting":"");
+    flRenderNodes();
+  },e=>{ FL_NODES_LOADED=false;
+    $("#flnodesrc").textContent="roster unavailable ("+(e&&e.code||"unavailable")+")";
+    try{flGate();attn();}catch(err){} });
+
+  db.collection(FL_BUS).onSnapshot(snap=>{
+    FL_MSGS=snap.docs.map(d=>Object.assign({id:d.id},d.data()||{}));
+    FL_BUS_LOADED=true;
+    const last=FL_MSGS.map(m=>m.at).filter(Boolean).sort().pop();
+    $("#flbussrc").textContent="connected to the store · "+FL_MSGS.length+
+      " message"+(FL_MSGS.length===1?"":"s")+
+      (last?" · last posted "+ageStamp(last):"")+
+      (snap.metadata&&snap.metadata.fromCache?" · reconnecting":"");
+    flRenderBus();
+  },e=>{ FL_BUS_LOADED=false;
+    $("#flbussrc").textContent="bus unavailable ("+(e&&e.code||"unavailable")+")";
+    try{flGate();attn();}catch(err){} });
+
+  flPresence();
 }
 
 /* ---------------- boot ---------------- */
@@ -6744,6 +7635,19 @@ function render(data,source){
     }
   });
   register(); prompts();
+  /* Same principle as the build scaffold: a banner at y=49 is not a mark on the
+     chart at y=3301. */
+  if(data.is_seed_data){
+    const mark=`<div class="exmark">ILLUSTRATIVE DATA — invented to exercise the layout. No backtest has produced this.</div>`;
+    ["#rec","#equity","#strategyTable","#icHorizon","#icSegment","#decay","#heat","#hyp"].forEach(sel=>{
+      const n=document.querySelector(sel); if(!n) return;
+      const host=(sel==="#equity"||sel==="#decay"||sel==="#heat"||sel==="#icHorizon"||sel==="#icSegment")
+        ? (n.closest(".chartwrap")||n) : n;
+      const prev=host.previousElementSibling;
+      if(prev&&prev.classList&&prev.classList.contains("exmark")) return;
+      host.insertAdjacentHTML("beforebegin",mark);
+    });
+  }
   const absent=Object.keys(data.sections_absent||{});
   if(absent.length){
     const b=$("#seedbar");
@@ -6758,7 +7662,9 @@ function render(data,source){
   $("#srcstamp").textContent=source;
   if(data.is_seed_data){
     const b=$("#seedbar"); b.hidden=false;
-    b.innerHTML="<b>ILLUSTRATIVE DATA</b> — every figure on this page is invented to exercise the layout. "+
+    /* Append: the partial-feed notice above is not less true for this one. */
+    b.innerHTML=(b.innerHTML?b.innerHTML+"<br>":"")+
+      "<b>ILLUSTRATIVE DATA</b> — every figure in \u00a701\u2013\u00a707 is invented to exercise the layout. "+
       "No backtest has been run. Replace with <code>data/results/dashboard_data.json</code>.";
   }
 }
@@ -6774,6 +7680,8 @@ if(typeof window.__ZOLTAR_DATA__==="object"&&window.__ZOLTAR_DATA__){
 wireIngest();
 loadBuild();
 loadReview();
+loadFleet();
 })();
 </script>
+
 

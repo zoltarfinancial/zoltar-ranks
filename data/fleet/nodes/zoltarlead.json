@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "probe_version": 1,
+  "node_id": "zoltarlead",
+  "hostname": "ZoltarLead",
+  "alias": "E16 Gen 2",
+  "probed_at": "2026-09-08T00:35:57-05:00",
+  "os": {
+    "system": "Windows",
+    "release": "11",
+    "version": "10.0.26200",
+    "arch": "AMD64"
+  },
+  "cpu": {
+    "model": "AMD Ryzen 7 7735U with Radeon Graphics",
+    "physical_cores": 8,
+    "logical_cores": 16,
+    "max_clock_mhz": 2701,
+    "passmark": null
+  },
+  "memory": {
+    "total_gb": 30.8,
+    "free_gb": 15.8,
+    "modules": [
+      {
+        "gb": 16.0,
+        "speed_mhz": 4800,
+        "slot": "DIMM 0",
+        "vendor": "Micron Technology"
+      },
+      {
+        "gb": 16.0,
+        "speed_mhz": 4800,
+        "slot": "DIMM 0",
+        "vendor": "Ramaxel Technology"
+      }
+    ]
+  },
+  "disks": [
+    {
+      "kind": "physical",
+      "model": "WDS200T1X0E-00AFY0",
+      "media_type": "SSD",
+      "bus": "NVMe",
+      "total_gb": 1863.0
+    },
+    {
+      "kind": "physical",
+      "model": "KBG6AZNT512G LA KIOXIA",
+      "media_type": "SSD",
+      "bus": "NVMe",
+      "total_gb": 476.9
+    },
+    {
+      "kind": "volume",
+      "mount": "C:\\",
+      "total_gb": 1860.8,
+      "free_gb": 1749.2
+    },
+    {
+      "kind": "volume",
+      "mount": "D:\\",
+      "total_gb": 474.7,
+      "free_gb": 396.6
+    }
+  ],
+  "gpu": [
+    {
+      "name": "AMD Radeon(TM) Graphics",
+      "vram_gb": 1.0,
+      "driver": "32.0.21037.3009"
+    }
+  ],
+  "software": {
+    "python": "3.14.7",
+    "python_exe": "C:\\Shared\\ClaudeWork\\zoltar-ranks\\.venv\\Scripts\\python.exe",
+    "git": "git version 2.55.0.windows.5",
+    "node": "v24.20.0",
+    "modules": {
+      "duckdb": "1.5.5",
+      "pandas": "3.0.5",
+      "pyarrow": "25.0.1",
+      "numpy": "2.5.2",
+      "psutil": null,
+      "yaml": "6.0.3",
+      "requests": "2.34.2"
+    }
+  },
+  "repo": {
+    "path": "C:\\Shared\\ClaudeWork\\zoltar-ranks",
+    "remote": "https://github.com/zoltarfinancial/zoltar-ranks.git",
+    "branch": "fleet/rejoin-zoltarlead",
+    "head_sha": "fdd4ac2",
+    "head_at": "2026-09-08T00:29:00-05:00",
+    "dirty": true
+  },
+  "power": {
+    "has_battery": true,
+    "on_ac": true,
+    "charge_pct": 99
+  },
+  "declared": {
+    "roles": [
+      "harvest",
+      "orchestrator",
+      "dashboard"
+    ],
+    "always_on": true,
+    "owner": "andrew",
+    "notes": "Runs ZoltarRanksHarvest every 30 min 07:00-21:30 and hosts the review brain that writes every cycle. always_on declared on measurement: powercfg STANDBYIDLE AC=0 and HIBERNATEIDLE AC=0, both NEVER. passmark ~22000 for Ryzen 7 7735HS is a DECLARATION, not evidence - the probe cannot measure it."
+  },
+  "tags": [
+    "ram-32g+",
+    "cores-12+",
+    "disk-200g+",
+    "has-repo",
+    "duckdb",
+    "on-ac"
+  ]
+}

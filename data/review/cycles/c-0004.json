@@ -1,0 +1,34 @@
+{
+ "cycle_id": "c-0004",
+ "opened_at": "2026-09-03T15:12:00-05:00",
+ "opened_by": "cowork",
+ "quiet": false,
+ "state_snapshot": {
+  "head_sha": "5844a4e",
+  "gate": "green",
+  "blocking": 0,
+  "phase": "1a",
+  "phase_pct": 95,
+  "note": "Unchanged machine state since c-0003: head 5844a4e (2026-09-02T16:43:54-05:00), all three harvest jobs healthy, harvest_intraday ok at 15:00:36 with 14042 rows, all seven contract gates pass, B1 and B3 open at normal severity, 0 unverified. No new inbox events since 2026-09-02T16:44:14-05:00. Composed by hand: this fire again had no shell on zoltarlead."
+ },
+ "assessment": "Machine state is still green and still not the constraint. Head is unchanged at 5844a4e since yesterday afternoon, all three harvest jobs ran clean, all seven contract gates pass and nothing of blocker severity is outstanding. What changed since c-0003 is only the clock, and it has crossed two lines: c-0001.4 and c-0001.5 have now sat on Andrew for over twenty-four hours with zero events, and the board has gone twenty-six hours without a commit while all three 'now' work orders wait to be pulled by a Claude Code session that has not started. Against the end goal nothing has moved - BASELINE_HONEST still does not exist, H9 and H10 are still unresolved, and c-0002.1, the only item on the board with an irreversible deadline, has spent a day of the fifteen left before the 1-minute bar window closes around 2026-09-18. Both raised findings remain folded into c-0002.1 and c-0002.2 and need nothing further here; the heartbeat's own shell on zoltarlead is still missing for a third consecutive fire, so this cycle is again typed rather than sealed and enters the repo unvalidated by check - c-0003.1 already carries that and is the item whose cost is now compounding.",
+ "items": [
+  {
+   "id": "c-0004.1",
+   "kind": "risk",
+   "for": "andrew",
+   "priority": "next",
+   "title": "The queue is not being consumed - 26 hours, no commit, and every open work order is pull-blocked",
+   "why": "Every route to the end goal runs through the critical path 1a to 2 to 3, and all three of its live work orders (c-0001.2, c-0002.1, c-0002.2) are pull-based: they move only when a Claude Code session runs review.py next, and Cowork cannot start one. Ordinarily an idle day costs nothing but a day. Here it does not, because c-0002.1 is the one item on the board that expires: yfinance serves 1-minute bars for roughly thirty days and the dense intraday era begins 2026-08-19, so after about 2026-09-18 the intraday clock anchor cannot be measured at minute resolution at all, and Phase 6 - the timing study the whole end goal resolves to - would have to be built on an unproven join between two clock domains. That is precisely the shape of error rule 9 exists to stop: a one-bar offset does not degrade a real effect, it manufactures a clean spurious one that passes every test in the repo.",
+   "acceptance": "data/review/inbox.jsonl gains a start, blocked or done event on c-0002.1 posted by claude-code, and git log shows a commit after 5844a4e. Failing that, an explicit defer or reject on c-0002.1 from Andrew recording that the intraday anchor will not be measured before the window closes - so Phase 6 inherits an unproven origin knowingly rather than by drift.",
+   "depends_on": [],
+   "estimate": "5m to start a session; c-0002.1 itself is the work",
+   "refs": [
+    "data/review/cycles/c-0002.json",
+    "src/zoltar_ranks/analysis/alignment_anchor.py",
+    "docs/FINDINGS.md",
+    "dashboard/review.py"
+   ]
+  }
+ ]
+}

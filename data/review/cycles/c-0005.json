@@ -1,0 +1,34 @@
+{
+ "cycle_id": "c-0005",
+ "opened_at": "2026-09-04T07:15:16-05:00",
+ "opened_by": "cowork",
+ "quiet": false,
+ "state_snapshot": {
+  "head_sha": "5844a4e",
+  "gate": "amber",
+  "blocking": 0,
+  "phase": "1a",
+  "phase_pct": 95,
+  "note": "Gate turned amber overnight - first status change since c-0002. Two causes, both liveness rather than failure: all seven contract tests are STALE (last executed 2026-09-02T16:43:33-05:00, ~39h, because no Claude Code session has run the suite), and harvest_evening went healthy -> LATE (last ok 2026-09-03T20:30:14 with 0 rows; the 21:00 and 21:30 ticks never ran, and its 24h beat strip shows 3 misses in the last 5). harvest_intraday and harvest_premarket remain healthy (premarket ok 2026-09-04T07:00:17). No assertion has failed - 0 blocking, 0 unverified, B1/B2/B3 unchanged at normal severity. Head unchanged at 5844a4e (2026-09-02T16:43:54-05:00), repo dirty as expected from uncommitted data/review/. No new inbox events since the two chase notes this session wrote at 2026-09-03T15:12; nothing new in raised - both findings remain folded into c-0002.1 and c-0002.2. Read from build_status.json and review_state.json, both emitted fresh at 2026-09-04T07:00:18-05:00 by the daily run; git log could NOT be read directly - this fire again had no shell on zoltarlead (c-0003.1), so head_sha and head_at here are the git-derived fields of that 07:00 emit rather than a log I ran, and this cycle is typed by hand rather than sealed by open-cycle."
+ },
+ "assessment": "The risk c-0004.1 named yesterday has stopped being a risk and started showing up in the machine state. Nothing broke - no assertion failed, no job errored, 0 blocking and 0 unverified - but the gate went amber overnight for the two reasons that follow from a build nobody is touching: all seven contract tests are now stale because no session has run the suite in thirty-nine hours, and the evening harvest went late after its 20:30 tick and has missed three of its last five. That distinction matters and should not be read past: amber here means the assertions have gone unwitnessed, not that they have gone wrong, and the evening feed is the one degradation that is actually new rather than a clock running out. Against the end goal nothing has moved for a second full day - BASELINE_HONEST still does not exist, H9 and H10 are still unresolved, and c-0002.1 has now spent two of the roughly fourteen days left before yfinance's 1-minute window closes on the intraday anchor around 2026-09-18. Four items now sit on Andrew, two of them past forty hours, and the two that would end the stall - c-0001.4 and c-0003.1 - each need about a minute of his attention: one answer about how the top-5 list is actually traded, and one shell on zoltarlead so this heartbeat can seal and validate its own cycles instead of typing them for a fifth consecutive fire.",
+ "items": [
+  {
+   "id": "c-0005.1",
+   "kind": "work_order",
+   "for": "claude-code",
+   "priority": "next",
+   "title": "Diagnose the evening harvest, which stopped after its 20:30 tick and has missed 3 of its last 5 windows",
+   "why": "The evening harvest is the only capture of the AFTERCLOSE UPDATE full retrain, and that vintage is load-bearing twice over: H11's entire population is the evening retrains, and the 2026-09-02 stamp-convention cutover makes the rows on either side of it the thing stamp_cutover exists to keep unpooled. A silent gap in this feed does not announce itself later - it shows up as a thinner n and a shifted MDE that nobody can attribute, which is the same class of error as the placeholder pointer: evidence quietly replaced by an artefact of collection. Three misses in five ticks is a pattern, not one bad night, so this needs a cause rather than a restart. It is not a phase step, which is why it is not displacing anything from now; but it is the input every phase downstream is measured on, and unlike the queue stall it degrades the archive rather than just delaying it.",
+   "acceptance": "The cause is recorded in docs/FINDINGS.md or the session log (schedule window, scheduled-task state, upstream availability, or exception - named, not guessed), and data/results/build_status.json shows harvest_evening back to status healthy with a last_run_at inside the 2026-09-04 15:30-21:30 CDT window. For the 2026-09-03 21:00 and 21:30 windows specifically: either the rows are backfilled and the run count reconciles, or FINDINGS records what was lost and why it was not recoverable - an unexplained gap is not an acceptable close.",
+   "depends_on": [],
+   "estimate": "1h",
+   "refs": [
+    "scripts/daily.py",
+    "data/results/build_status.json",
+    "data/build/manifest.yaml",
+    "docs/FINDINGS.md"
+   ]
+  }
+ ]
+}

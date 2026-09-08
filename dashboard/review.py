@@ -54,6 +54,25 @@ CYCLE_RE = re.compile(r"^c-\d{4}$")
 
 
 # --------------------------------------------------------------------- helpers
+def _utf8_console() -> None:
+    """Windows defaults stdout to cp1252, and this tool prints the charter.
+
+    The charter's critical path contains U+2192, so a plain `print` raised
+    UnicodeEncodeError and `review.py next` -- the first command anyone runs --
+    exited 1 on Windows. Forcing the streams here rather than relying on
+    PYTHONIOENCODING means the fix travels with the file: a scheduled task, a
+    git hook and a fresh clone all get it without anyone remembering to set an
+    environment variable. `errors="replace"` so a console that genuinely cannot
+    render a glyph degrades to a placeholder instead of failing the run --
+    reporting must never be the thing that breaks the harvest.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
+
+
 def now() -> datetime:
     return datetime.now().astimezone()
 
@@ -131,7 +150,8 @@ def next_cycle_id() -> str:
 def git(*args: str) -> str:
     try:
         return subprocess.run(["git", *args], cwd=REPO, capture_output=True,
-                              text=True, timeout=20).stdout.strip()
+                              text=True, encoding="utf-8", errors="replace",
+                              timeout=20).stdout.strip()
     except Exception:
         return ""
 
@@ -532,6 +552,7 @@ def cmd_check(_args) -> int:
 
 
 def main() -> None:
+    _utf8_console()
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)

@@ -3,11 +3,12 @@
   "_what_this_is": "The fleet's only authority on hostname -> node_id. Specified in docs/node-identity-protocol.md (adoption step 4). Its job is twofold: stop a node from naming itself something that collides, and let the console resolve a hostname it sees on a row into a node it knows.",
   "_lookup_rules": [
     "Lookups are CASE-INSENSITIVE. One machine reports itself three ways: $env:COMPUTERNAME uppercase, hostname.exe and DNS in mixed case, and the device bridge lowercase. All three were observed on ZOLTARGENESIS in a single session on 2026-09-07.",
-    "Resolve against `map` first. If there is no hit, try `former_names` \u2014 a historical row written before a rename still has to resolve to the node that wrote it.",
+    "Resolve against `map` first. If there is no hit, try `former_names` — a historical row written before a rename still has to resolve to the node that wrote it.",
     "A value of null means the hostname is NOT KNOWN, not that the node does not exist. Render it as a gap, never as unresolved-therefore-absent."
   ],
   "map": {
     "ZOLTARGENESIS": "zoltargenesis",
+    "ZOLTARLEAD": "zoltarlead",
     "ZOLTARONE": "zoltarone",
     "ZOLTARTWO": "zoltartwo"
   },
@@ -24,12 +25,6 @@
     }
   },
   "unknown": {
-    "zoltarlead": {
-      "hostname": null,
-      "_why_null": "ZOLTARLEAD'S HOSTNAME IS RECORDED NOWHERE IN THE FLEET. It has never been probed, has no node card and no heartbeat. The machine that writes every review cycle is the one the fleet cannot identify. Recorded here as an explicit null rather than omitted, so the gap is visible in the file instead of only in conversation.",
-      "_impact": "Under docs/node-identity-protocol.md its agents run verified:null \u2014 correctly, and visibly \u2014 until someone reads $env:COMPUTERNAME on it once. That is a thirty-second fix and it is overdue independently of anything else.",
-      "_also": "As of 2026-09-07 the review protocol's own heartbeat has been dead since 2026-09-02 (review.py check reports it late). That is the same machine. Worth looking at both at once."
-    },
     "zoltarstar": {
       "hostname": null,
       "_why_null": "Declared by Andrew, not online, no card. No hostname has ever been observed."
@@ -39,9 +34,9 @@
     "zoltargenesis": "Live read 2026-09-07T04:42:49-05:00 by zoltargenesis/claude-code on the machine itself: $env:COMPUTERNAME='ZOLTARGENESIS', hostname.exe='ZoltarGenesis', [System.Net.Dns]::GetHostName()='ZoltarGenesis'. Cross-checked against fleet/identity.json v2 attested_hostnames; heartbeat at 04:50:51 stamped verified:true.",
     "zoltarone": "MEASURED live on the machine 2026-09-07T16:5x-05:00 by zoltarone/claude-code: $env:COMPUTERNAME='ZOLTARONE', hostname.exe='ZoltarOne', [System.Net.Dns]::GetHostName()='ZoltarOne', registry ActiveComputerName=ComputerName='ZOLTARONE' (so no rename staged). All agree case-insensitively. This REPLACES the previous second-hand entry, which carried DESKTOP-7FJV5QQ and was correctly flagged here as needing a live read. It was stale: the rename happened 2026-09-04, three days before this file was written.",
     "zoltartwo": "NOT OBSERVED. Added to `map` on Andrew's 2026-09-07 instruction, not from a live read -- no session has ever seen this hostname. It is a DECLARATION, and under this fleet's own rule a declaration is not evidence. If ZoltarTwo comes online reporting a different name, this row is wrong in exactly the way the zoltarone row was wrong. Confirm on first contact and correct it here.",
-    "zoltarlead": "STILL NOT RECORDED ANYWHERE. Left as an explicit null in `unknown` on purpose so the gap is visible in the file rather than only in conversation. The machine that writes every review cycle remains the one the fleet cannot identify."
+    "zoltarlead": "MEASURED live on the machine 2026-09-08T00:35-05:00 by zoltarlead/claude-code: $env:COMPUTERNAME='ZOLTARLEAD', hostname.exe='ZoltarLead', [System.Net.Dns]::GetHostName()='ZoltarLead'. Registry ActiveComputerName and ComputerName both 'ZOLTARLEAD', so no rename is staged. All agree case-insensitively. This CLOSES the file's own note that ZoltarLead's hostname was recorded nowhere in the fleet -- the machine that writes every review cycle was the one node that could not be identified. Card at data/fleet/identity/zoltarlead.json, schema v2, mirrored byte-identically to fleet/identity.json because the identity kit's guard reads <workspace>/fleet/identity.json while this repo's committed convention is data/fleet/identity/<node>.json; tests/test_fleet_identity.py pins the two equal so they cannot drift into the two-cards-read-by-different-callers hazard."
   },
-  "_schema_note": "docs/node-identity-protocol.md sketches this file as a flat hostname->node_id object. That shape cannot express a former name, an explicit unknown, or where a value came from \u2014 all three of which were needed on day one. The flat map is preserved under `map` so the sketched lookup still works; the rest is additive. If the protocol is ratified in its original shape, `map` alone is the file.",
+  "_schema_note": "docs/node-identity-protocol.md sketches this file as a flat hostname->node_id object. That shape cannot express a former name, an explicit unknown, or where a value came from — all three of which were needed on day one. The flat map is preserved under `map` so the sketched lookup still works; the rest is additive. If the protocol is ratified in its original shape, `map` alone is the file.",
   "by": {
     "agent_id": "zoltarone/claude-code",
     "node_id": "zoltarone",
