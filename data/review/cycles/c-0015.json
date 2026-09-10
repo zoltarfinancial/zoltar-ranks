@@ -1,0 +1,109 @@
+{
+  "cycle_id": "c-0015",
+  "opened_at": "2026-09-10T18:16:58-05:00",
+  "opened_by": "cowork",
+  "by": {
+    "agent_id": "zoltarlead/cowork",
+    "node_id": "zoltarlead",
+    "hostname": "zoltarlead",
+    "hostname_source": "get_device_info.deviceName vs fleet/identity.json attested_hostnames (case-insensitive match)",
+    "lane": "cowork",
+    "verified": true,
+    "at": "2026-09-10T18:16:58-05:00",
+    "reachable": {"files": "ok", "db": "ok", "device_shell": "unavailable this fire"}
+  },
+  "quiet": false,
+  "written_without_review_py": true,
+  "_note": "Written by the cowork lane, which has no shell on this device and cannot run dashboard/review.py open-cycle. The id is assigned by hand as the successor to c-0014 and the file is left uncommitted for the courier. THIS CYCLE USES kind: finding WHERE EARLIER CYCLES USED kind: note - see c-0015.1; note is an inbox event type, not an item kind, and c-0009 through c-0014 were wrong to use it.",
+  "state_snapshot": {
+    "read_at": "2026-09-10T18:16:58-05:00",
+    "board": {
+      "tasks": 31,
+      "events": 71,
+      "max_lamport": 96,
+      "bus": 41,
+      "fleet_live": 5,
+      "policy_level": 1,
+      "away_mode": false,
+      "age": "IDENTICAL to what the 22:09Z fire wrote and left. Andrew has not touched the board in 49.6 h. The newest message on the bus before this fire was my own m-20260910-1717.",
+      "status_method": "re-derived from all 71 events ordered by lamport; agreed task for task with the previous fire's derivation"
+    },
+    "build_status": {
+      "generated_at": "2026-09-10T18:00:18-05:00",
+      "age": "0.28 h",
+      "gate": "amber",
+      "headline": "Running, but not yet trustworthy - 5 blocker gate(s) never run or stale.",
+      "changed_since_c-0014": "NOTHING. The 18:00 CDT evening run completed all six steps ok with rows 0; the gate, the phase, the three blockers and the seven contract tests are unmoved, and the five blocker gates are still stale at 2026-09-02T16:43:33. This cycle, like the last one, is not about the build."
+    },
+    "review_state": {"generated_at": "2026-09-10T18:00:19-05:00", "age": "0.28 h", "current_cycle": "c-0014", "counts": {"open": 28, "done": 5, "unverified": 0, "raised": 18}, "protocol_heartbeat": "LATE since 2026-09-08T13:12 CDT, last_cycle c-0008 - six cycles have been written since without a beat line, because this lane cannot run review.py. Named in the courier ORDER_RESULT as its item 3."},
+    "inbox_jsonl": {"age": "58.9 h", "new_events": 0},
+    "charter": {"age": "8.2 d"},
+    "heartbeats": {
+      "zoltarlead": {"at": "2026-09-10T18:01:01-05:00", "age": "0.25 h", "branch": "fleet/courier-zoltarlead", "head_sha": "57ed181", "dirty": true, "probe_rc": 0, "note": "the worker moved off fleet/rejoin-zoltarlead @ 9115058 this hour"},
+      "zoltarone": {"at": "2026-09-07T17:00:01-05:00", "age": "73.3 h", "note": "73 missed hourly beats. Andrew was pushed at 2026-09-10T07:19 CDT; the 24 h floor holds until 2026-09-11T07:19 CDT."},
+      "zoltargenesis": "ABSENT from this clone - last_heartbeat_at null, never a copied stamp",
+      "zoltartwo": "ABSENT from this clone",
+      "zoltarstar": "ABSENT from this clone - one message, no measurement"
+    },
+    "git": {
+      ".git/FETCH_HEAD age": "0.23 h",
+      "origin/main ref here": "a246ccf - UNCHANGED. The merge decision has not been acted on.",
+      "origin/fleet/dispatch ref here": "2b3d57e, written 2026-09-10T23:02:29Z, 0.23 h (was b35437f at c-0014; b35437f -> 6785ce2 -> 2b3d57e)",
+      "courier receipts": "SIX today. New since c-0014: 222225Z ok -> 6785ce2, which carried cowork's own c-0014.json to origin within 10 minutes of it being written; 230225Z ok -> 2b3d57e. The ORDER_RESULT also records a 17:32 fire that returned ok-nothing-to-land and pushed nothing.",
+      "orders/ uncommitted": 0,
+      "executor receipts": "ONE, for the first time in this fleet's history - fleet/bridge/outbox/20260910-1733-zoltarlead-courier.md, 22:33:05Z, 0.73 h"
+    },
+    "deadline": {"at": "2026-09-16T00:00:00-05:00", "days_out": 5.24, "ref": "c-0007.1", "irreversible": true, "note": "crosses the 3-day push threshold on 2026-09-13T00:00 CDT"},
+    "kb": {
+      "local": "C:\\Shared\\lessons-learned-kb UNREACHABLE - not a connected folder for this session, and this fire has no device shell. Unreachable, not empty.",
+      "drive": "rules.md (id 12yTfdE3Ib8nxLw94FCdxq8nfTJpW3xgY) downloaded and read IN FULL this fire: rev 4, 4 promoted rules, byte-identical id/modifiedTime to the previous fire, so no rebuild. index.md (id 1nSbBzIpBLUkEwj1HWIcbtEFwetAvFX8C) metadata only - modifiedTime 2026-09-10T16:38:32Z unchanged; stated as metadata, not claimed as a content read.",
+      "written": "nothing - write-frozen until kb/ lands in git"
+    }
+  },
+  "assessment": "One hour after the carrier came alive, the receipt leg closed too - on one node, and by a route nobody was watching. fleet/bridge/outbox/20260910-1733-zoltarlead-courier.md is the first executor receipt this fleet has produced on any node on any day, and it verifies with an exported task XML the exact clause the previous fire recorded as unverifiable: the courier's schedule has an unbounded PT10M repetition and a boot trigger, which is the precise shape whose absence caused the 2026-09-01 outage. That is real progress and it is worth naming plainly, because almost nothing else on this board has moved: the gate is still amber on the same five contract tests stale since 2026-09-02, the inbox has been silent 58.9 h, and Andrew has not touched the board in 49.6 h. The report also carries the finding that matters more than the good news. Merging fleet/dispatch into main - the one act the 22:20Z push asked Andrew for - would turn main's own review check red, because seven cycle items use kind: note, which the protocol I own does not allow, and I wrote the seventh of them an hour ago. The bottleneck has not moved again; it has grown a rider, and the rider is my defect rather than the fleet's. Against the end goal this is still the same story in a new costume: the machine state is healthy, the market-data clock on c-0002.1 is 5.24 days from an irreversible close, and every hop between the two is waiting on one person.",
+  "items": [
+    {
+      "id": "c-0015.1",
+      "kind": "decision",
+      "for": "andrew",
+      "priority": "next",
+      "title": "Decide how fleet/dispatch reaches main without turning main's review check red: seven cycle items use kind: note, which review-protocol.md does not allow",
+      "why": "A rider on c-0014.1, invisible until the courier's ORDER_RESULT arrived at 22:33Z. review-protocol.md defines exactly five item kinds - work_order, question, decision, risk, finding - and lists note as an INBOX EVENT type. c-0009.2, c-0010.2, c-0010.3, c-0011.2, c-0012.2, c-0013.3 and c-0014.3 all carry kind: note, and c-0010.2 and c-0010.4 set depends_on to the ORDER id t-20260908-courier-zoltarlead rather than a cycle item id, which review_state.unmet_dependencies confirms independently of the report. review.py check enforces invariants 1-4 and runs inside emit_build_status.py --check, so main would audit itself red the moment those files land. The courier is not at fault - a transport must not judge content and it carried exactly what this lane wrote. It matters against the end goal because c-0014.1 is the only thing standing between the board and delivery to ZoltarOne and ZoltarGenesis, and asking Andrew to take an action whose cost I had not measured is how a board loses the right to be believed.",
+      "acceptance": "origin/main carries orders/ AND python dashboard/emit_build_status.py --check reports 'review protocol  0 blocking' on main, by whichever route Andrew picks: (a) merge and accept a red review check until a corrections cycle lands, (b) cherry-pick orders/ alone and leave data/review/cycles/ off main for now, or (c) widen review.py's allowed-kinds list to include note, which legitimises the mistake and needs a matching edit to review-protocol.md.",
+      "depends_on": [],
+      "refs": ["claude/review-protocol.md", "fleet/bridge/outbox/20260910-1733-zoltarlead-courier.md", "data/review/cycles/c-0014.json", "dashboard/review.py"]
+    },
+    {
+      "id": "c-0015.2",
+      "kind": "finding",
+      "for": "cowork",
+      "priority": "later",
+      "title": "The first executor receipt in this fleet's history, what it settles, and what this fire still could not verify",
+      "why": "Recorded so no later fire mistakes any of it for settled or for unknown in the wrong direction. SETTLED by fleet/bridge/outbox/20260910-1733-zoltarlead-courier.md: the courier task's S4U principal, unbounded PT10M repetition, PT2M boot trigger, StartWhenAvailable, LastTaskResult=0 and Missed=0, read from the exported XML rather than inferred from an interval - this closes the previous fire's top open uncertainty; the 22:03:10Z failure against unreachable.invalid was DELIBERATE, not merely deliberate-looking, and changed no git config, remote or credential; and the courier does not commit-loop, because its 17:32 fire returned ok-nothing-to-land with fresh routine receipts on disk. STILL NOT VERIFIED FROM THIS SESSION: this receipt came from a worker session, not from a standing unattended executor daemon, so ZoltarLead still has no service that consumes an order file without a human starting a session - the executor gap named in c-0014.1 is unchanged; the report's own claim of '10 blocking' from review.py check is not reproducible here because this lane cannot run python, and the number recomputed by hand against the cycle files is nine (seven kind: note plus two order-id depends_on), so the report's count is cited as its claim and mine as mine; the review protocol's heartbeat has been late since 2026-09-08T13:12 through six cycles for the same reason and this fire cannot clear it either; and ZoltarStar's node card, identity file and hostmap row are still declarations on a branch for which this clone holds no ref. This item is kind: finding and not kind: note ON PURPOSE - it is the first cycle written after c-0015.1 was raised, and it is where the forward half of that fix begins.",
+      "acceptance": "A later fire either finds a standing executor daemon on ZoltarLead in data/fleet/heartbeat/zoltarlead.json or an order-consuming service receipt, or restates this item unchanged. No cycle after c-0014 contains an item whose kind is not one of work_order, question, decision, risk, finding.",
+      "depends_on": [],
+      "refs": ["fleet/bridge/outbox/20260910-1733-zoltarlead-courier.md", "data/fleet/heartbeat/zoltarlead.json", "data/results/review_state.json"]
+    }
+  ],
+  "folded_from_board": ["t-20260910-cycle-kind-invalid -> c-0015.1 (created by this same fire from the ORDER_RESULT; mirrored both ways so git holds the plan)"],
+  "folded_from_board_note": "No task was created by Andrew since c-0014 - he has not touched the board in 49.6 h. The only new task is this fire's own, and it is mirrored as c-0015.1.",
+  "mirrored_to_board": {"c-0015.1": "tasks/t-20260910-cycle-kind-invalid (created e-000098-crtkind)", "c-0015.2": "not mirrored - a cowork-lane finding with no assignee and no dispatchable node"},
+  "dispatched_this_fire": [],
+  "dispatched_none_because": "Status re-derived for all 31 tasks from all 71 events ordered by lamport, L1 auto-approval applied to classes probe/research/docs only and never to a question, decision, risk or finding. The set of approved-and-undispatched tasks is unchanged from the previous fire: t-20260908-dispatcher-runbook (for: brain - no node, no order file) and t-20260908-join-zoltarstar (held; its node's executor is declared unable to fire at all, F-ZS-6). Every other approved task already has an order file committed at 88899a3, and re-dispatching an idempotent order file would post a second dispatch event that falsely signals progress. The lever is still c-0014.1, and this fire added a rider to it rather than a new order.",
+  "policy_deviation": null,
+  "notify": {
+    "sent": [
+      {"trigger": "section 7(a) - a task newly waiting on Andrew with a deadline inside 10 days", "task": "t-20260910-cycle-kind-invalid", "why_not_suppressed": "It is a different item from t-20260910-land-dispatch-on-main, which was pushed at 2026-09-10T17:20 CDT, so the 24 h standing-item floor does not apply to it. It is also load-bearing on that push: acting on the 17:20 message tonight without this one reddens trunk."}
+    ],
+    "suppressed": [
+      {"trigger": "section 7(b) - a refused receipt", "reason": "The one executor receipt this fleet has ever produced has outcome executed, not refused."},
+      {"trigger": "section 7(c) - a node the plan depends on silent > 3 h", "reason": "ZoltarOne at 73.3 h is a standing trigger, pushed 2026-09-10T07:19 CDT. The 24 h floor forbids re-notifying before 2026-09-11T07:19 CDT. Named inside the 7(a) push instead."},
+      {"trigger": "section 7(d) - goal deadline inside 3 days", "reason": "c-0002.1's window is 5.24 d out; it crosses 3 days on 2026-09-13T00:00 CDT."}
+    ]
+  },
+  "kb": {
+    "tier_used": "Drive (local tier unreachable - not a connected folder, no device shell)",
+    "applied": "rules.md rev 4 rule 1, clock re-read immediately before each of the five stamped writes (18:14:48, 18:15:44, 18:16:30, 18:16:58 CDT and the receipt's own read); rule 4, null input => unknown state - ZoltarOne's cpu_pct/ram_free_gb/branch/head_sha left at the 2026-09-07 file's values and NOT re-stamped, and the three heartbeat-less nodes kept last_heartbeat_at null even though ZoltarStar has a message; rule 2, every age rendered with its reason. Also the F-ZG-16 read-back habit, which produced c-0015.1: the ORDER_RESULT's own claim of '10 blocking' was not taken on its word but recounted against the cycle files, which is how c-0014.3 - written after the report - was found as a seventh instance the report could not have seen.",
+    "wrote": "nothing - write-frozen until kb/ lands in git"
+  }
+}
