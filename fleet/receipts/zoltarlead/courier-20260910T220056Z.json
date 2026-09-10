@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "kind": "courier",
+  "node_id": "zoltarlead",
+  "agent_id": "zoltarlead/courier",
+  "run_at": "2026-09-10T17:00:56-05:00",
+  "stamp": "20260910T220056Z",
+  "branch": "fleet/dispatch",
+  "worktree": "C:\\Shared\\ClaudeWork\\zoltar-ranks.courier-wt",
+  "outcome": "committing",
+  "failed_step": null,
+  "steps": [
+    {
+      "step": "1.fetch",
+      "cmd": "git fetch --prune origin",
+      "rc": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "step": "2.worktree-prune",
+      "cmd": "git worktree prune",
+      "rc": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "step": "2.worktree-add",
+      "cmd": "git worktree add --force -B fleet/dispatch C:\\Shared\\ClaudeWork\\zoltar-ranks.courier-wt origin/main",
+      "rc": 0,
+      "stdout": "branch 'fleet/dispatch' set up to track 'origin/main'.\nHEAD is now at a246ccf Merge pull request #3 from zoltarfinancial/fleet/rejoin-zoltarlead",
+      "stderr": "Preparing worktree (new branch 'fleet/dispatch')"
+    },
+    {
+      "step": "3.add",
+      "cmd": "git add -- orders fleet/msgs fleet/receipts data/fleet/heartbeat data/review",
+      "rc": 0,
+      "stdout": "",
+      "stderr": "warning: in the working copy of 'data/fleet/heartbeat/zoltarlead.json', CRLF will be replaced by LF the next time Git touches it"
+    }
+  ],
+  "carried": {
+    "added": [
+      "orders/zoltargenesis/t-20260908-genesis-inventory.md",
+      "orders/zoltarlead/c-0002.1.md",
+      "orders/zoltarlead/t-20260908-courier-zoltarlead.md",
+      "orders/zoltarone/t-20260908-executor-dispatch-branch.md",
+      "orders/zoltarone/t-20260908-zoltarone-installer-substitution.md",
+      "fleet/msgs/000003-zoltarlead-claude-code-00f737026d108876.json",
+      "data/review/cycles/c-0008.json",
+      "data/review/cycles/c-0009.json",
+      "data/review/cycles/c-0010.json",
+      "data/review/cycles/c-0011.json",
+      "data/review/cycles/c-0012.json",
+      "data/review/cycles/c-0013.json"
+    ],
+    "updated_one_writer": [
+      "data/fleet/heartbeat/zoltarlead.json"
+    ],
+    "unioned": [
+      "data/review/heartbeat.jsonl",
+      "data/review/inbox.jsonl"
+    ],
+    "conflicts": [],
+    "missing_sources": []
+  },
+  "committed": null,
+  "pushed_sha": null,
+  "needs_andrew": null,
+  "_note": "Written by a scheduled task that runs git and fleet_sync.py only. No model.",
+  "base": "origin/main",
+  "base_sha": "a246ccf6975f28ebd5acedda55d536c41dbdbbb5",
+  "staged": [
+    "data/fleet/heartbeat/zoltarlead.json",
+    "data/review/cycles/c-0008.json",
+    "data/review/cycles/c-0009.json",
+    "data/review/cycles/c-0010.json",
+    "data/review/cycles/c-0011.json",
+    "data/review/cycles/c-0012.json",
+    "data/review/cycles/c-0013.json",
+    "data/review/heartbeat.jsonl",
+    "data/review/inbox.jsonl",
+    "fleet/msgs/000003-zoltarlead-claude-code-00f737026d108876.json",
+    "orders/zoltargenesis/t-20260908-genesis-inventory.md",
+    "orders/zoltarlead/c-0002.1.md",
+    "orders/zoltarlead/t-20260908-courier-zoltarlead.md",
+    "orders/zoltarone/t-20260908-executor-dispatch-branch.md",
+    "orders/zoltarone/t-20260908-zoltarone-installer-substitution.md"
+  ],
+  "commit_worthy": [
+    "data/fleet/heartbeat/zoltarlead.json",
+    "data/review/cycles/c-0008.json",
+    "data/review/cycles/c-0009.json",
+    "data/review/cycles/c-0010.json",
+    "data/review/cycles/c-0011.json",
+    "data/review/cycles/c-0012.json",
+    "data/review/cycles/c-0013.json",
+    "data/review/heartbeat.jsonl",
+    "data/review/inbox.jsonl",
+    "fleet/msgs/000003-zoltarlead-claude-code-00f737026d108876.json",
+    "orders/zoltargenesis/t-20260908-genesis-inventory.md",
+    "orders/zoltarlead/c-0002.1.md",
+    "orders/zoltarlead/t-20260908-courier-zoltarlead.md",
+    "orders/zoltarone/t-20260908-executor-dispatch-branch.md",
+    "orders/zoltarone/t-20260908-zoltarone-installer-substitution.md"
+  ]
+}

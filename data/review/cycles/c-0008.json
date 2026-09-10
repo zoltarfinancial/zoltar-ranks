@@ -1,0 +1,87 @@
+{
+  "cycle_id": "c-0008",
+  "opened_at": "2026-09-08T07:15:00-05:00",
+  "opened_by": "cowork",
+  "quiet": false,
+  "state_snapshot": {
+    "head_sha": "9115058",
+    "gate": "amber",
+    "blocking": 0,
+    "phase": "1a",
+    "phase_pct": 90
+  },
+  "assessment": "The queue starved for five days and then broke open overnight: five commits between 00:25 and 00:53 on 2026-09-08 (head is now 9115058 on fleet/rejoin-zoltarlead, origin/main a3ad2ff), c-0005.1 and c-0006.1 both closed with measurement rather than assertion - the 2026-09-03 evening retrain was never lost, 4,652 rows identical to the nights either side, and the two ticks that did not fire landed ninety minutes after the data was already in the archive. None of that work was on 1a -> 2 -> 3 -> 6, though, and the one item whose cost is irreversible moved the wrong way: probed against live yfinance, 1-minute reach is 28 days and not 30, so c-0002.1 expires around 2026-09-16 and the runway is eight days rather than the eleven c-0007 carried - two days lost at the end, where they are worth the most. The most consequential finding is that the 2026-09-02 stamp cutover only half-happened: every post-cutover evening publishes the same build twice, about sixteen seconds apart, byte-identical at corr 1.000000 on all 2326 rows, so evening_retrains double-counts from 09-02 onward - H11's published MDE is entirely pre-cutover and clean, but the next recompute would silently gain power that is not there, in the flattering direction, which is the third instance of this build's signature failure of one physical event wearing two run_ts. Two things now sit on Andrew that are not scheduling: plaintext brokerage and mail credentials reported on disk at zoltargenesis in a tree one git init from publication, and a machine-wide diagnostic log switched off, which is why the last missed harvest window has no diagnosis and the next one will have none either.",
+  "items": [
+    {
+      "id": "c-0008.1",
+      "kind": "decision",
+      "for": "andrew",
+      "priority": "next",
+      "title": "Decide what happens to the plaintext Robinhood and Gmail credentials reported on disk at zoltargenesis.",
+      "why": "The charter reserves anything touching real money to Andrew, and this is the only exposure on the board whose cost is both irreversible and unbounded: an expiring 1-minute window loses evidence that can be re-derived from another study design, a published brokerage credential cannot be un-published. Claude Code reported it from zoltargenesis at 2026-09-07T00:57:21 and it has sat unfolded through c-0007 while smaller items were chased three times, which is the review board failing at the one thing it exists for. Stated plainly: this session cannot reach zoltargenesis and has NOT verified the report - it is claude-code's measurement, taken at face value because the failure mode of ignoring a true one is far worse than the cost of acting on a false one.",
+      "acceptance": "A reply event on c-0008.1 in data/review/inbox.jsonl naming one of: (a) the credentials have been removed from that tree and rotated, with the store they now live in named; (b) they stay where they are and that tree will never be git-init'd or pushed, with the reason written into docs/FINDINGS.md so a later node cannot rediscover the tree and publish it; or (c) the report is wrong, with what was actually found. In cases (a) and (b) the outcome is recorded in docs/FINDINGS.md; in case (c) a note on c-0008.1 closes it.",
+      "depends_on": [],
+      "estimate": "5m for the answer",
+      "refs": [
+        "docs/FINDINGS.md",
+        "data/review/inbox.jsonl",
+        "data/review/charter.json"
+      ]
+    },
+    {
+      "id": "c-0008.2",
+      "kind": "work_order",
+      "for": "claude-code",
+      "priority": "next",
+      "title": "Widen the twin-commit exclusion of c-0002.2 to dedup on payload identity, so the post-cutover double-publish collapses to one evening event.",
+      "why": "This supersedes c-0002.2 rather than duplicating it: c-0002.2 was written when the twin commit looked like one anomaly living in h11_power.py, and the 2026-09-08 finding shows it is a class - placeholder re-scores, the 13-second twin commit, and now the half-finished stamp cutover are all one physical event carrying two run_ts with an identical payload. A dedup keyed on run_ts or on a 13-second span will not catch a 16-second one and will not catch the next variant either; keyed on payload identity within a short window it catches all three. This is on the critical path because every success criterion in the charter is a number with an interval around it, and a population that double-counts shrinks intervals in the direction that flatters the result - the exact failure the charter was written to prevent.",
+      "acceptance": "The exclusion lives in the shared available_at path rather than in src/zoltar_ranks/analysis/h11_power.py, and keys on payload identity (identical scores and close_prices over shared (symbol, risk_bucket)) within a short window, not on run_ts spacing. A test in tests/test_stamp_cutover.py asserts that evening_retrains returns exactly one row for each of 2026-09-02, 2026-09-03 and 2026-09-04, where it returns two today, and a test in tests/test_h11_power.py asserts the H11 population is unchanged over 2026-03-03..2026-09-01 so the published MDE (0.0948%/run, 95% CI [0.0675%, 0.1200%], n=109) is provably not restated by this fix. tests/test_stamp_cutover.py::test_no_third_stamping_convention is made to pass by fixing the double-publish handling, never by loosening the assertion, and its message is reworded from 'a third convention' to 'both conventions concurrently for one build'. python dashboard/emit_build_status.py --check still reports 0 blocking.",
+      "depends_on": [
+        "c-0002.2"
+      ],
+      "estimate": "3h",
+      "refs": [
+        "src/zoltar_ranks/analysis/h11_power.py",
+        "tests/test_stamp_cutover.py",
+        "tests/test_h11_power.py",
+        "c-0002.2"
+      ]
+    },
+    {
+      "id": "c-0008.3",
+      "kind": "decision",
+      "for": "andrew",
+      "priority": "later",
+      "title": "Turn on Microsoft-Windows-TaskScheduler/Operational on zoltarlead, or accept that missed harvest ticks stay undiagnosable.",
+      "why": "c-0005.1 closed by proving what did not cause the 2026-09-03 gap - not power, not a failing step, not the trigger - and then hitting a wall that is not a research limit but a switch: Task Scheduler's own history log is disabled, so there is no record that the 21:00 and 21:30 fires were attempted, skipped or failed, and none can be reconstructed. The intraday harvest is the only irreversible job on the board, so the next recurrence costs history that no longer exists, and today a fire that never happened and a log line that was never written are byte-identical. The fix is one elevated line that changes machine-wide logging configuration, which puts it outside the worker lane; it is priority later only because the now-count is full and no evidence is lost while the answer waits.",
+      "acceptance": "A reply event on c-0008.3 naming either (a) the command was run and 'wevtutil gl Microsoft-Windows-TaskScheduler/Operational' now reports enabled: true - Claude Code can then confirm it in a note - or (b) an explicit decision to leave it off, recorded in docs/FINDINGS.md so no later diagnosis is scoped as if the channel existed.",
+      "depends_on": [
+        "c-0005.1"
+      ],
+      "estimate": "2m to run, 1m to decide",
+      "refs": [
+        "docs/FINDINGS.md",
+        "c-0005.1"
+      ]
+    },
+    {
+      "id": "c-0008.4",
+      "kind": "work_order",
+      "for": "cowork",
+      "priority": "next",
+      "title": "Give review.py a node dimension so a work order can name the machine that must run it.",
+      "why": "Raised 2026-09-07T00:57:04 and true: every worker that runs 'review.py next' sees every claude-code item, so the board cannot express 'this one must run on zoltarlead'. That was harmless while there was one worker and is not now - c-0002.1 needs live yfinance and the dense intraday era on this node, and the fleet track has already produced work that only ZoltarOne can accept. With eight days left on c-0002.1, the failure this prevents is the specific and expensive one where the expiring item is pulled by a node that cannot finish it. This is cowork's own lane, and it is blocked in practice by c-0003.1: without a shell on zoltarlead the change cannot be tested, and shipping an untested change to the one CLI all three parties depend on is worse than the gap it closes.",
+      "acceptance": "dashboard/review.py accepts an optional node on a cycle item and a --node filter on 'next', defaulting to showing everything when neither is set so existing cycles are unaffected; tests/test_review_protocol.py asserts that an item with a node is hidden from a 'next --node other' and shown to its own node, and that an item without a node is shown to both. 'python dashboard/review.py check' and 'python dashboard/emit_build_status.py --check' both pass, the latter still reporting 0 blocking. Not to be written until c-0003.1 is resolved or a session with a shell on zoltarlead is available to run those two commands.",
+      "depends_on": [
+        "c-0003.1"
+      ],
+      "estimate": "2h",
+      "refs": [
+        "dashboard/review.py",
+        "tests/test_review_protocol.py",
+        "c-0003.1",
+        "c-0002.1"
+      ]
+    }
+  ]
+}

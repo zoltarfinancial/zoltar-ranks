@@ -1,0 +1,141 @@
+{
+ "cycle_id": "c-0012",
+ "opened_at": "2026-09-08T18:14:27-05:00",
+ "opened_by": "zoltarlead/cowork",
+ "quiet": false,
+ "written_without_review_py": true,
+ "_note": "No shell on the device this fire (no device_bash tool present), so dashboard/review.py open-cycle and beat could not be run. This file is written directly and is authoritative; the next fire that has a shell should emit it. Deliberately short: c-0011 sealed 0.95 h ago and its reading stands. This cycle exists for one reason - three board tasks were created after c-0011 sealed and the runbook requires every new board task to be folded into a cycle so git holds the plan.",
+ "state_snapshot": {
+  "clone_head_branch": "fleet/rejoin-zoltarlead",
+  "clone_head_sha": "9115058",
+  "clone_dirty": true,
+  "clone_origin_main_ref": "a3ad2ff",
+  "board_origin_main_per_merge_event": "a246ccf (e-000050, 13:54 CDT) - this clone has still never fetched it",
+  "fetch_head_age_hours": 17.9,
+  "gate": "amber",
+  "gate_headline": "Running, but not yet trustworthy - 5 blocker gate(s) never run or stale.",
+  "build_status_generated_at": "2026-09-08T18:00:18-05:00",
+  "build_status_age_hours": 0.24,
+  "blocking": 0,
+  "jobs": "harvest_premarket (08:30:17) / harvest_intraday (15:00:38, 2328 rows) / harvest_evening (18:00:18) all healthy. harvest_evening ran once since c-0011; no job and no gate changed status, and the five blocker contract tests are still stale at 2026-09-02T16:43:33.",
+  "board": {
+   "tasks": 29,
+   "events": 58,
+   "max_lamport_read": 83,
+   "policy_level": 1,
+   "away_mode": false
+  },
+  "new_board_tasks_since_c_0011": 3,
+  "new_board_events_since_c_0011": 3,
+  "new_bus_messages_since_c_0011": 1,
+  "new_inbox_events": 0,
+  "inbox_age_hours": 10.9,
+  "new_commits_this_fire": 0,
+  "new_receipts_this_fire": 0,
+  "newest_courier_receipt": "2026-09-08T00:49:38-05:00 (17.4 h) - and none of the five is a courier receipt; \\Zoltar\\ZoltarLead-Courier has still never written one",
+  "orders_uncommitted_in_clone": 6,
+  "nodes_with_heartbeat_in_git": {
+   "zoltarlead": "2026-09-08T18:01:01-05:00 (0.22 h)",
+   "zoltarone": "2026-09-07T17:00:01-05:00 (25.3 h)"
+  },
+  "nodes_without_heartbeat_in_git": [
+   "zoltargenesis",
+   "zoltartwo",
+   "zoltarstar"
+  ]
+ },
+ "assessment": "Three tasks landed on the board at 17:37 CDT from an interactive session with Andrew, all of them KB v2, and not one of them can be dispatched by a fire: t-20260908-kb-v2-repo-decision is class trunk and is his call by construction, and both work orders under it are class fleet, which policy L1 holds for his approval. So the hour's real change is that the KB now has a designed fix with an owner and a gate, and the gate is one decision Andrew has not yet made. That decision is worth naming precisely because it is small: it is only which repo the sync bot may write, and until it is answered the v2 cutover cannot start, which means F-ZT-6/7 - a mutation protocol that can delete the KB on one empty read - stays live behind a freeze rather than behind a fix. Nothing else moved. The build is unchanged in substance: harvest_evening ran clean at 18:00, the gate is amber for the same five stale blocker gates it has been amber for since 2026-09-02, and no commit has landed. The courier bootstrap named in c-0010.1 is still untouched, so this fire adds a fourth and fifth queued item to a queue that has never had a carrier: six order files now 17.9 h behind a FETCH_HEAD that has never moved, and c-0002.1's 1-minute-bar window is 7.3 days out. ZoltarOne is now silent 25.3 h against an hourly beat. The distinction that matters and that no fire can close from here: every item on this board is blocked on a person doing one thing at one machine, not on any agent's judgment.",
+ "items": [
+  {
+   "id": "c-0012.1",
+   "kind": "decision",
+   "for": "andrew",
+   "priority": "next",
+   "title": "Mirror of t-20260908-kb-v2-repo-decision - which repo the KB sync bot may write.",
+   "why": "Held here so git carries the plan, not only the db. The KB v2 design makes git the KB's origin, and a bot that syncs every 30 minutes needs a branch it is allowed to write. Own private repo with a bot-written main is clean; the fallback, kb/ inside zoltar-ranks on branch kb/sync, works but routes every KB sync through a merge you have to perform. This is the one place an agent would write a trunk, which is why it is not a fire's call. It gates t-20260908-kb-v2-cutover via depends_on, so nothing under it starts until it is answered.",
+   "acceptance": "A reply event on t-20260908-kb-v2-repo-decision naming the repo; if own repo, the created URL posted in that reply, plus the OneDrive path confirmed and the Drive inbox/ and flat/ folders created."
+  },
+  {
+   "id": "c-0012.2",
+   "kind": "note",
+   "for": "cowork",
+   "priority": "later",
+   "title": "Two class-fleet work orders now sit proposed with no route to a node even after approval.",
+   "why": "t-20260908-kb-v2-cutover is for zoltarlead/claude-code, which has no executor; t-20260908-zoltarstar-clock is for zoltarstar/claude-code, a node with no clone, no identity file and no heartbeat, whose join is blocked. Approving either would move it to approved and produce an order file that nothing reads. Recording it so a later fire does not read a dispatch event on these as evidence of delivery - the same absence-versus-failure distinction the board exists to keep.",
+   "acceptance": "Neither task is reported as delivered anywhere until a receipt carrying a branch sha exists for it."
+  }
+ ],
+ "folded_from_board": [
+  {
+   "task": "t-20260908-kb-v2-repo-decision",
+   "created_at": "2026-09-08T17:37:16-05:00",
+   "by": "zoltarlead/cowork (interactive session with Andrew, KB v2 build)",
+   "kind": "decision",
+   "class": "trunk",
+   "derived_status": "open",
+   "cycle_item": "c-0012.1"
+  },
+  {
+   "task": "t-20260908-kb-v2-cutover",
+   "created_at": "2026-09-08T17:37:16-05:00",
+   "by": "zoltarlead/cowork (interactive session with Andrew, KB v2 build)",
+   "kind": "work_order",
+   "class": "fleet",
+   "derived_status": "proposed",
+   "note": "Waits on Andrew at L1 and on depends_on t-20260908-kb-v2-repo-decision. Kept at its board id; no cycle-item id assigned."
+  },
+  {
+   "task": "t-20260908-zoltarstar-clock",
+   "created_at": "2026-09-08T17:37:16-05:00",
+   "by": "zoltarlead/cowork (interactive session with Andrew, KB v2 build)",
+   "kind": "work_order",
+   "class": "fleet",
+   "derived_status": "proposed",
+   "note": "Waits on Andrew at L1; the node it addresses has no clone. Kept at its board id."
+  }
+ ],
+ "dispatched_this_fire": [],
+ "approved_not_dispatched": [
+  {
+   "task": "t-20260908-dispatcher-runbook",
+   "reason": "Derived approved (class docs, L1 auto-approval) but for: brain - no node, so no order file exists to write. Standing comment e-000069-runbk; not re-raised."
+  }
+ ],
+ "not_dispatched_other": [
+  {
+   "tasks": ["t-20260908-kb-v2-cutover", "t-20260908-zoltarstar-clock", "c-0002.2", "c-0008.2", "c-0008.4", "t-20260908-kb-into-git", "t-20260908-wevtutil", "t-20260908-zoltartwo-git-auth"],
+   "reason": "class build or fleet - derived proposed, waits on Andrew at policy L1."
+  },
+  {
+   "tasks": ["t-20260908-kb-v2-repo-decision", "c-0001.5", "c-0003.1", "c-0007.1", "t-20260908-genesis-binding"],
+   "reason": "questions, decisions and risks for Andrew - never auto-dispatched."
+  },
+  {
+   "tasks": ["c-0002.1", "t-20260908-executor-dispatch-branch", "t-20260908-genesis-inventory", "t-20260908-courier-zoltarlead", "t-20260908-zoltarone-installer-substitution"],
+   "reason": "already dispatched (e-000066/67/68/74/77); order files written and still uncommitted; no receipts."
+  },
+  {
+   "tasks": ["t-20260908-join-zoltarstar"],
+   "reason": "derived blocked; approved by Andrew but the node has no clone. Standing comment e-000075-strcmt."
+  },
+  {
+   "tasks": ["t-20260908-rotate-credentials"],
+   "reason": "deferred at Andrew's instruction (e-000072/e-000076)."
+  },
+  {
+   "tasks": ["c-0001.2"],
+   "reason": "derived running; chased 15:15 CDT (e-000070-chs012), no reply yet, not chased again inside a day."
+  }
+ ],
+ "policy_deviation": null,
+ "notify": {
+  "pushed": false,
+  "why": "Runbook section 7 admits four triggers and none fires. The three new tasks are priority next with no deadline, so no task is newly waiting on Andrew at priority now or inside 10 days; no receipt was refused (none has ever arrived); the goal deadline 2026-09-16 is 7.3 days out; and ZoltarOne's silence, now 25.3 h, is a standing item pushed 1.97 h ago, inside the 24 h re-notify floor. Andrew was present in the session that created all three tasks."
+ },
+ "kb": {
+  "read": "Drive tier - index.md rev 20 (id 1oMbxIKqGW-fgByhH1_t4FLf3g-Mvz8Um, 12819 bytes, unchanged since the previous fire, exactly one index.md) and rules.md rev 2, both read in full before any write.",
+  "applied": "time__local-stamp-written-from-utc-clock (clock re-read immediately before each stamped write, never cached); rules rev 2 rule 2 (ages rendered with their reason, nothing older than one cadence called now); memory__answered-from-stale-read-placeholder (status re-derived from all 58 events, not read off the previous receipt - which is how the three new tasks were found); fleet__tier-owned-field-written-by-another-tier (no heartbeat stamp copied onto a card whose shell tier has written nothing).",
+  "drive_leg": "skipped - CUTOVER section 5 is not green; t-20260908-kb-v2-cutover was created this hour and is still proposed. KB remains write-frozen; nothing written.",
+  "local_tier": "C:\\Shared\\lessons-learned-kb is not a connected folder for this session - unreachable, not empty."
+ }
+}

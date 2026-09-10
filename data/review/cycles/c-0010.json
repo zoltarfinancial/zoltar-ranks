@@ -1,0 +1,107 @@
+{
+ "cycle_id": "c-0010",
+ "opened_at": "2026-09-08T16:14:50-05:00",
+ "opened_by": "cowork",
+ "quiet": false,
+ "written_without_review_py": true,
+ "_note": "Written directly as a file: this fire had no shell on the device (no device_bash tool in this session), so review.py open-cycle could not assign the id or stamp it, and no beat was recorded. Cycles remain immutable; c-0010 is the next free id after c-0009.",
+ "state_snapshot": {
+  "clone_head_branch": "fleet/rejoin-zoltarlead",
+  "clone_head_sha": "9115058",
+  "clone_origin_main_ref": "a3ad2ff",
+  "board_origin_main_per_merge_event": "a246ccf",
+  "fetch_head_age_hours": 15.8,
+  "gate": "amber",
+  "gate_headline": "Running, but not yet trustworthy - 5 blocker gate(s) never run or stale.",
+  "build_status_generated_at": "2026-09-08T16:00:21-05:00",
+  "blocking": 0,
+  "phase": "2 (market data) blocked on attention, not machine state",
+  "board": {
+   "tasks": 25,
+   "events_before_this_fire": 47,
+   "max_lamport_before": 73,
+   "newest_event_at": "2026-09-08T15:21:58-05:00",
+   "policy_level": 1
+  },
+  "orders_uncommitted_in_clone": [
+   "orders/zoltarlead/c-0002.1.md",
+   "orders/zoltarlead/t-20260908-courier-zoltarlead.md",
+   "orders/zoltarone/t-20260908-executor-dispatch-branch.md",
+   "orders/zoltargenesis/t-20260908-genesis-inventory.md"
+  ],
+  "newest_courier_receipt": "2026-09-08T00:49:38-05:00 (15.4 h)",
+  "nodes_with_heartbeat_in_git": ["zoltarlead (16:01:01 CDT, 0.2 h)", "zoltarone (2026-09-07T17:00:01 CDT, 23.2 h)"],
+  "nodes_without_heartbeat_in_git": ["zoltargenesis", "zoltartwo"],
+  "new_receipts_this_fire": [],
+  "new_commits_this_fire": []
+ },
+ "assessment": "Andrew cleared the queue this hour and the board is now unblocked on decisions and blocked only on hands. In the 53 minutes since c-0009 he approved the courier (e-000073) and the ZoltarStar join (e-000071) and answered the credentials decision (e-000072, defer and do not surface). So the finding that dominated c-0009 - orders written with no transport - has changed shape rather than closed: the courier is approved and its order file is now written, but ZoltarLead has no executor, which means the one order that would install the carrier has no carrier of its own. That is the bootstrap, and it is the whole remaining gap. Nothing else moved: origin/main in this clone still reads a3ad2ff against the board's a246ccf, FETCH_HEAD is 15.8 hours old, no courier receipt since 00:49 CDT, no executor receipts, gate still amber with zero blocking on the review protocol. Four order files now sit uncommitted in the clone including c-0002.1, whose 1-minute-bar window closes around 2026-09-16 - eight days, and it is the only irreversible clock on the board. ZoltarStar was deliberately not dispatched: the node has no clone, identity or executor, so an orders/zoltarstar/ file would only make the board show a delivery that cannot happen; the real carrier is the ready session brief in claude/join-zoltarstar.md, which Andrew pastes at that machine. Evidence discipline unchanged: zoltarone has been silent for 23.2 hours against an hourly beat and the plan depends on it, zoltargenesis and zoltartwo have no heartbeat file in git at all, so of four cards only zoltarlead is inside cadence, and none of that is an outage call from this clone.",
+ "items": [
+  {
+   "id": "c-0010.1",
+   "kind": "finding",
+   "for": "andrew",
+   "priority": "now",
+   "title": "The courier is approved but nothing on ZoltarLead can install it - the carrier order needs a human-started session, once.",
+   "why": "c-0009.1 said the dispatch loop had no transport and named one approval as the fix. Andrew gave that approval at 15:21 CDT and the order file orders/zoltarlead/t-20260908-courier-zoltarlead.md is now written. It will not run. ZoltarLead has no executor in any git evidence - no fleet/bridge/inbox, no order-executor task, no receipt after 00:49 CDT - so the node that is supposed to receive the courier order is the one node with nothing to receive it. Every other dispatch on this board is downstream of it: c-0002.1 (irreversible, expires ~2026-09-16), t-20260908-executor-dispatch-branch on ZoltarOne, t-20260908-genesis-inventory on ZoltarGenesis. This is a five-minute unblock that is currently costing the build days, and it is the last hand-operated step in the loop - after the courier runs once, it carries everything, including its own successors.",
+   "acceptance": "A Claude Code session on ZoltarLead runs orders/zoltarlead/t-20260908-courier-zoltarlead.md to completion. A later fire of this brain reads a courier receipt under fleet/receipts/zoltarlead/ stamped after 2026-09-08T16:00 CDT, sees .git/FETCH_HEAD less than 30 minutes old, and finds all four order files listed in state_snapshot.orders_uncommitted_in_clone present on origin/fleet/dispatch at a real sha. Until then, no dispatch event on this board may be read as work reaching a machine.",
+   "depends_on": [],
+   "refs": ["t-20260908-courier-zoltarlead", "e-000073-z7kax8", "e-000074-dspcou", "orders/zoltarlead/t-20260908-courier-zoltarlead.md", ".git/FETCH_HEAD", "fleet/receipts/zoltarlead/"]
+  },
+  {
+   "id": "c-0010.2",
+   "kind": "note",
+   "for": "andrew",
+   "priority": "next",
+   "title": "ZoltarStar is approved to join; the carrier is you at that machine, not the dispatcher.",
+   "why": "t-20260908-join-zoltarstar was approved at 15:16 CDT. It is deliberately not dispatched and this cycle records why so no later fire treats the absence as an oversight: zoltarstar has no clone, no identity card, no heartbeat and no executor, so there is nothing there that could consume an orders/zoltarstar/ file, and writing one would put a delivery on the board that no carrier can make. The task's own requires field says andrew-present. The brief is already written and current against main = a246ccf.",
+   "acceptance": "Andrew opens a fresh Claude Code session on ZoltarStar in the target folder and pastes the block from project doc claude/join-zoltarstar.md. Done when data/fleet/nodes/zoltarstar.json exists from a real probe, a hostmap row names it, one courier round trip completes and the executor proves 5/5. Sequencing note, not a blocker: joining after the courier exists means ZoltarStar inherits a working transport instead of the defect this fleet just spent five days on.",
+   "depends_on": ["t-20260908-courier-zoltarlead"],
+   "refs": ["t-20260908-join-zoltarstar", "e-000071-i7kaf9", "e-000075-strcmt", "claude/join-zoltarstar.md"]
+  },
+  {
+   "id": "c-0010.3",
+   "kind": "note",
+   "for": "cowork",
+   "priority": "later",
+   "title": "Credentials task is deferred by instruction and is not to be surfaced by any future fire.",
+   "why": "Andrew replied at 15:21 CDT: keep it as a follow-up, move it out of the immediate queue, and do not reveal or touch what it refers to. Recorded here so a future fire, reading a priority-now decision sitting open, does not re-raise it as a chase. Posted as event e-000076-dfrcred. Effective priority later. The standing constraint holds regardless of this task's state: nothing in this fleet reads, copies or commits those files, and no dispatched order may reference them.",
+   "acceptance": "No fire re-raises, re-prioritises or restates this item until Andrew asks. Reopen only on his word.",
+   "depends_on": [],
+   "refs": ["t-20260908-rotate-credentials", "e-000072-ourytq", "e-000076-dfrcred"]
+  },
+  {
+   "id": "c-0010.4",
+   "kind": "risk",
+   "for": "andrew",
+   "priority": "later",
+   "title": "ZoltarOne has been silent for 23.2 hours against an hourly beat, and this clone cannot tell a dead machine from a dead heartbeat task.",
+   "why": "t-20260908-executor-dispatch-branch is dispatched to ZoltarOne and is the change that makes dispatch trunk-free for the whole fleet. Its node's last shell heartbeat is 2026-09-07T17:00:01 CDT - 23 missed hourly beats. ZoltarLead already measured Microsoft-Windows-TaskScheduler/Operational as disabled on its own machine, which makes a fire that never happened byte-identical to a log entry never written; t-20260908-wevtutil tracks checking the other nodes. Not raised as now, because the courier gap blocks that order from arriving regardless, and one gap at a time is the honest queue.",
+   "acceptance": "Either a heartbeat file for zoltarone stamped after 2026-09-08T12:00 CDT appears in git, or someone at that machine reports which of the two failed. Not settleable from this clone.",
+   "depends_on": ["t-20260908-courier-zoltarlead"],
+   "refs": ["fleet_live/zoltarone", "t-20260908-executor-dispatch-branch", "t-20260908-wevtutil", "data/fleet/heartbeat/zoltarone.json"]
+  }
+ ],
+ "folded_from_board": [],
+ "dispatched_this_fire": [
+  {"task": "t-20260908-courier-zoltarlead", "node": "zoltarlead", "order": "orders/zoltarlead/t-20260908-courier-zoltarlead.md", "approval": "andrew 2026-09-08T15:21:58-05:00 (e-000073-z7kax8)", "event": "e-000074-dspcou"}
+ ],
+ "approved_not_dispatched": [
+  {"task": "t-20260908-join-zoltarstar", "reason": "node zoltarstar does not exist in the fleet - no clone, identity, heartbeat or executor; requires andrew-present. Comment e-000075-strcmt."}
+ ],
+ "policy_deviation": {
+  "rule": "policy/current.max_parallel_per_node = 1",
+  "what": "zoltarlead already had c-0002.1 in flight; the courier order was dispatched to it anyway.",
+  "why": "The courier is the carrier for c-0002.1 itself. Holding it behind a parallel cap would deadlock the cap against the thing that resolves it. Recorded rather than silently taken."
+ },
+ "by": {
+  "agent_id": "zoltarlead/cowork",
+  "node_id": "zoltarlead",
+  "hostname": "zoltarlead",
+  "hostname_source": "get_device_info.deviceName vs fleet/identity.json attested_hostnames (case-insensitive match)",
+  "lane": "cowork",
+  "verified": true,
+  "at": "2026-09-08T16:14:50-05:00",
+  "reachable": {"files": "ok", "db": "ok", "device_shell": "unavailable this fire"}
+ }
+}

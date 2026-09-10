@@ -1,0 +1,121 @@
+{
+ "cycle_id": "c-0011",
+ "opened_at": "2026-09-08T17:17:18-05:00",
+ "opened_by": "zoltarlead/cowork",
+ "quiet": false,
+ "written_without_review_py": true,
+ "_note": "No shell on the device this fire (no device_bash tool present), so dashboard/review.py open-cycle and beat could not be run. This file is written directly and is authoritative; the next fire that has a shell should emit it. Kept deliberately short: c-0010 was sealed 1.0 h ago and its reading still stands - manufacturing a second full assessment in one hour is the failure mode the runbook names third.",
+ "state_snapshot": {
+  "clone_head_branch": "fleet/rejoin-zoltarlead",
+  "clone_head_sha": "9115058",
+  "clone_dirty": true,
+  "clone_origin_main_ref": "a3ad2ff",
+  "board_origin_main_per_merge_event": "a246ccf (e-000050, 13:54 CDT) - this clone has still never fetched it",
+  "fetch_head_age_hours": 16.9,
+  "gate": "amber",
+  "gate_headline": "Running, but not yet trustworthy - 5 blocker gate(s) never run or stale.",
+  "build_status_generated_at": "2026-09-08T17:00:20-05:00",
+  "build_status_age_hours": 0.26,
+  "blocking": 0,
+  "jobs": "harvest_premarket / harvest_intraday / harvest_evening all healthy; harvest_evening ran 17:00:20 CDT. No job or gate changed status since c-0010.",
+  "board": {
+   "tasks": 26,
+   "events": 54,
+   "max_lamport_read": 76,
+   "policy_level": 1
+  },
+  "new_board_events_since_c_0010": 0,
+  "new_bus_messages_since_c_0010": 0,
+  "new_inbox_events": 0,
+  "inbox_age_hours": 9.9,
+  "new_commits_this_fire": 0,
+  "new_receipts_this_fire": 0,
+  "newest_courier_receipt": "2026-09-08T00:49:38-05:00 (16.4 h) - and none of the five is a courier receipt; \\\\Zoltar\\\\ZoltarLead-Courier has never written one",
+  "orders_uncommitted_in_clone": 6,
+  "nodes_with_heartbeat_in_git": {
+   "zoltarlead": "2026-09-08T17:01:01-05:00 (0.3 h)",
+   "zoltarone": "2026-09-07T17:00:01-05:00 (24.3 h)"
+  },
+  "nodes_without_heartbeat_in_git": [
+   "zoltargenesis",
+   "zoltartwo",
+   "zoltarstar"
+  ]
+ },
+ "assessment": "One thing changed on the board this hour and it is a correction, not progress: t-20260908-zoltarone-installer-substitution, the F-ZS-5 probe that c-0010's own fire created at 16:12 CDT, was left approved and undispatched by that fire and is not listed anywhere in c-0010 - not in its items, not in folded_from_board, not in approved_not_dispatched. It is dispatched now. That gap matters more than the probe does: a dispatcher that creates a task and then omits it from the same cycle has no mechanism that would ever notice, because the next fire only knows what the board and the cycle say. Everything else is exactly as c-0010 read it, and c-0010's assessment stands unamended - origin/main in this clone is still a3ad2ff against the board's a246ccf, FETCH_HEAD is 16.9 h old, the courier has still never run, no executor receipt has ever arrived, the gate is amber with zero blocking on the review protocol, and six order files now sit uncommitted in the clone. The bootstrap named in c-0010.1 is untouched and is still the whole gap: one hand-started session on this machine installs the courier and six files start moving, including c-0002.1, whose 1-minute-bar window closes around 2026-09-16 - eight days. ZoltarOne has now been silent for 24.3 hours against an hourly beat, which has crossed from late into a full day; the probe dispatched this fire is the one thing on the board that would distinguish a dead machine from a misdirected executor, and it cannot reach the node until the same courier exists. No push this fire: nothing newly qualifies under the runbook's notify rule and every standing item was pushed 1.0 h ago.",
+ "items": [
+  {
+   "id": "c-0011.1",
+   "kind": "finding",
+   "for": "andrew",
+   "priority": "later",
+   "title": "The parallel cap has now been exceeded on two consecutive fires - either raise it or make it binding.",
+   "why": "policy/current.max_parallel_per_node = 1. c-0010 exceeded it deliberately for zoltarlead and recorded a deviation; this fire exceeded it for zoltarone and recorded an interpretation. Two fires running is the point at which a policy field stops constraining anything and starts documenting that it does not. The spec is genuinely ambiguous - section 3 lists max_parallel_per_node as an L3 gate, while the dispatcher runbook's section 3 names only three dispatch conditions and the cap is not among them - so this is your call, not a reading I should keep making per fire. Both exceedances are also arguably moot: no courier has ever run, so no node has ever had even one order in flight in any physical sense.",
+   "acceptance": "policy/current carries either max_parallel_per_node raised to 2+ with a history entry, or an explicit note that the cap binds at L1 and the dispatcher must queue - after which no fire records a deviation again."
+  },
+  {
+   "id": "c-0011.2",
+   "kind": "note",
+   "for": "cowork",
+   "priority": "later",
+   "title": "A fire that creates a task must dispatch it or name it as not-dispatched in the same fire.",
+   "why": "c-0010 created t-20260908-zoltarone-installer-substitution three minutes before it sealed its own cycle and then left it out of every list in that cycle. Nothing downstream would have surfaced it; it was found only because this fire re-derived status for all 26 tasks from events rather than trusting the previous receipt's not_dispatched list. Deriving from events, never from the last receipt, is the habit that caught it and is the habit to keep.",
+   "acceptance": "Every future dispatcher-receipt accounts for every task whose derived status is approved - in dispatched or in not_dispatched - with no task appearing in neither."
+  }
+ ],
+ "folded_from_board": [
+  {
+   "task": "t-20260908-zoltarone-installer-substitution",
+   "created_at": "2026-09-08T16:12:33-05:00",
+   "by": "zoltarlead/cowork (previous fire)",
+   "note": "Board task with origin db, created after c-0009 and omitted from c-0010. Folded here and dispatched this fire. Kept at its board id; no cycle-item id assigned."
+  }
+ ],
+ "dispatched_this_fire": [
+  {
+   "task": "t-20260908-zoltarone-installer-substitution",
+   "node": "zoltarone",
+   "order": "orders/zoltarone/t-20260908-zoltarone-installer-substitution.md",
+   "approval": "policy L1 auto-approval, class probe (no Andrew approval required or claimed)",
+   "event": "e-000077-dspsub"
+  }
+ ],
+ "approved_not_dispatched": [
+  {
+   "task": "t-20260908-join-zoltarstar",
+   "reason": "Approved by Andrew (e-000071) but the node has no clone, identity, heartbeat or executor. An orders/zoltarstar/ file would show a delivery that cannot happen. Carrier is the brief in claude/join-zoltarstar.md, which Andrew pastes at that machine. Standing since c-0010; not re-raised."
+  },
+  {
+   "task": "t-20260908-dispatcher-runbook",
+   "reason": "for: brain, not a node - no order file exists for it. First half of its acceptance is met (the runbook exists and this fire executed it end to end); the second half needs one task round-tripping to git_state committed, which needs the courier. Not marked done. Comment e-000069-runbk stands."
+  }
+ ],
+ "policy_deviation": {
+  "rule": "policy/current.max_parallel_per_node = 1",
+  "what": "zoltarone already held t-20260908-executor-dispatch-branch as dispatched; the F-ZS-5 probe was dispatched to it anyway.",
+  "why": "Nothing is in flight on the machine - no courier has ever pushed fleet/dispatch, so zoltarone has never seen either order file. F-ZS-5 alleges the executor may not read orders/zoltarone at all, which would make the already-dispatched order undeliverable; the probe is the test of that. Dispatched on the reading that the cap is an L3 gate per research-engine-spec section 3. Recorded, not hidden, and escalated as c-0011.1 rather than repeated silently.",
+  "second_consecutive": true
+ },
+ "notified_andrew": [],
+ "notify_suppressed_because": "Runbook section 7: no task newly waiting on Andrew, no refused receipt, no new goal clock inside 3 days. ZoltarOne's silence and the courier bootstrap are both standing items pushed at 16:16 CDT, 1.0 h ago, and the 24 h re-notify floor applies.",
+ "kb": {
+  "tier_read": "Drive - exactly one index.md, id 1oMbxIKqGW-fgByhH1_t4FLf3g-Mvz8Um, 2026-09-08T12:03:25Z, 12819 bytes, no fork",
+  "local_tier": "C:\\\\Shared\\\\lessons-learned-kb is not a connected folder for this session - unreachable",
+  "applied": "handoff__described-intent-as-completed-state (the probe is recorded as dispatched and written, explicitly not as delivered or run); fleet__tier-owned-field-written-by-another-tier (no heartbeat stamp copied onto a card whose shell tier has written nothing - zoltargenesis, zoltartwo and zoltarstar stay null); time__local-stamp-written-from-utc-clock (every stamp America/Chicago -05:00, clock re-read immediately before each write); memory__answered-from-stale-read-placeholder (status re-derived from all 54 events rather than read off the previous receipt - this is what caught the omitted task)",
+  "write": "frozen - nothing written"
+ },
+ "by": {
+  "agent_id": "zoltarlead/cowork",
+  "node_id": "zoltarlead",
+  "hostname": "zoltarlead",
+  "lane": "cowork",
+  "verified": true,
+  "at": "2026-09-08T17:17:18-05:00",
+  "hostname_source": "get_device_info.deviceName vs fleet/identity.json attested_hostnames (case-insensitive match)",
+  "reachable": {
+   "files": "ok",
+   "db": "ok",
+   "device_shell": "unavailable this fire"
+  }
+ }
+}

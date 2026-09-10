@@ -1,0 +1,257 @@
+{
+ "cycle_id": "c-0009",
+ "opened_at": "2026-09-08T15:14:30-05:00",
+ "opened_by": "cowork",
+ "quiet": false,
+ "written_without_review_py": true,
+ "_note": "Written directly as a file: this fire had no shell on the device, so review.py open-cycle could not assign the id or stamp it, and no beat was recorded. Cycles remain immutable.",
+ "state_snapshot": {
+  "clone_head_branch": "fleet/rejoin-zoltarlead",
+  "clone_head_sha": "9115058",
+  "clone_origin_main_ref": "a3ad2ff",
+  "board_origin_main_per_merge_event": "a246ccf",
+  "fetch_head_age_hours": 14.9,
+  "gate": "amber",
+  "blocking": 0,
+  "phase": "1a",
+  "board": {
+   "tasks": 23,
+   "events": 37,
+   "max_lamport": 63,
+   "newest_event_at": "2026-09-08T14:44:05-05:00"
+  },
+  "nodes_with_heartbeat_in_git": [
+   "zoltarlead",
+   "zoltarone"
+  ],
+  "nodes_without_heartbeat_in_git": [
+   "zoltargenesis",
+   "zoltartwo"
+  ],
+  "policy_level": 1
+ },
+ "assessment": "First dispatcher fire under claude/dispatcher-runbook.md, and it found the loop is built but not connected. Three approved tasks had never been dispatched, so orders/zoltarlead/c-0002.1.md, orders/zoltarone/t-20260908-executor-dispatch-branch.md and orders/zoltargenesis/t-20260908-genesis-inventory.md were written into the clone this fire and posted as dispatch events. None of them can reach a node yet: .git/FETCH_HEAD on this clone is 14.9 hours old and origin/main still reads a3ad2ff here while the board recorded the merge to a246ccf at 13:54, so nothing has entered or left this machine since 05:22 CDT. The courier that would close that hop is t-20260908-courier-zoltarlead, class fleet, priority now, sitting at proposed because L1 does not auto-approve fleet - it is the one click that turns every dispatch on this board into work a machine actually does, and Andrew was on the board 30 minutes ago and approved the consumer (t-20260908-executor-dispatch-branch) without approving the carrier. Meanwhile the irreversible clock is unchanged: c-0002.1 expires around 2026-09-16, eight days out, and c-0007.1 - name the date that runs it - is still open on Andrew. On evidence rather than assertion: zoltarone last heartbeat 2026-09-07T17:00 CDT (22.2 h), zoltargenesis and zoltartwo have no heartbeat file in git at all, so of the four cards only zoltarlead is inside its cadence. This fire could not run review.py or emit_build_status.py - no shell on the device in this session - so this cycle was written as a file and no beat was recorded; the id c-0009 is the next free one and no other writer produces cycles.",
+ "items": [
+  {
+   "id": "c-0009.1",
+   "kind": "finding",
+   "for": "andrew",
+   "priority": "now",
+   "title": "Orders are being written with no transport to carry them: this clone has not fetched or pushed in 14.9 hours.",
+   "why": "The dispatch loop's three hops are board -> order file -> git -> executor. This fire proved hop one works and hop two does not exist on ZoltarLead: FETCH_HEAD is 2026-09-08T00:22 CDT, origin/main here reads a3ad2ff while the board's merge event records a246ccf at 13:54, and fleet/receipts/zoltarlead/ has nothing newer than 00:49. Every order written today is therefore a file on one machine, which is exactly the five-day split-brain that cost this build its cycles - the same shape, now with the plan on the board instead of in a cycle file. It is not a research limit, it is one approval: t-20260908-courier-zoltarlead is class fleet, so L1 will not auto-approve it, and it has waited since 12:27 today while the task that consumes what the courier would carry was approved at 14:41.",
+   "acceptance": "t-20260908-courier-zoltarlead is approved on the board; a later fire reads a courier receipt under fleet/receipts/zoltarlead/ newer than 2026-09-08T15:00 CDT, and orders/zoltarone/t-20260908-executor-dispatch-branch.md is present on origin/fleet/dispatch. Until then no dispatch event on this board may be read as work reaching a machine.",
+   "depends_on": [],
+   "refs": [
+    "t-20260908-courier-zoltarlead",
+    "claude/dispatcher-runbook.md",
+    "fleet/receipts/zoltarlead/",
+    ".git/FETCH_HEAD"
+   ]
+  },
+  {
+   "id": "c-0009.2",
+   "kind": "note",
+   "for": "cowork",
+   "priority": "later",
+   "title": "c-0001.2 has had no event since 2026-09-02T16:44 CDT and is still derived as running.",
+   "why": "Six days with a start and a comment saying 'progress, NOT done' and nothing since. It is the only task holding a node slot on zoltarlead against max_parallel_per_node: 1, and this fire dispatched c-0002.1 to that node anyway because a six-day-silent task is not occupying a machine and the c-0002.1 deadline is irreversible. That judgement is recorded here rather than hidden: if c-0001.2 is genuinely in flight, this fire over-dispatched by one.",
+   "acceptance": "Either an event on c-0001.2 saying where it stands, or a blocked/cancel event closing it.",
+   "depends_on": [],
+   "refs": [
+    "c-0001.2",
+    "policy/current"
+   ]
+  }
+ ],
+ "folded_from_board": [
+  {
+   "id": "t-20260908-courier-zoltarlead",
+   "kind": "work_order",
+   "for": "zoltarlead/claude-code",
+   "priority": "now",
+   "title": "Install a Claude-free courier on ZoltarLead: commit bridge/ + orders/ + fleet/msgs to fleet/dispatch every 10 min",
+   "why": "The db\u2192git hop has no courier on ZoltarLead; that is why five days of cycles never left the machine. A scheduled PowerShell task that only commits and pushes (never runs a model) closes it deterministically. Also runs scripts/fleet_sync.py.",
+   "acceptance": "Scheduled task \\Zoltar\\ZoltarLead-Courier exists (S4U, 10 min, at boot); a file dropped in bridge/dispatch appears on origin/fleet/dispatch within 10 minutes; receipt written on failure too",
+   "depends_on": [
+    "t-20260908-merge-rejoin"
+   ],
+   "origin": "db",
+   "class": "fleet",
+   "board_status": "folded from the board into git; the board remains the live copy"
+  },
+  {
+   "id": "t-20260908-dispatcher-runbook",
+   "kind": "work_order",
+   "for": "brain",
+   "priority": "now",
+   "title": "Dispatcher runbook: brains mirror tasks db\u2192order files and receipts\u2192events",
+   "why": "The board is a mirror. A brain with device access must, every fire: (1) read tasks whose derived status is approved and write orders/<node>/<task_id>.md into the clone (or the node's bridge/inbox); (2) read receipts from fleet/bridge/outbox and fleet/receipts-* and post receipt events here; (3) post commit events with the sha once a courier lands them. Genesis's cloud brain is db-only and does neither.",
+   "acceptance": "claude/dispatcher-runbook.md in the project; one task round-trips db \u2192 order \u2192 receipt \u2192 event with git_state committed",
+   "depends_on": [],
+   "origin": "db",
+   "class": "docs",
+   "board_status": "folded from the board into git; the board remains the live copy"
+  },
+  {
+   "id": "t-20260908-executor-dispatch-branch",
+   "kind": "work_order",
+   "for": "zoltarone/claude-code",
+   "priority": "now",
+   "title": "Executors take orders from origin/fleet/dispatch, not only from main",
+   "why": "Today run-order.ps1 reads orders/<node>/ from the working tree and only pulls when on main \u2014 so every dispatch needs a trunk merge, which is the single thing that blocks autonomy. Reading orders from a fetched fleet/dispatch ref (git show origin/fleet/dispatch:orders/<node>/\u2026) makes dispatch trunk-free while main stays Andrew's.",
+   "acceptance": "On ZoltarOne and ZoltarGenesis an order pushed to fleet/dispatch is consumed within one cycle with provenance \"dispatch\" on the receipt; nothing on main changed",
+   "depends_on": [
+    "t-20260908-merge-rejoin"
+   ],
+   "origin": "db",
+   "class": "build",
+   "board_status": "folded from the board into git; the board remains the live copy"
+  },
+  {
+   "id": "t-20260908-genesis-binding",
+   "kind": "decision",
+   "for": "andrew",
+   "priority": "next",
+   "title": "Bind the ZoltarGenesis Cowork task to the device (F-ZG-4)",
+   "why": "Thirteen consecutive device-less fires: the Genesis brain can read and write this board but cannot touch that machine's files, so it cannot drain orders into the executor's inbox. Recreating the task from the desktop app on that machine binds it. Alternative: leave it db-only and rely on the git channel (works today).",
+   "acceptance": "fleet/heartbeat/zoltargenesis.json on disk advances on a scheduled fire",
+   "depends_on": [],
+   "origin": "db",
+   "class": "fleet",
+   "board_status": "folded from the board into git; the board remains the live copy"
+  },
+  {
+   "id": "t-20260908-genesis-inventory",
+   "kind": "work_order",
+   "for": "zoltargenesis/claude-code",
+   "priority": "next",
+   "title": "Inventory the StockPicker lineage on ZoltarGenesis: what it does that zoltar-ranks does not",
+   "why": "Andrew says this code goes further than the current ranks at the same problem \u2014 ingesting ranks, finding execution biases, recommending actionable changes. A read-only inventory (modules, entry points, data it expects, what it outputs) is the cheapest way to decide what to port into ZoltarUnlimited. Never read credential files.",
+   "acceptance": "docs/genesis-inventory.md on a branch: module map, entry points, inputs/outputs, overlap with zoltar-ranks, top 3 candidates to port",
+   "depends_on": [],
+   "origin": "db",
+   "class": "probe",
+   "board_status": "folded from the board into git; the board remains the live copy"
+  },
+  {
+   "id": "t-20260908-join-zoltarstar",
+   "kind": "work_order",
+   "for": "zoltarstar/claude-code",
+   "priority": "next",
+   "title": "Join ZoltarStar: clone, identity card, probe, heartbeat, executor",
+   "why": "The most capable machine after the Legion is not in the fleet. Joining it after 9115058 lands means it inherits the transport protocol and the interpreter fix instead of the five-day defect.",
+   "acceptance": "data/fleet/nodes/zoltarstar.json from a real probe; hostmap row; one courier round trip; executor proof 5/5",
+   "depends_on": [
+    "t-20260908-merge-rejoin"
+   ],
+   "origin": "db",
+   "class": "fleet",
+   "board_status": "folded from the board into git; the board remains the live copy"
+  },
+  {
+   "id": "t-20260908-kb-into-git",
+   "kind": "work_order",
+   "for": "zoltarlead/claude-code",
+   "priority": "next",
+   "title": "Move the Lessons-Learned KB into kb/ in git with a generated index",
+   "why": "The Drive-tier mutation protocol can delete every lesson on one empty read (F-ZT-6/7), which is why the KB is frozen. Append-only lesson files + a generated index remove the bug class; Drive and C:\\Shared become stamped read-only mirrors. Union three tiers (Drive ~18, ZoltarLead 2, ZoltarOne \u22651), reading each lesson twice.",
+   "acceptance": "kb/ on a branch with scripts/kb_index.py; index.md regenerates identically twice; Drive untouched",
+   "depends_on": [
+    "t-20260908-merge-rejoin"
+   ],
+   "origin": "db",
+   "class": "build",
+   "board_status": "folded from the board into git; the board remains the live copy"
+  },
+  {
+   "id": "t-20260908-merge-rejoin",
+   "kind": "decision",
+   "for": "andrew",
+   "priority": "now",
+   "title": "Merge fleet/rejoin-zoltarlead @ 9115058 into main",
+   "why": "Until it lands, any new node (ZoltarStar next) clones a3ad2ff and onboards with the exact defect that cost five days: no transport protocol, no ZoltarLead node card, no interpreter fix. Five days of review cycles stay unpublished.",
+   "acceptance": "git ls-remote origin main returns a sha that contains 9115058",
+   "depends_on": [],
+   "origin": "db",
+   "class": "trunk",
+   "board_status": "folded from the board into git; the board remains the live copy"
+  },
+  {
+   "id": "t-20260908-rotate-credentials",
+   "kind": "decision",
+   "for": "andrew",
+   "priority": "now",
+   "title": "Rotate the Robinhood and Gmail credentials found in plaintext on ZoltarGenesis (StockPicker/.env, credentials.py)",
+   "why": "Not a zoltar-ranks file and not committed anywhere \u2014 but one git init away from being published, on a machine that now has a git remote. Rotate first; then move both files out of any possible repo root.",
+   "acceptance": "Both passwords rotated; StockPicker/.env and credentials.py no longer contain live values",
+   "depends_on": [],
+   "origin": "db",
+   "class": "fleet",
+   "board_status": "folded from the board into git; the board remains the live copy"
+  },
+  {
+   "id": "t-20260908-wevtutil",
+   "kind": "work_order",
+   "for": "andrew",
+   "priority": "next",
+   "title": "Enable the TaskScheduler operational log on every node (elevated)",
+   "why": "With the log disabled a missed fire and a missing log entry are byte-identical, so c-0005.1's cause was unrecoverable. One elevated one-liner per node: wevtutil set-log Microsoft-Windows-TaskScheduler/Operational /enabled:true",
+   "acceptance": "wevtutil gl Microsoft-Windows-TaskScheduler/Operational shows enabled: true on zoltarlead, zoltarone, zoltargenesis",
+   "depends_on": [],
+   "origin": "db",
+   "class": "fleet",
+   "board_status": "folded from the board into git; the board remains the live copy"
+  },
+  {
+   "id": "t-20260908-zoltartwo-git-auth",
+   "kind": "work_order",
+   "for": "andrew",
+   "priority": "next",
+   "title": "One interactive git login on ZoltarTwo",
+   "why": "ZoltarTwo has a local branch it cannot push (cmdkey shows no GitHub entry). Until then it is unregistered by the fleet's own rule.",
+   "acceptance": "git ls-remote --heads origin fleet/join-zoltartwo returns a sha",
+   "depends_on": [],
+   "origin": "db",
+   "class": "fleet",
+   "board_status": "folded from the board into git; the board remains the live copy"
+  }
+ ],
+ "mirror_aliases": {
+  "c-0008.1": "t-20260908-rotate-credentials",
+  "c-0008.3": "t-20260908-wevtutil"
+ },
+ "dispatched_this_fire": [
+  {
+   "task": "c-0002.1",
+   "node": "zoltarlead",
+   "order": "orders/zoltarlead/c-0002.1.md"
+  },
+  {
+   "task": "t-20260908-executor-dispatch-branch",
+   "node": "zoltarone",
+   "order": "orders/zoltarone/t-20260908-executor-dispatch-branch.md"
+  },
+  {
+   "task": "t-20260908-genesis-inventory",
+   "node": "zoltargenesis",
+   "order": "orders/zoltargenesis/t-20260908-genesis-inventory.md"
+  }
+ ],
+ "by": {
+  "agent_id": "zoltarlead/cowork",
+  "node_id": "zoltarlead",
+  "hostname": "zoltarlead",
+  "lane": "cowork",
+  "verified": true,
+  "at": "2026-09-08T15:14:30-05:00",
+  "hostname_source": "mcp__remote-devices__get_device_info.deviceName",
+  "matched_attested": [
+   "ZOLTARLEAD",
+   "ZoltarLead"
+  ],
+  "reachable": {
+   "files": "ok",
+   "db": "ok"
+  }
+ }
+}

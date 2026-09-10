@@ -1,0 +1,137 @@
+{
+ "cycle_id": "c-0013",
+ "opened_at": "2026-09-09T07:19:16-05:00",
+ "opened_by": "zoltarlead/cowork",
+ "by": {
+  "agent_id": "zoltarlead/cowork",
+  "node_id": "zoltarlead",
+  "hostname": "zoltarlead",
+  "lane": "cowork",
+  "hostname_source": "get_device_info.deviceName vs fleet/identity.json attested_hostnames (case-insensitive match)",
+  "verified": true,
+  "at": "2026-09-09T07:19:16-05:00",
+  "reachable": {
+   "files": "ok",
+   "db": "ok",
+   "device_shell": "unavailable this fire"
+  }
+ },
+ "quiet": false,
+ "written_without_review_py": true,
+ "_note": "Third consecutive fire with no shell on the device (no device_bash tool in this session), so dashboard/review.py open-cycle could not assign the id or seal the file and no beat was recorded. Id assigned by hand as the successor to c-0012; the file is immutable from here like every other cycle.",
+ "state_snapshot": {
+  "read_at": "2026-09-09T07:19:16-05:00",
+  "board": {
+   "tasks": 29,
+   "events": 58,
+   "max_lamport": 83,
+   "newest_event_at": "2026-09-08T17:37:16-05:00",
+   "age": "13.0 h; identical to what the 18:16 CDT fire read - no task, approval, reply, dispatch or receipt since",
+   "policy_level": 1,
+   "away_mode": false,
+   "status_method": "re-derived for all 29 tasks from all 58 events ordered by lamport; the previous receipt's lists were not trusted (c-0011.2)"
+  },
+  "build_status": {
+   "generated_at": "2026-09-09T07:00:26-05:00",
+   "age": "0.29 h",
+   "gate": "amber",
+   "headline": "Running, but not yet trustworthy - 5 blocker gate(s) never run or stale.",
+   "changed_since_c-0012": "Two new clean runs (harvest_evening 2026-09-08T21:30:21, harvest_premarket 2026-09-09T07:00:26). No job, gate, phase, blocker or contract-test status changed; the five blocker gates are still stale at 2026-09-02T16:43:33."
+  },
+  "review_state": {
+   "mtime": "2026-09-09T07:00:27-05:00",
+   "age": "0.29 h"
+  },
+  "inbox_jsonl": {
+   "age": "24.0 h",
+   "new_events": 0
+  },
+  "charter": {
+   "age": "6.7 d"
+  },
+  "heartbeats": {
+   "zoltarlead": {
+    "at": "2026-09-09T07:01:01-05:00",
+    "age": "0.29 h",
+    "branch": "fleet/rejoin-zoltarlead",
+    "head_sha": "9115058",
+    "dirty": true,
+    "probe_rc": 0
+   },
+   "zoltarone": {
+    "at": "2026-09-07T17:00:01-05:00",
+    "age": "30.8 h",
+    "note": "30 missed hourly beats; was 25.3 h at c-0012"
+   },
+   "zoltargenesis": "ABSENT from this clone",
+   "zoltartwo": "ABSENT from this clone",
+   "zoltarstar": "ABSENT from this clone"
+  },
+  "git": {
+   ".git/FETCH_HEAD age": "30.9 h (was 17.9 h at c-0012)",
+   "origin/main ref here": "a3ad2ff, 30.9 h stale; the board's merge event e-000050 records a246ccf",
+   "courier receipts": "none, ever - newest file in fleet/receipts/zoltarlead/ is 30.5 h old and is a fleet_sync transport receipt",
+   "orders/ uncommitted": 6,
+   "oldest stranded order": "orders/zoltarlead/c-0002.1.md, 16.0 h"
+  },
+  "deadline": {
+   "at": "2026-09-16T00:00:00-05:00",
+   "days_out": 6.7,
+   "ref": "c-0007.1",
+   "irreversible": true
+  },
+  "kb": {
+   "local": "C:\\Shared\\lessons-learned-kb UNREACHABLE - not a connected folder for this session (unreachable, not empty)",
+   "drive": "index.md rev 23 (id 1FrUrhmnnmYOWi2oHm7tyEtphZZo_S356, 20 rows, trailer present, downloaded not snippet-read, exactly one index.md); rules.md rev 3 (id 180XZQXeuZE4MoaBaym4vNgNn2yTp527V, 3 promoted rules)",
+   "written": "nothing - the KB stays write-frozen until kb/ lands in git"
+  }
+ },
+ "assessment": "Nothing on this board moved overnight, and after 13 hours that is the finding rather than the weather: 29 tasks, 58 events, max lamport 83 - byte for byte what the last fire read. What did move is an age, and it is the age that decides everything else. The ZoltarLead clone has not fetched in 30.9 hours and its courier has still never written a receipt, so the six order files written on 2026-09-08 are 14 to 16 hours old with no carrier and origin/main here still reads a3ad2ff against the board's a246ccf. The distinction this cycle exists to keep sharp is that dispatched is not delivered: this board has never once had a receipt carrying a branch sha, so every task it shows as dispatched is more honestly described as written down. The machine is not the problem - ZoltarLead's worker beat 0.29 h ago with a clean probe, both overnight harvests ran green, and the gate is amber for exactly the five contract tests it has been amber for since 2026-09-02. Transport is the problem, and the fix is one manual act on one machine, unchanged since c-0010 named it. Two clocks are now running against that inaction rather than against anyone's judgment: c-0002.1's 1-minute-bar window is 6.70 days out and irreversible, and its order has never left the clone; and ZoltarOne has been silent 30.8 hours, past a full day, while the read-only probe that would tell a dead machine from a misdirected executor sits in the same stranded queue - the instrument needs the carrier it was meant to diagnose. One thing genuinely new arrived from outside the fleet: both Drive KB files were rebuilt-and-trashed overnight by other sessions, which is the precise destructive protocol F-ZT-6/7 names, so the freeze is holding only over the lanes that read the freeze. That does not change what this fire writes to the KB, which is nothing. It does raise the price of leaving t-20260908-kb-v2-repo-decision unanswered.",
+ "items": [
+  {
+   "id": "c-0013.1",
+   "kind": "risk",
+   "for": "andrew",
+   "priority": "now",
+   "title": "Six orders, 30.9 h without a fetch, and an irreversible clock 6.70 days out - all waiting on one manual session.",
+   "why": "The end goal needs c-0002.1's intraday alignment anchor, and yfinance keeps only ~28 days of 1-minute bars, so the window closing 2026-09-16 cannot be reopened. c-0002.1 was dispatched 16.0 h ago and its order file has never left the clone, because ZoltarLead is the one node with no executor and no working courier. Approving the courier did not install it. Until one Claude Code session runs orders/zoltarlead/t-20260908-courier-zoltarlead.md on that machine, every dispatch this board makes is a file on a disk nobody fetches, and the two remaining unknowns behind it - is ZoltarOne dead or misdirected, and does the executor read fleet/dispatch - stay unknowable.",
+   "acceptance": "fleet/receipts/zoltarlead/ contains a courier receipt written after 2026-09-09, .git/FETCH_HEAD on the clone is under 30 minutes old, and at least one events/receipt or events/commit document on this board carries a real branch sha for one of the six stranded orders. Nothing short of a sha counts."
+  },
+  {
+   "id": "c-0013.2",
+   "kind": "finding",
+   "for": "cowork",
+   "priority": "next",
+   "title": "The KB freeze is holding only over the lanes that read it: both Drive files were rebuilt-and-trashed overnight by other sessions.",
+   "why": "F-ZT-6/7 is a mutation protocol that can delete the KB on one empty read. It is behind a freeze rather than behind a fix, and the freeze is honoured by the fleet lanes because they read it - but rules.md rev 3 was published 2026-09-08T20:24 CDT by a scheduled eBay-scan task and index.md rev 23 at 2026-09-09T04:40 CDT by an interactive chat session, each rebuilding whole and trashing the prior id. So the unsafe protocol is running nightly in lanes the freeze does not reach, which is exactly the exposure t-20260908-kb-v2-repo-decision is meant to close. This is recorded, not acted on: no fire writes to a frozen KB to make a point.",
+   "acceptance": "t-20260908-kb-v2-repo-decision carries a reply event naming the repo, and until it does, every dispatcher receipt records the Drive rev numbers it observed so the drift is measured rather than assumed."
+  },
+  {
+   "id": "c-0013.3",
+   "kind": "note",
+   "for": "cowork",
+   "priority": "later",
+   "title": "Chase on c-0007.1 posted as e-000084-chs071; no duplicate item raised for any standing Andrew queue.",
+   "why": "c-0001.5, c-0003.1, c-0007.1 and t-20260908-genesis-binding have all been open with Andrew for more than a day. The runbook is explicit that silence gets a short note, not a re-raised item, and that answering for Andrew is the worst failure available to a brain. Only c-0007.1 was chased, because only c-0007.1 has an irreversible clock and new information to carry (its input is stranded).",
+   "acceptance": "No item in this cycle duplicates an open board task, and the event log shows exactly one chase event this fire."
+  }
+ ],
+ "folded_from_board": [],
+ "folded_from_board_note": "No board task has been created since c-0012 sealed. Max lamport is unchanged at 83.",
+ "dispatched_this_fire": [],
+ "dispatched_none_because": "No task derives approved-and-undispatched-to-a-node. Exactly one derives approved and undispatched - t-20260908-dispatcher-runbook - and it is for: brain, so there is no node and no order file to write; standing comment e-000069-runbk. The five already-dispatched tasks keep their dispatch events and were not re-dispatched: an order file that already exists is idempotent by construction and a second dispatch event would be a false signal of progress.",
+ "policy_deviation": null,
+ "policy_deviation_note": "None. Nothing was dispatched, so max_parallel_per_node=1 was not tested. c-0011.1 (raise the cap or make it binding) is still open with Andrew and is not re-raised.",
+ "notify": {
+  "pushed": true,
+  "trigger": "Runbook section 7(c) - a node the plan depends on silent > 3 h - read on ZoltarLead's own carrier rather than on ZoltarOne.",
+  "text": "the courier bootstrap: one manual session on ZoltarLead, 6.70 days to the 1-minute-bar window",
+  "re_notify_check": "The last recorded push was 2026-09-08T16:16 CDT (15.0 h ago) and the receipt for that fire records its subject as ZoltarOne's silence, not the courier. Treated as a first notification for the courier deadlock, with the uncertainty stated in the receipt rather than resolved by assumption. If it was in fact the same subject, this push is 15.0 h inside the 24 h floor and is the one deviation this fire made."
+ },
+ "kb": {
+  "read": "Drive tier in full - index.md rev 23 (20 rows, trailer present), rules.md rev 3 (3 promoted rules)",
+  "applied": "time__local-stamp-written-from-utc-clock (clock re-read immediately before each stamped write); rules rev 3 rule 2 (every age rendered with its reason, and ZoltarOne's cpu_pct/ram_free_gb marked as measuring the 2026-09-07 file, not the machine); fleet__tier-owned-field-written-by-another-tier (no heartbeat stamp copied onto the three nodes with no heartbeat file); kb__retrieved-from-truncated-search-snippet (index.md downloaded and base64-decoded, excludeContentSnippets true, trailer verified); memory__answered-from-stale-read-placeholder (all 29 statuses re-derived from events)",
+  "written": "nothing - frozen until kb/ lands in git",
+  "drive_leg": "SKIPPED - CUTOVER section 5 is not green; t-20260908-kb-v2-cutover is still proposed and its gating decision is unanswered"
+ }
+}
