@@ -1,0 +1,170 @@
+{
+ "cycle_id": "c-0016",
+ "opened_at": "2026-09-11T07:19:58-05:00",
+ "opened_by": "cowork",
+ "by": {
+  "agent_id": "zoltarlead/cowork",
+  "node_id": "zoltarlead",
+  "hostname": "zoltarlead",
+  "hostname_source": "get_device_info.deviceName vs fleet/identity.json attested_hostnames (case-insensitive match)",
+  "lane": "cowork",
+  "verified": true,
+  "at": "2026-09-11T07:19:58-05:00",
+  "reachable": {
+   "files": "ok",
+   "db": "ok",
+   "device_shell": "unavailable this fire"
+  }
+ },
+ "quiet": false,
+ "written_without_review_py": true,
+ "_note": "Written by the cowork lane, which has no shell on this device and cannot run dashboard/review.py open-cycle. The id is assigned by hand as the successor to c-0015 and the file is left uncommitted for the courier. Kinds used here are work_order, decision, risk and finding only - no kind: note, which is an inbox event type and not an item kind (see t-20260910-cycle-kind-invalid, the outstanding defect in c-0009..c-0014).",
+ "state_snapshot": {
+  "read_at": "2026-09-11T07:19:58-05:00",
+  "board": {
+   "tasks": 33,
+   "events": 82,
+   "max_lamport": 107,
+   "bus": 42,
+   "fleet_live": 5,
+   "policy_level": 1,
+   "away_mode": false,
+   "age": "MOVED. Andrew commented on the board at 2026-09-10T21:15:34-05:00 (e-000100-3y1x6y, on c-0007.1) - his first board action in about 49 h - asking for confirmation before merging 'PR #3 a246ccf'. Seven events were appended by this fire (101-107).",
+   "status_method": "re-derived from all 75 pre-existing events ordered by lamport, tie-break at; policy L1 auto-approval applied to classes probe/research/docs only and never to a question or decision"
+  },
+  "build_status": {
+   "generated_at": "2026-09-11T07:00:20-05:00",
+   "age": "0.33 h",
+   "gate": "amber",
+   "headline": "Running, but not yet trustworthy - 5 blocker gate(s) never run or stale.",
+   "changed_since_c-0015": "NOTHING IN THE BUILD. The 07:00 CDT premarket run completed all six steps ok with rows 0; the gate, the phases, the blockers and the contract tests are unmoved and the five blocker gates are still stale at 2026-09-02T16:43:33. Everything that moved this fire moved in git and on the board, not in the pipeline."
+  },
+  "review_state": {
+   "generated_at": "2026-09-11T07:00:19-05:00",
+   "age": "0.33 h",
+   "current_cycle": "c-0015",
+   "protocol_heartbeat": "STILL LATE since 2026-09-08T13:12 CDT, last_cycle c-0008 - eight cycles have now been written without a beat line, because this lane cannot run review.py. Unchanged and still named in the courier ORDER_RESULT."
+  },
+  "inbox_jsonl": {
+   "file_mtime": "2026-09-11T06:31:19Z",
+   "mtime_age": "0.81 h",
+   "newest_parsed_event": "2026-09-08T00:51:58-05:00",
+   "newest_event_age": "79.5 h",
+   "new_events": 0,
+   "note": "The mtime is the courier's reset-to-remote rewriting line endings, NOT an append. No party has posted to the inbox in 79.5 h. Stating both numbers because treating the mtime as the event age would have read as activity where there is none."
+  },
+  "charter": {
+   "age": "8.7 d"
+  },
+  "heartbeats": {
+   "zoltarlead": {
+    "at": "2026-09-11T07:01:01-05:00",
+    "age": "0.32 h",
+    "branch": "fleet/courier-zoltarlead",
+    "head_sha": "a13380c",
+    "dirty": true,
+    "probe_rc": 0,
+    "note": "moved 57ed181 -> a13380c, which is the same sha origin/main passed through at 06:29:33Z"
+   },
+   "zoltarone": {
+    "at": "2026-09-07T17:00:01-05:00",
+    "age": "86.3 h",
+    "note": "86 missed hourly beats. The 24 h re-notify floor expired at 2026-09-11T07:19 CDT; deliberately not pushed this fire - one push per fire, and the trunk news is the larger item."
+   },
+   "zoltargenesis": "ABSENT from this clone - last_heartbeat_at null, never a copied stamp",
+   "zoltartwo": "ABSENT from this clone",
+   "zoltarstar": "ABSENT from this clone - one message, no measurement"
+  },
+  "git": {
+   ".git/FETCH_HEAD age": "0.14 h",
+   "origin/main ref here": "1a05afa - MOVED TWICE OVERNIGHT after eleven days frozen. .git/logs/refs/remotes/origin/main: a246ccf -> a13380c 'fetch origin: fast-forward' 2026-09-11T06:29:33Z; a13380c -> 1a05afa 'fetch --prune origin: fast-forward' 06:42:26Z. Both fast-forwards, so the new tip descends from a246ccf. WHETHER orders/ IS ON IT IS UNVERIFIED - refs cannot say and this lane has no git.",
+   "origin/fleet/dispatch ref here": "74ac4e8, pushed by the courier at 2026-09-11T12:02:25Z (0.27 h), base ed5c7bc",
+   "courier receipts": "14 new since c-0015, hourly at :02:25Z plus one 06:32:25Z, every one outcome ok; fleet_sync transport receipts every 10 minutes alongside them, newest 000005-20260911T070231.json. The carrier has run unattended all night without a single failure.",
+   "orders/ uncommitted": 1,
+   "executor receipts": "TWO now. The second is fleet/bridge/outbox/20260910-2213-zoltarlead-c-0002.1.md (2026-09-10T23:14:55Z, research/c-0002.1-intraday-anchor @ c2227a3), which the 23:17Z fire missed because it REPLACED the courier report at the same path rather than appending beside it."
+  },
+  "deadline": {
+   "at": "2026-09-16T00:00:00-05:00",
+   "days_out": 4.7,
+   "ref": "c-0007.1",
+   "irreversible": false,
+   "note": "NO LONGER IRREVERSIBLE. The 09-16 clock was the yfinance 1-minute window; c-0002.1 persisted 6.61M bars to data/cache/prices/yfinance/intraday_1m/, so the measurement survives the window. A softer clock replaces it: deleting that cache after about 2026-09-17 makes the measurement unrepeatable."
+  },
+  "kb": {
+   "local": "C:\\\\Shared\\\\lessons-learned-kb UNREACHABLE - not a connected folder for this session and this fire has no device shell. Unreachable, not empty.",
+   "drive": "rules.md (id 1IcvXf7vgXyR-s7CS3lxho0qkmYjv184R) downloaded and read IN FULL this fire: rev 5, FIVE promoted rules - a new id and one new row since c-0015 read rev 4 at a different id. index.md (id 1mjN8gdNjl7-G96YtFFA9Krga4p-42wIX, 27,379 bytes, modifiedTime 2026-09-11T04:55:01Z) metadata only; stated as metadata, not claimed as a content read.",
+   "applied": "Three rules bore on this fire and are visible in it: the clock was re-read immediately before each stamped write rather than once; the inbox age is reported as two separate numbers because a file mtime is not an event age; and every unmeasurable card field stays null with a stated reason instead of inheriting a sibling's value or a previous stamp.",
+   "written": "nothing - write-frozen until kb/ lands in git"
+  }
+ },
+ "assessment": "The bottleneck broke overnight and nobody was there to see it, and the thing it was blocking arrived in the same window. origin/main fast-forwarded twice at 06:29:33Z and 06:42:26Z after eleven days frozen, four hours after Andrew asked on the board whether to merge - so the answer to the question he asked is that he already acted on it. But refs only prove that main moved, not what moved, and the one fact the whole fleet turns on is whether orders/ is on 1a05afa: the executors on ZoltarOne and ZoltarGenesis read the working tree of main, so that single bit is the difference between three orders becoming reachable and the dispatch branch still being stranded. This lane cannot run git, so rather than infer it I dispatched a read-only probe to the worker, which is the first order this board has issued that exists purely to close a gap in the brain's own eyesight. Meanwhile c-0002.1 came back with the first real number this build has produced against the end goal: the price inside an intraday rank is about 25 minutes older than that rank's own available_at, CI [-27,-24], five times better aligned than the same-bar fill the Streamlit baseline assumes - which is evidence that H9's artefact is real and quantified rather than suspected. Its pre-registered gate still returned STOP_TIMEZONE and the worker refused to re-gate after seeing the result, which is the discipline working; what that leaves on Andrew is a judgement call and no longer a race, because the 6.61M bars behind the measurement are now on disk. Against the charter, Phase 1a's honest-baseline question finally has a measured input, and the only thing still standing between the fleet and unattended execution is that no node runs an executor daemon - both receipts in this fleet's history came from sessions a human started.",
+ "items": [
+  {
+   "id": "c-0016.1",
+   "kind": "work_order",
+   "for": "claude-code",
+   "assignee": "claude-code@zoltarlead",
+   "priority": "now",
+   "title": "Read what origin/main @ 1a05afa actually contains, and whether main's review check is green.",
+   "why": "Four open items are gated on one bit the brain lane cannot read: is orders/ on main? run-order.ps1 on ZoltarOne and ZoltarGenesis pulls --ff-only origin main and reads the working tree, so if orders/ landed in last night's two fast-forwards the three orders already addressed to those nodes are reachable and the dispatch deadlock is over; if it did not, t-20260910-land-dispatch-on-main goes back to Andrew today. Reading refs cannot answer it. This is the cheapest order on the board and it unblocks the most.",
+   "acceptance": "ORDER_RESULT.md states, each with the command and its raw output: git rev-parse origin/main and the commit subject; git ls-tree -r --name-only origin/main -- orders/ (full list or explicitly empty); whether scripts/fleet_courier.py, scripts/fleet_msg.py, scripts/fleet_sync.py and docs/fleet-protocol.md are on origin/main; which of data/review/cycles/c-0001..c-0016.json are on origin/main; the exit code and the review-protocol section of python dashboard/emit_build_status.py --check run against a separate worktree at origin/main; and git log --oneline a246ccf..1a05afa. Read-only: no file edited in any lane, this working tree not switched off fleet/courier-zoltarlead (the courier's scheduled task runs from it), nothing merged, pushed or deleted.",
+   "depends_on": [],
+   "estimate": "20m",
+   "refs": [
+    "orders/zoltarlead/t-20260911-verify-main-contents.md",
+    ".git/logs/refs/remotes/origin/main",
+    "t-20260910-land-dispatch-on-main"
+   ]
+  },
+  {
+   "id": "c-0016.2",
+   "kind": "decision",
+   "for": "andrew",
+   "priority": "now",
+   "title": "c-0007.1 is no longer a deadline: accept the STOP_TIMEZONE verdict, or approve the corrected gate and a re-measure against the persisted bars.",
+   "why": "The decision as originally put to you was 'name a date before 09-16 or let the 1-minute window close'. Both halves of that premise are gone: the session ran, and 6.61M bars are on disk so the window no longer binds. What is left is the call only you can make. The measured offset is -25 minutes with CI [-27,-24], but the pre-registered gate returned STOP_TIMEZONE because h=0 lost on 2026-08-19, and the worker correctly refused to re-gate after seeing the result. The data do not look like a clock error: 0 of 162 powered runs sits within 10 minutes of -60 and the offset drifts continuously -23..-30 by day. This blocks Phase 6 and it is on the critical path 1a -> 2 -> 3 -> 6.",
+   "acceptance": "c-0007.1 carries a reply from Andrew choosing one of: (a) accept STOP_TIMEZONE, Phase 6 stays stopped and the finding is recorded as resolved-by-stop; or (b) approve the amended gate clause 'does the fine-grid optimum lie within +/-15 min of a clock-error cell other than 0' as a pre-registered amendment with its own FDR entry, and a re-measure against data/cache/prices/yfinance/intraday_1m/ rather than against yfinance. Either answer also states whether the intraday pipeline reads quotes about 25 minutes before it stamps a run, since that decides whether Phase 6 models a fixed or a per-run latency.",
+   "depends_on": [
+    "c-0002.1"
+   ],
+   "estimate": "10m",
+   "refs": [
+    "fleet/bridge/outbox/20260910-2213-zoltarlead-c-0002.1.md",
+    "data/results/alignment_anchor_intraday.json",
+    "c-0007.1",
+    "e-000103-rpl071"
+   ]
+  },
+  {
+   "id": "c-0016.3",
+   "kind": "risk",
+   "for": "andrew",
+   "priority": "next",
+   "title": "data/cache/prices/yfinance/intraday_1m/ is now the only copy of a measurement that cannot be retaken, and it is gitignored.",
+   "why": "The 6.61M 1-minute bars behind the -25 minute anchor are about 100 MB, gitignored, and unfetchable from yfinance after roughly 2026-09-17. They are what converted c-0007.1 from a race into a judgement call, and they are the input to any re-measure under the amended gate. A routine cache clean or a fresh clone loses them silently, and nothing in the repo records that they matter.",
+   "acceptance": "Either the directory is excluded from every cleanup path and that exclusion is written down where someone who was not here would find it, or the bars are archived somewhere append-only outside the working tree and the archive's location is recorded in docs/ALIGNMENT_ANCHOR.md. A one-line reply saying which is enough to close this.",
+   "depends_on": [],
+   "estimate": "15m",
+   "refs": [
+    "data/cache/prices/yfinance/intraday_1m/",
+    "docs/ALIGNMENT_ANCHOR.md"
+   ]
+  },
+  {
+   "id": "c-0016.4",
+   "kind": "finding",
+   "for": "cowork",
+   "priority": "later",
+   "title": "The receipt ledger keyed on path, so an ORDER_RESULT that replaced another at the same path was invisible for 12.8 hours.",
+   "why": "The 23:17Z board-mirror recorded one executor receipt when two existed. fleet/bridge/outbox/20260910-2213-zoltarlead-c-0002.1.md overwrote the courier's report at a path the ledger had already marked seen, so a real research result - the first this build has produced against the end goal - sat unmirrored through the whole overnight gap. This is the same failure mode the charter names as evidence replaced by claim, wearing a ledger's clothes: the mirror proved a file had been processed when what it had processed was different bytes. It cost a reporting cycle here; on a refused or halted receipt it would cost a notification.",
+   "acceptance": "data/fleet/board-mirror.json keys executor receipts on path PLUS the order id named inside the file PLUS its written_at stamp, and a fire re-reads the order id of every outbox file it has seen before rather than skipping on path alone. Checkable by replacing any already-mirrored outbox file with a different order's report and confirming the next fire posts a receipt event for the new order id.",
+   "depends_on": [],
+   "estimate": "30m",
+   "refs": [
+    "data/fleet/board-mirror.json",
+    "fleet/bridge/outbox/",
+    "claude/dispatcher-runbook.md"
+   ]
+  }
+ ]
+}
