@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "kind": "courier",
+  "node_id": "zoltarlead",
+  "agent_id": "zoltarlead/courier",
+  "run_at": "2026-09-11T11:02:26-05:00",
+  "stamp": "20260911T160226Z",
+  "branch": "fleet/dispatch",
+  "worktree": "C:\\Shared\\ClaudeWork\\zoltar-ranks.courier-wt",
+  "outcome": "committing",
+  "failed_step": null,
+  "steps": [
+    {
+      "step": "1.fetch",
+      "cmd": "git fetch --prune origin",
+      "rc": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "step": "2.reset-to-remote",
+      "cmd": "git reset --hard origin/fleet/dispatch",
+      "rc": 0,
+      "stdout": "HEAD is now at 0ef58e0 courier(zoltarlead): 1 dispatch path(s)",
+      "stderr": ""
+    },
+    {
+      "step": "3.add",
+      "cmd": "git add -- orders fleet/msgs fleet/receipts data/fleet/heartbeat data/review",
+      "rc": 0,
+      "stdout": "",
+      "stderr": "warning: in the working copy of 'data/fleet/heartbeat/zoltarlead.json', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'fleet/receipts/zoltarlead/000005-20260911T100231.json', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'fleet/receipts/zoltarlead/000005-20260911T101227.json', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'fleet/receipts/zoltarlead/000005-20260911T102227.json', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'fleet/receipts/zoltarlead/000005-20260911T103227.json', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'fleet/receipts/zoltarlead/000005-20260911T104227.json', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'fleet/receipts/zoltarlead/000005-20260911T105227.json', CRLF will be replaced by LF the next time Git touches it"
+    }
+  ],
+  "carried": {
+    "added": [
+      "fleet/receipts/zoltarlead/000005-20260911T100231.json",
+      "fleet/receipts/zoltarlead/000005-20260911T101227.json",
+      "fleet/receipts/zoltarlead/000005-20260911T102227.json",
+      "fleet/receipts/zoltarlead/000005-20260911T103227.json",
+      "fleet/receipts/zoltarlead/000005-20260911T104227.json",
+      "fleet/receipts/zoltarlead/000005-20260911T105227.json"
+    ],
+    "updated_one_writer": [
+      "fleet/receipts/zoltarlead/courier-20260911T150225Z.json",
+      "data/fleet/heartbeat/zoltarlead.json"
+    ],
+    "unioned": [],
+    "conflicts": [],
+    "missing_sources": []
+  },
+  "committed": null,
+  "pushed_sha": null,
+  "needs_andrew": null,
+  "_note": "Written by a scheduled task that runs git and fleet_sync.py only. No model.",
+  "base": "origin/fleet/dispatch",
+  "base_sha": "0ef58e0a2b22ca50fcda1505c4a1c490c749b762",
+  "staged": [
+    "data/fleet/heartbeat/zoltarlead.json",
+    "fleet/receipts/zoltarlead/000005-20260911T100231.json",
+    "fleet/receipts/zoltarlead/000005-20260911T101227.json",
+    "fleet/receipts/zoltarlead/000005-20260911T102227.json",
+    "fleet/receipts/zoltarlead/000005-20260911T103227.json",
+    "fleet/receipts/zoltarlead/000005-20260911T104227.json",
+    "fleet/receipts/zoltarlead/000005-20260911T105227.json",
+    "fleet/receipts/zoltarlead/courier-20260911T150225Z.json"
+  ],
+  "commit_worthy": [
+    "data/fleet/heartbeat/zoltarlead.json"
+  ]
+}
