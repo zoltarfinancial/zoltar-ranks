@@ -398,6 +398,68 @@ counted as mismatches — counting them would let a ticker-mapping bug masquerad
 as an adjustment finding. A mapping table is required before the split
 diagnostic (§5) can be trusted.
 
-**Still unmeasured:** the intraday anchor (§4) and the split diagnostic (§5).
-The intraday one is time-critical — yfinance serves 1-minute bars for ~30 days
-and the dense era begins 2026-08-19.
+**Still unmeasured:** the split diagnostic (§5). The intraday anchor is F9.
+
+## F9. The intraday anchor: a rank's price is ~25 minutes older than the rank
+
+Measured 2026-09-10 (order `c-0002.1`) with
+`python -m zoltar_ranks.analysis.alignment_anchor --intraday`, against RAW
+yfinance 1-minute bars, anchored on `available_at` (rule 5). Every decision rule
+was fixed in code before any bar was examined and is written into
+`data/results/alignment_anchor_intraday.json` as `pre_registered`.
+
+**Pre-registered verdict: `STOP_TIMEZONE`.** It stands, and Phase 6 stops until
+Andrew decides how to treat it.
+
+| | |
+|---|---|
+| offset (median of per-run best offsets) | **−25 min** |
+| 95% CI (cluster bootstrap over dates, B=10,000) | **[−27, −24]** |
+| per-run p10 / p50 / p90 | −29.9 / −25 / −23 |
+| runs: dense era / measured / powered | 182 / 165 / **162** over **15 dates** |
+| median deviation at the best offset | **2.5 bps** |
+| median deviation at h = 0 | 18.4 bps |
+| median power ratio | 8.9 (guard needs ≥ 3) |
+
+Negative means **the price inside the rank is from BEFORE the rank's
+`available_at`**. Pooled curve (median deviation, bps): −60 → 21.6, −30 → 7.3,
+**−25 → 3.8, −24 → 3.6**, −20 → 8.1, 0 → 18.4, +60 → 31.4.
+
+**Why the timezone gate fired, and why the data do not look like a timezone
+error.** The gate compares the coarse cells {0, ±60, ±120, ±300, ±360} and
+requires h = 0 to win on every date. It was written assuming the true offset was
+near 0. It is near −25, halfway to −60, so the comparison became close: on
+2026-08-19, whose own lag was −30 (range −32..−28), −60 beat 0 by 1.9 bps (21.98
+vs 23.88). But **no powered run out of 162 has an offset within 10 minutes of
+−60**; every one lies in [−35, −20], the per-date medians vary from −23 to −30,
+and the fine curve is a sharp single minimum 6× lower than the −60 cell. A clock
+error is a constant multiple of 60 for every run. This is continuous and varies
+by day: it looks like **build latency** — prices fetched, then ~25 minutes of
+scoring before the rank is stamped and published. One mechanism consistent with
+it, **not verified**: a quote feed delayed ~15-20 minutes plus build time.
+Andrew knows the pipeline and can confirm.
+
+This is an interpretation, and the pre-registered verdict is not changed by it.
+Re-gating after seeing the data is exactly what rule 9 forbids.
+
+**What it means downstream.** The morning build carries the prior session's
+close (F8); an intraday re-score carries the market as it was ~25 minutes before
+the rank existed. So a signal-decay curve measured from `available_at` starts
+~25 minutes into the decay, and an engine that fills at `close_price` on an
+intraday run (FINDINGS F5) is filling at a price from before the rank could have
+been seen — worse than same-bar. Rule 3 is unaffected: the latency is still
+measured from `available_at`.
+
+**Coverage.** 1,167 universe symbols, all served in at least one window; per-window
+misses `TWO`, `WBS` (from 2026-08-27) and `CRNX`, `HLX` (from 2026-09-04). 16
+sessions of bars, 2026-08-19 → 2026-09-10. **0 requests ProviderUnavailable** out
+of 36 (3 windows × 12 symbol batches, 8-day chunks). 17 runs excluded as outside
+08:40-14:50 CT; 3 excluded as no-power — each the first run of a day whose
+intraday series started late (08-24 11:11, 09-01 10:30, 09-09 10:45), whose price
+matches the tape nowhere within ±90 minutes. 2026-08-31 has bars but **no
+archived intraday runs** — an archive gap, not a provider one.
+
+The raw bars (6.61M rows) are persisted under
+`data/cache/prices/yfinance/intraday_1m/`, so this can be re-measured after the
+yfinance window closes around 2026-09-17. Deleting that directory makes it
+unrecoverable.
