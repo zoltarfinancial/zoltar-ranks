@@ -2,7 +2,7 @@
   "schema_version": 1,
   "node_id": "zoltarlead",
   "agent_id": "zoltarlead/claude-code",
-  "at": "2026-09-11T01:01:01-05:00",
+  "at": "2026-09-08T00:38:10-05:00",
   "fire_kind": "scheduled",
   "outcome": "ok",
   "errors": [],
@@ -13,7 +13,7 @@
     "hostname": "ZOLTARLEAD",
     "lane": "claude-code",
     "verified": true,
-    "at": "2026-09-11T01:01:01-05:00",
+    "at": "2026-09-08T00:38:10-05:00",
     "identity_file": "C:\\Shared\\ClaudeWork\\zoltar-ranks\\data\\fleet\\identity\\zoltarlead.json",
     "identity_schema": 2,
     "hostname_reads": {
@@ -24,8 +24,8 @@
     "reason": null
   },
   "repo": {
-    "branch": "fleet/courier-zoltarlead",
-    "head_sha": "57ed181",
+    "branch": "fleet/rejoin-zoltarlead",
+    "head_sha": "fdd4ac2",
     "dirty": true
   },
   "probe": {
