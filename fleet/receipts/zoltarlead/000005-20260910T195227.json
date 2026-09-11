@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "agent_id": "zoltarlead/claude-code",
+  "node_id": "zoltarlead",
+  "at": "2026-09-10T19:52:27-05:00",
+  "lamport": 5,
+  "transports": {
+    "git": {
+      "state": "ok",
+      "msgs_read": 4,
+      "head": "57ed181"
+    },
+    "onedrive": {
+      "state": "ok",
+      "msgs_read": 4
+    },
+    "db": {
+      "state": "absent-by-design",
+      "msgs_read": null,
+      "reason": "no Artifact tool in Claude Code; only a cowork brain reaches the db"
+    }
+  },
+  "ingested": [],
+  "gaps": [],
+  "repaired": [],
+  "by": {
+    "agent_id": "zoltarlead/claude-code",
+    "node_id": "zoltarlead",
+    "hostname": "ZOLTARLEAD",
+    "lane": "claude-code",
+    "verified": true,
+    "at": "2026-09-10T19:52:27-05:00",
+    "identity_file": "C:\\Shared\\ClaudeWork\\zoltar-ranks\\data\\fleet\\identity\\zoltarlead.json",
+    "identity_schema": 2,
+    "hostname_reads": {
+      "env_COMPUTERNAME": "ZOLTARLEAD",
+      "socket_gethostname": "ZoltarLead",
+      "platform_node": "ZoltarLead"
+    },
+    "reason": null
+  },
+  "git_fetch": {
+    "ok": true,
+    "error": null
+  }
+}
