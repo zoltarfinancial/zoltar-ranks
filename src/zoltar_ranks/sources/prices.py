@@ -25,7 +25,7 @@ from __future__ import annotations
 import hashlib
 import logging
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, timedelta
 from pathlib import Path
 
@@ -61,6 +61,10 @@ class Coverage:
     served: set[str]
     provider: str
     interval: str
+    #: Request windows the provider answered with NOTHING. Each is recorded as
+    #: ProviderUnavailable with its window -- never read as "there was no data".
+    #: Optional with a default, so the column contract is unchanged.
+    unavailable: list = field(default_factory=list)
 
     @property
     def missing(self) -> set[str]:
@@ -220,6 +224,40 @@ def _unstack_yf(raw: pd.DataFrame, symbols: list[str]) -> list[pd.DataFrame]:
     return frames
 
 
+def _unstack_yf_intraday(raw, tickers, back, interval, provider) -> list[pd.DataFrame]:
+    """yfinance intraday output -> INTRADAY_COLUMNS frames, one per symbol.
+
+    Handles both the flat (single ticker) and (ticker, field) MultiIndex shapes.
+    The index is tz-aware (UTC, measured) and is converted to tz-naive
+    America/Chicago -- the archive's wall clock -- right here.
+    """
+    if raw is None or getattr(raw, "empty", True):
+        return []
+    frames = []
+    multi = isinstance(raw.columns, pd.MultiIndex)
+    for tk in tickers:
+        try:
+            sub = raw[tk] if multi else raw
+        except KeyError:
+            continue
+        sub = sub.dropna(how="all")
+        if sub.empty or "Close" not in sub:
+            continue
+        idx = pd.to_datetime(sub.index)
+        if getattr(idx, "tz", None) is None:
+            # A naive index would be an unknown clock. Refuse rather than guess --
+            # guessing the source tz is the exact error the anchor measures.
+            raise ValueError(f"yfinance returned a tz-naive intraday index for {tk}")
+        idx = idx.tz_convert(MARKET_TZ).tz_localize(None)
+        frames.append(pd.DataFrame({
+            "ts": idx, "symbol": back.get(tk, tk), "interval": interval,
+            "open": sub["Open"].to_numpy(), "high": sub["High"].to_numpy(),
+            "low": sub["Low"].to_numpy(), "close": sub["Close"].to_numpy(),
+            "volume": sub["Volume"].to_numpy(), "provider": provider,
+        }))
+    return frames
+
+
 # --------------------------------------------------------------------------
 # Providers. Each raises NotImplementedError until built -- see docs/PLAN.md §2a.
 # Order of work: RobinStocks first (it is the source the ranks are built from,
@@ -315,11 +353,79 @@ class YFinanceProvider(PriceProvider):
         df["provider"] = self.name
         return df
 
+    #: Yahoo refuses more than 8 calendar days of 1-minute data per request.
+    #: MEASURED 2026-09-10: an exact 8-day window is served; a 9-day window comes
+    #: back EMPTY -- not an error, an empty frame -- which is precisely the
+    #: silence-that-reads-as-absence this project audits for. So the chunk size is
+    #: load-bearing, not a tuning knob.
+    MAX_INTRADAY_DAYS = {"1min": 8, "5min": 60, "1hour": 730}
+    YF_INTERVAL = {"1min": "1m", "5min": "5m", "1hour": "60m"}
+
     def fetch_intraday(self, symbols, start, end, interval):
-        raise NotImplementedError(
-            "PLAN §2a/§2a-bis. yfinance serves 1-minute bars for roughly the last "
-            "30 days only -- fine as a cross-check, not as the timing study's "
-            "backbone. Blocked on the INTRADAY_COLUMNS `session` decision.")
+        """RAW intraday OHLCV, chunked by `MAX_INTRADAY_DAYS`, `ts` = bar OPEN.
+
+        `start`..`end` are inclusive calendar dates. Every (window, symbol-batch)
+        request that returns an empty frame for ALL of its symbols is recorded in
+        `Coverage.unavailable` with its window -- a ProviderUnavailable record,
+        never an inferred absence. A batch that served some symbols and not
+        others records the misses in `Coverage.missing`. Only if EVERY request
+        comes back empty does this raise.
+
+        Bars are RAW (auto_adjust=False), regular session only (prepost=False).
+        The alignment anchor compares them against `ranks.close_price`, which
+        FINDINGS F8 measured to be unadjusted. Yahoo returns this index in UTC;
+        it is converted to tz-naive America/Chicago here and nowhere else.
+
+        Symbols with a '.' (BRK.B, BF.B) are requested with '-', which is
+        Yahoo's spelling, and mapped back -- the daily anchor lost both to this.
+        """
+        import yfinance as yf
+
+        if interval not in self.YF_INTERVAL:
+            raise ValueError(f"unsupported interval {interval!r}")
+        yfi, span = self.YF_INTERVAL[interval], self.MAX_INTRADAY_DAYS[interval]
+        wanted = sorted(set(symbols))
+        yf_of = {s: s.replace(".", "-") for s in wanted}
+        back = {v: k for k, v in yf_of.items()}
+
+        frames, unavailable, windows = [], [], []
+        w0 = start
+        while w0 <= end:
+            w1 = min(w0 + timedelta(days=span), end + timedelta(days=1))  # exclusive
+            windows.append((w0, w1))
+            w0 = w1
+
+        for w0, w1 in windows:
+            for chunk in _chunks(wanted, self.CHUNK):
+                tick = [yf_of[s] for s in chunk]
+                err = None
+                try:
+                    raw = yf.download(tick, start=w0, end=w1, interval=yfi,
+                                      auto_adjust=False, prepost=False,
+                                      group_by="ticker", progress=False, threads=True)
+                except Exception as exc:                      # noqa: BLE001
+                    raw, err = None, f"{type(exc).__name__}: {exc}"
+                got = _unstack_yf_intraday(raw, tick, back, interval, self.name)
+                if not got:
+                    unavailable.append({
+                        "start": str(w0), "end_exclusive": str(w1),
+                        "symbols": len(chunk), "first": chunk[0], "last": chunk[-1],
+                        "reason": err or ("provider returned an empty 1-minute "
+                                          "frame for every symbol in this request"),
+                    })
+                    continue
+                frames.extend(got)
+
+        if not frames:
+            raise ProviderUnavailable(
+                f"yfinance returned no {interval} bars for any of {len(wanted)} "
+                f"symbols in any of {len(windows)} window(s) {start}..{end}. "
+                f"Treating this as an outage, not as an empty market.")
+        bars = pd.concat(frames, ignore_index=True)
+        cov = Coverage(requested=set(wanted), served=set(bars["symbol"].unique()),
+                       provider=self.name, interval=interval,
+                       unavailable=unavailable)
+        return bars, cov
 
     def fetch_actions(self, symbols, start, end):
         """Splits and dividends -- the table that makes returns trustworthy.

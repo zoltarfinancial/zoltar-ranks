@@ -1,0 +1,2285 @@
+{
+  "schema_version": 1,
+  "order": "c-0002.1",
+  "generated_at": "2026-09-10T22:08:29-05:00",
+  "verdict": {
+    "state": "STOP_TIMEZONE",
+    "tz_by_date": {
+      "2026-08-19": {
+        "argmin_h": -60,
+        "mard_bps": {
+          "-300": 86.74,
+          "-120": 41.63,
+          "-60": 21.98,
+          "0": 23.88,
+          "60": 41.85,
+          "120": 54.39,
+          "300": 104.66
+        }
+      },
+      "2026-08-20": {
+        "argmin_h": 0,
+        "mard_bps": {
+          "-360": 92.08,
+          "-300": 74.4,
+          "-120": 42.85,
+          "-60": 24.56,
+          "0": 21.15,
+          "60": 39.42,
+          "120": 50.38,
+          "300": 89.18
+        }
+      },
+      "2026-08-21": {
+        "argmin_h": 0,
+        "mard_bps": {
+          "-300": 66.42,
+          "-120": 35.24,
+          "-60": 22.09,
+          "0": 17.19,
+          "60": 33.69,
+          "120": 42.16,
+          "300": 71.3,
+          "360": 89.85
+        }
+      },
+      "2026-08-24": {
+        "argmin_h": 0,
+        "mard_bps": {
+          "-360": 74.13,
+          "-300": 69.51,
+          "-120": 34.53,
+          "-60": 20.2,
+          "0": 15.37,
+          "60": 29.26,
+          "120": 37.74
+        }
+      },
+      "2026-08-25": {
+        "argmin_h": 0,
+        "mard_bps": {
+          "-360": 83.94,
+          "-300": 62.69,
+          "-120": 33.44,
+          "-60": 23.34,
+          "0": 16.11,
+          "60": 29.33,
+          "120": 40.73,
+          "300": 71.44
+        }
+      },
+      "2026-08-26": {
+        "argmin_h": 0,
+        "mard_bps": {
+          "-300": 58.46,
+          "-120": 27.87,
+          "-60": 17.16,
+          "0": 13.86,
+          "60": 26.27,
+          "120": 34.5,
+          "300": 60.73
+        }
+      },
+      "2026-08-27": {
+        "argmin_h": 0,
+        "mard_bps": {
+          "-360": 80.81,
+          "-300": 69.01,
+          "-120": 35.82,
+          "-60": 23.21,
+          "0": 17.3,
+          "60": 33.81,
+          "120": 41.92,
+          "300": 65.7
+        }
+      },
+      "2026-08-28": {
+        "argmin_h": 0,
+        "mard_bps": {
+          "-360": 83.77,
+          "-300": 63.52,
+          "-120": 34.57,
+          "-60": 21.4,
+          "0": 18.88,
+          "60": 31.37,
+          "120": 47.59,
+          "300": 70.33,
+          "360": 108.18
+        }
+      },
+      "2026-09-01": {
+        "argmin_h": 0,
+        "mard_bps": {
+          "-360": 100.0,
+          "-300": 87.3,
+          "-120": 46.84,
+          "-60": 22.65,
+          "0": 18.43,
+          "60": 30.98,
+          "120": 38.98
+        }
+      },
+      "2026-09-02": {
+        "argmin_h": 0,
+        "mard_bps": {
+          "-360": 97.56,
+          "-300": 77.48,
+          "-120": 37.99,
+          "-60": 24.37,
+          "0": 22.82,
+          "60": 35.23,
+          "120": 48.69,
+          "300": 86.45
+        }
+      },
+      "2026-09-03": {
+        "argmin_h": 0,
+        "mard_bps": {
+          "-360": 88.36,
+          "-300": 81.8,
+          "-120": 33.38,
+          "-60": 21.24,
+          "0": 18.44,
+          "60": 30.45,
+          "120": 40.14,
+          "300": 79.26
+        }
+      },
+      "2026-09-04": {
+        "argmin_h": 0,
+        "mard_bps": {
+          "-360": 62.12,
+          "-300": 52.23,
+          "-120": 33.58,
+          "-60": 19.9,
+          "0": 15.15,
+          "60": 28.22,
+          "120": 37.14,
+          "300": 62.0,
+          "360": 79.76
+        }
+      },
+      "2026-09-08": {
+        "argmin_h": 0,
+        "mard_bps": {
+          "-360": 81.41,
+          "-300": 69.47,
+          "-120": 36.52,
+          "-60": 24.55,
+          "0": 20.11,
+          "60": 31.64,
+          "120": 40.61,
+          "300": 76.53
+        }
+      },
+      "2026-09-09": {
+        "argmin_h": 0,
+        "mard_bps": {
+          "-360": 91.76,
+          "-300": 72.57,
+          "-120": 32.64,
+          "-60": 19.55,
+          "0": 16.33,
+          "60": 29.66,
+          "120": 38.22
+        }
+      },
+      "2026-09-10": {
+        "argmin_h": 0,
+        "mard_bps": {
+          "-360": 83.15,
+          "-300": 70.62,
+          "-120": 32.71,
+          "-60": 21.54,
+          "0": 20.9,
+          "60": 35.91,
+          "120": 45.7,
+          "300": 78.9,
+          "360": 87.45
+        }
+      }
+    },
+    "note": "a clock-domain hypothesis beats h=0 on ['2026-08-19']. Rule 9: Phase 6 stops; the winning offset is NOT applied."
+  },
+  "offset_minutes": {
+    "estimate": -25.0,
+    "ci95": [
+      -27.0,
+      -24.0
+    ],
+    "ci_method": "cluster bootstrap over dates, B=10000, seed=20260910",
+    "mean": -25.864197530864196,
+    "quantiles": {
+      "p10": -29.9,
+      "p25": -28.0,
+      "p50": -25.0,
+      "p75": -24.0,
+      "p90": -23.0
+    },
+    "share_within_1min": 0.0,
+    "sign_convention": "negative = the price in the rank is from BEFORE available_at; positive = after"
+  },
+  "sample": {
+    "anchor_time": "available_at (rule 5)",
+    "dense_era_start": "2026-08-19",
+    "intraday_runs_total": 182,
+    "excluded_outside_session_window": 17,
+    "runs_measured": 165,
+    "runs_powered": 162,
+    "runs_no_power": 3,
+    "runs_at_grid_edge": 0,
+    "run_ts_differs_from_available_at": 0,
+    "dates_powered": [
+      "2026-08-19",
+      "2026-08-20",
+      "2026-08-21",
+      "2026-08-24",
+      "2026-08-25",
+      "2026-08-26",
+      "2026-08-27",
+      "2026-08-28",
+      "2026-09-01",
+      "2026-09-02",
+      "2026-09-03",
+      "2026-09-04",
+      "2026-09-08",
+      "2026-09-09",
+      "2026-09-10"
+    ],
+    "symbol_run_pairs": 192147
+  },
+  "coverage": {
+    "universe_symbols": 1167,
+    "symbols_with_bars": 1167,
+    "symbols_without_bars": [],
+    "sessions_with_bars": [
+      "2026-08-19",
+      "2026-08-20",
+      "2026-08-21",
+      "2026-08-24",
+      "2026-08-25",
+      "2026-08-26",
+      "2026-08-27",
+      "2026-08-28",
+      "2026-08-31",
+      "2026-09-01",
+      "2026-09-02",
+      "2026-09-03",
+      "2026-09-04",
+      "2026-09-08",
+      "2026-09-09",
+      "2026-09-10"
+    ],
+    "per_date": {
+      "2026-08-19": {
+        "symbols_with_bars": 1166,
+        "runs_in_sample": 10,
+        "runs_powered": 10
+      },
+      "2026-08-20": {
+        "symbols_with_bars": 1165,
+        "runs_in_sample": 12,
+        "runs_powered": 12
+      },
+      "2026-08-21": {
+        "symbols_with_bars": 1165,
+        "runs_in_sample": 12,
+        "runs_powered": 12
+      },
+      "2026-08-24": {
+        "symbols_with_bars": 1165,
+        "runs_in_sample": 8,
+        "runs_powered": 7
+      },
+      "2026-08-25": {
+        "symbols_with_bars": 1165,
+        "runs_in_sample": 12,
+        "runs_powered": 12
+      },
+      "2026-08-26": {
+        "symbols_with_bars": 1165,
+        "runs_in_sample": 11,
+        "runs_powered": 11
+      },
+      "2026-08-27": {
+        "symbols_with_bars": 1165,
+        "runs_in_sample": 12,
+        "runs_powered": 12
+      },
+      "2026-08-28": {
+        "symbols_with_bars": 1165,
+        "runs_in_sample": 13,
+        "runs_powered": 13
+      },
+      "2026-08-31": {
+        "symbols_with_bars": 1164
+      },
+      "2026-09-01": {
+        "symbols_with_bars": 1164,
+        "runs_in_sample": 10,
+        "runs_powered": 9
+      },
+      "2026-09-02": {
+        "symbols_with_bars": 1163,
+        "runs_in_sample": 10,
+        "runs_powered": 10
+      },
+      "2026-09-03": {
+        "symbols_with_bars": 1163,
+        "runs_in_sample": 11,
+        "runs_powered": 11
+      },
+      "2026-09-04": {
+        "symbols_with_bars": 1163,
+        "runs_in_sample": 13,
+        "runs_powered": 13
+      },
+      "2026-09-08": {
+        "symbols_with_bars": 1163,
+        "runs_in_sample": 11,
+        "runs_powered": 11
+      },
+      "2026-09-09": {
+        "symbols_with_bars": 1163,
+        "runs_in_sample": 9,
+        "runs_powered": 8
+      },
+      "2026-09-10": {
+        "symbols_with_bars": 1163,
+        "runs_in_sample": 11,
+        "runs_powered": 11
+      }
+    },
+    "windows": [
+      {
+        "start": "2026-08-19",
+        "end_exclusive": "2026-08-27",
+        "rows": 2480547,
+        "symbols_served": 1167,
+        "sessions": [
+          "2026-08-19",
+          "2026-08-20",
+          "2026-08-21",
+          "2026-08-24",
+          "2026-08-25",
+          "2026-08-26"
+        ]
+      },
+      {
+        "start": "2026-08-27",
+        "end_exclusive": "2026-09-04",
+        "rows": 2474665,
+        "symbols_served": 1165,
+        "sessions": [
+          "2026-08-27",
+          "2026-08-28",
+          "2026-08-31",
+          "2026-09-01",
+          "2026-09-02",
+          "2026-09-03"
+        ]
+      },
+      {
+        "start": "2026-09-04",
+        "end_exclusive": "2026-09-11",
+        "rows": 1653931,
+        "symbols_served": 1163,
+        "sessions": [
+          "2026-09-04",
+          "2026-09-08",
+          "2026-09-09",
+          "2026-09-10"
+        ]
+      }
+    ],
+    "provider_unavailable": []
+  },
+  "precision": {
+    "median_mard_at_best_offset_bps": 2.532,
+    "median_mard_at_h0_bps": 18.438,
+    "median_power_ratio": 8.893218147574906
+  },
+  "curve_median_mard_bps": {
+    "-360": 83.855,
+    "-300": 71.598,
+    "-120": 34.568,
+    "-90": 29.311,
+    "-89": 28.554,
+    "-88": 29.481,
+    "-87": 28.397,
+    "-86": 27.946,
+    "-85": 27.663,
+    "-84": 27.885,
+    "-83": 27.291,
+    "-82": 26.96,
+    "-81": 27.02,
+    "-80": 26.564,
+    "-79": 26.102,
+    "-78": 25.635,
+    "-77": 25.481,
+    "-76": 25.167,
+    "-75": 25.406,
+    "-74": 24.809,
+    "-73": 24.784,
+    "-72": 24.707,
+    "-71": 24.371,
+    "-70": 23.964,
+    "-69": 23.767,
+    "-68": 23.262,
+    "-67": 23.215,
+    "-66": 22.962,
+    "-65": 22.719,
+    "-64": 22.315,
+    "-63": 22.286,
+    "-62": 22.047,
+    "-61": 21.677,
+    "-60": 21.633,
+    "-59": 21.377,
+    "-58": 20.824,
+    "-57": 20.551,
+    "-56": 20.439,
+    "-55": 20.052,
+    "-54": 19.898,
+    "-53": 19.275,
+    "-52": 18.968,
+    "-51": 18.416,
+    "-50": 18.004,
+    "-49": 17.436,
+    "-48": 17.178,
+    "-47": 16.963,
+    "-46": 16.29,
+    "-45": 15.605,
+    "-44": 15.292,
+    "-43": 14.944,
+    "-42": 14.334,
+    "-41": 13.871,
+    "-40": 13.444,
+    "-39": 13.097,
+    "-38": 12.254,
+    "-37": 11.847,
+    "-36": 11.5,
+    "-35": 10.703,
+    "-34": 10.279,
+    "-33": 9.757,
+    "-32": 8.926,
+    "-31": 8.111,
+    "-30": 7.303,
+    "-29": 6.482,
+    "-28": 5.792,
+    "-27": 5.214,
+    "-26": 4.413,
+    "-25": 3.824,
+    "-24": 3.609,
+    "-23": 4.427,
+    "-22": 5.806,
+    "-21": 7.018,
+    "-20": 8.083,
+    "-19": 9.099,
+    "-18": 9.677,
+    "-17": 10.24,
+    "-16": 10.855,
+    "-15": 11.57,
+    "-14": 12.086,
+    "-13": 12.694,
+    "-12": 13.035,
+    "-11": 13.452,
+    "-10": 14.283,
+    "-9": 14.517,
+    "-8": 14.946,
+    "-7": 15.378,
+    "-6": 15.947,
+    "-5": 16.092,
+    "-4": 16.62,
+    "-3": 17.002,
+    "-2": 17.657,
+    "-1": 17.791,
+    "0": 18.438,
+    "1": 18.782,
+    "2": 19.231,
+    "3": 19.592,
+    "4": 20.109,
+    "5": 20.599,
+    "6": 20.648,
+    "7": 21.102,
+    "8": 21.258,
+    "9": 21.839,
+    "10": 21.941,
+    "11": 22.069,
+    "12": 22.148,
+    "13": 22.648,
+    "14": 22.773,
+    "15": 23.046,
+    "16": 23.343,
+    "17": 23.514,
+    "18": 23.684,
+    "19": 24.085,
+    "20": 24.077,
+    "21": 24.535,
+    "22": 24.646,
+    "23": 24.784,
+    "24": 25.413,
+    "25": 25.393,
+    "26": 25.333,
+    "27": 25.596,
+    "28": 25.985,
+    "29": 25.906,
+    "30": 25.77,
+    "31": 26.073,
+    "32": 26.204,
+    "33": 27.018,
+    "34": 27.397,
+    "35": 27.487,
+    "36": 28.104,
+    "37": 27.66,
+    "38": 28.036,
+    "39": 28.441,
+    "40": 28.966,
+    "41": 29.436,
+    "42": 28.985,
+    "43": 29.103,
+    "44": 29.275,
+    "45": 29.491,
+    "46": 30.123,
+    "47": 30.634,
+    "48": 30.927,
+    "49": 30.988,
+    "50": 30.906,
+    "51": 31.423,
+    "52": 31.473,
+    "53": 31.445,
+    "54": 31.441,
+    "55": 31.502,
+    "56": 31.568,
+    "57": 31.316,
+    "58": 31.593,
+    "59": 31.379,
+    "60": 31.442,
+    "61": 32.394,
+    "62": 32.297,
+    "63": 32.21,
+    "64": 32.786,
+    "65": 32.97,
+    "66": 33.705,
+    "67": 33.739,
+    "68": 33.688,
+    "69": 34.49,
+    "70": 34.568,
+    "71": 34.743,
+    "72": 35.151,
+    "73": 34.901,
+    "74": 35.387,
+    "75": 35.296,
+    "76": 35.194,
+    "77": 35.332,
+    "78": 35.354,
+    "79": 35.568,
+    "80": 36.004,
+    "81": 36.481,
+    "82": 36.468,
+    "83": 36.559,
+    "84": 36.211,
+    "85": 36.303,
+    "86": 36.929,
+    "87": 36.477,
+    "88": 36.807,
+    "89": 36.964,
+    "90": 37.243,
+    "120": 41.918,
+    "300": 72.357,
+    "360": 88.65
+  },
+  "per_run": [
+    {
+      "available_at": "2026-08-19 09:09:36",
+      "date": "2026-08-19",
+      "offset_min": -32,
+      "mard_best_bps": 10.213,
+      "mard_0_bps": 65.342,
+      "power_ratio": 7.719916662742489,
+      "powered": true,
+      "n": 1165
+    },
+    {
+      "available_at": "2026-08-19 09:44:45",
+      "date": "2026-08-19",
+      "offset_min": -30,
+      "mard_best_bps": 6.5,
+      "mard_0_bps": 47.247,
+      "power_ratio": 9.556868084317221,
+      "powered": true,
+      "n": 1164
+    },
+    {
+      "available_at": "2026-08-19 10:19:23",
+      "date": "2026-08-19",
+      "offset_min": -30,
+      "mard_best_bps": 4.948,
+      "mard_0_bps": 29.283,
+      "power_ratio": 9.002584818804277,
+      "powered": true,
+      "n": 1166
+    },
+    {
+      "available_at": "2026-08-19 10:53:58",
+      "date": "2026-08-19",
+      "offset_min": -28,
+      "mard_best_bps": 4.1,
+      "mard_0_bps": 31.014,
+      "power_ratio": 6.625171447878516,
+      "powered": true,
+      "n": 1164
+    },
+    {
+      "available_at": "2026-08-19 11:28:43",
+      "date": "2026-08-19",
+      "offset_min": -30,
+      "mard_best_bps": 2.716,
+      "mard_0_bps": 18.74,
+      "power_ratio": 10.935636941734533,
+      "powered": true,
+      "n": 1164
+    },
+    {
+      "available_at": "2026-08-19 12:04:45",
+      "date": "2026-08-19",
+      "offset_min": -31,
+      "mard_best_bps": 2.931,
+      "mard_0_bps": 20.875,
+      "power_ratio": 7.210207684880726,
+      "powered": true,
+      "n": 1164
+    },
+    {
+      "available_at": "2026-08-19 12:39:27",
+      "date": "2026-08-19",
+      "offset_min": -30,
+      "mard_best_bps": 2.193,
+      "mard_0_bps": 22.871,
+      "power_ratio": 9.72800084892211,
+      "powered": true,
+      "n": 1163
+    },
+    {
+      "available_at": "2026-08-19 13:14:24",
+      "date": "2026-08-19",
+      "offset_min": -30,
+      "mard_best_bps": 2.108,
+      "mard_0_bps": 23.155,
+      "power_ratio": 9.454878999816835,
+      "powered": true,
+      "n": 1166
+    },
+    {
+      "available_at": "2026-08-19 13:49:48",
+      "date": "2026-08-19",
+      "offset_min": -29,
+      "mard_best_bps": 2.32,
+      "mard_0_bps": 19.757,
+      "power_ratio": 8.60288025031465,
+      "powered": true,
+      "n": 1164
+    },
+    {
+      "available_at": "2026-08-19 14:26:13",
+      "date": "2026-08-19",
+      "offset_min": -32,
+      "mard_best_bps": 2.433,
+      "mard_0_bps": 24.61,
+      "power_ratio": 9.03152374446386,
+      "powered": true,
+      "n": 1164
+    },
+    {
+      "available_at": "2026-08-20 09:09:15",
+      "date": "2026-08-20",
+      "offset_min": -34,
+      "mard_best_bps": 12.995,
+      "mard_0_bps": 48.826,
+      "power_ratio": 5.050081596127391,
+      "powered": true,
+      "n": 1164
+    },
+    {
+      "available_at": "2026-08-20 09:43:49",
+      "date": "2026-08-20",
+      "offset_min": -30,
+      "mard_best_bps": 5.556,
+      "mard_0_bps": 37.513,
+      "power_ratio": 9.275643182158717,
+      "powered": true,
+      "n": 1164
+    },
+    {
+      "available_at": "2026-08-20 10:18:27",
+      "date": "2026-08-20",
+      "offset_min": -30,
+      "mard_best_bps": 4.209,
+      "mard_0_bps": 42.07,
+      "power_ratio": 8.984098649885414,
+      "powered": true,
+      "n": 1162
+    },
+    {
+      "available_at": "2026-08-20 10:54:36",
+      "date": "2026-08-20",
+      "offset_min": -31,
+      "mard_best_bps": 3.565,
+      "mard_0_bps": 30.383,
+      "power_ratio": 10.998611033549984,
+      "powered": true,
+      "n": 1165
+    },
+    {
+      "available_at": "2026-08-20 11:28:06",
+      "date": "2026-08-20",
+      "offset_min": -29,
+      "mard_best_bps": 2.913,
+      "mard_0_bps": 24.113,
+      "power_ratio": 9.538046840171134,
+      "powered": true,
+      "n": 1163
+    },
+    {
+      "available_at": "2026-08-20 11:56:36",
+      "date": "2026-08-20",
+      "offset_min": -24,
+      "mard_best_bps": 2.678,
+      "mard_0_bps": 18.195,
+      "power_ratio": 10.658053702602722,
+      "powered": true,
+      "n": 1162
+    },
+    {
+      "available_at": "2026-08-20 12:25:11",
+      "date": "2026-08-20",
+      "offset_min": -24,
+      "mard_best_bps": 2.528,
+      "mard_0_bps": 16.713,
+      "power_ratio": 8.910461287239768,
+      "powered": true,
+      "n": 1164
+    },
+    {
+      "available_at": "2026-08-20 12:53:42",
+      "date": "2026-08-20",
+      "offset_min": -24,
+      "mard_best_bps": 2.348,
+      "mard_0_bps": 16.097,
+      "power_ratio": 8.764809247493165,
+      "powered": true,
+      "n": 1163
+    },
+    {
+      "available_at": "2026-08-20 13:22:44",
+      "date": "2026-08-20",
+      "offset_min": -24,
+      "mard_best_bps": 2.342,
+      "mard_0_bps": 15.303,
+      "power_ratio": 8.008695220447192,
+      "powered": true,
+      "n": 1162
+    },
+    {
+      "available_at": "2026-08-20 13:51:48",
+      "date": "2026-08-20",
+      "offset_min": -23,
+      "mard_best_bps": 2.226,
+      "mard_0_bps": 16.57,
+      "power_ratio": 8.386966164415956,
+      "powered": true,
+      "n": 1163
+    },
+    {
+      "available_at": "2026-08-20 14:18:06",
+      "date": "2026-08-20",
+      "offset_min": -22,
+      "mard_best_bps": 1.844,
+      "mard_0_bps": 17.878,
+      "power_ratio": 11.7492168649755,
+      "powered": true,
+      "n": 1163
+    },
+    {
+      "available_at": "2026-08-20 14:46:57",
+      "date": "2026-08-20",
+      "offset_min": -23,
+      "mard_best_bps": 2.767,
+      "mard_0_bps": 25.173,
+      "power_ratio": 8.875975007910046,
+      "powered": true,
+      "n": 1163
+    },
+    {
+      "available_at": "2026-08-21 09:01:41",
+      "date": "2026-08-21",
+      "offset_min": -24,
+      "mard_best_bps": 9.662,
+      "mard_0_bps": 40.509,
+      "power_ratio": 8.182014448506017,
+      "powered": true,
+      "n": 1165
+    },
+    {
+      "available_at": "2026-08-21 09:32:31",
+      "date": "2026-08-21",
+      "offset_min": -26,
+      "mard_best_bps": 5.984,
+      "mard_0_bps": 35.376,
+      "power_ratio": 9.073056399485273,
+      "powered": true,
+      "n": 1164
+    },
+    {
+      "available_at": "2026-08-21 10:00:38",
+      "date": "2026-08-21",
+      "offset_min": -23,
+      "mard_best_bps": 5.087,
+      "mard_0_bps": 38.003,
+      "power_ratio": 8.719454786277456,
+      "powered": true,
+      "n": 1165
+    },
+    {
+      "available_at": "2026-08-21 10:30:14",
+      "date": "2026-08-21",
+      "offset_min": -25,
+      "mard_best_bps": 4.4,
+      "mard_0_bps": 26.803,
+      "power_ratio": 8.845544505190649,
+      "powered": true,
+      "n": 1162
+    },
+    {
+      "available_at": "2026-08-21 11:01:10",
+      "date": "2026-08-21",
+      "offset_min": -27,
+      "mard_best_bps": 3.203,
+      "mard_0_bps": 18.666,
+      "power_ratio": 9.503865556619992,
+      "powered": true,
+      "n": 1163
+    },
+    {
+      "available_at": "2026-08-21 11:29:42",
+      "date": "2026-08-21",
+      "offset_min": -23,
+      "mard_best_bps": 2.906,
+      "mard_0_bps": 17.019,
+      "power_ratio": 7.164704267273747,
+      "powered": true,
+      "n": 1163
+    },
+    {
+      "available_at": "2026-08-21 11:58:18",
+      "date": "2026-08-21",
+      "offset_min": -25,
+      "mard_best_bps": 2.591,
+      "mard_0_bps": 16.173,
+      "power_ratio": 8.752733906783156,
+      "powered": true,
+      "n": 1163
+    },
+    {
+      "available_at": "2026-08-21 12:29:14",
+      "date": "2026-08-21",
+      "offset_min": -26,
+      "mard_best_bps": 2.098,
+      "mard_0_bps": 17.364,
+      "power_ratio": 9.064564980585137,
+      "powered": true,
+      "n": 1163
+    },
+    {
+      "available_at": "2026-08-21 12:58:50",
+      "date": "2026-08-21",
+      "offset_min": -25,
+      "mard_best_bps": 2.189,
+      "mard_0_bps": 16.681,
+      "power_ratio": 10.090220152670296,
+      "powered": true,
+      "n": 1163
+    },
+    {
+      "available_at": "2026-08-21 13:28:34",
+      "date": "2026-08-21",
+      "offset_min": -25,
+      "mard_best_bps": 2.133,
+      "mard_0_bps": 15.055,
+      "power_ratio": 9.731754365749602,
+      "powered": true,
+      "n": 1163
+    },
+    {
+      "available_at": "2026-08-21 13:58:35",
+      "date": "2026-08-21",
+      "offset_min": -26,
+      "mard_best_bps": 2.363,
+      "mard_0_bps": 15.364,
+      "power_ratio": 7.4937042155991715,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-08-21 14:27:21",
+      "date": "2026-08-21",
+      "offset_min": -25,
+      "mard_best_bps": 2.096,
+      "mard_0_bps": 16.266,
+      "power_ratio": 9.197405797428322,
+      "powered": true,
+      "n": 1163
+    },
+    {
+      "available_at": "2026-08-24 11:11:54",
+      "date": "2026-08-24",
+      "offset_min": -24,
+      "mard_best_bps": 96.417,
+      "mard_0_bps": 105.443,
+      "power_ratio": 1.0774137495176008,
+      "powered": false,
+      "n": 1164
+    },
+    {
+      "available_at": "2026-08-24 11:41:36",
+      "date": "2026-08-24",
+      "offset_min": -26,
+      "mard_best_bps": 2.632,
+      "mard_0_bps": 19.615,
+      "power_ratio": 8.154382276886391,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-08-24 12:11:09",
+      "date": "2026-08-24",
+      "offset_min": -26,
+      "mard_best_bps": 2.061,
+      "mard_0_bps": 15.367,
+      "power_ratio": 11.021033106862278,
+      "powered": true,
+      "n": 1162
+    },
+    {
+      "available_at": "2026-08-24 12:40:46",
+      "date": "2026-08-24",
+      "offset_min": -25,
+      "mard_best_bps": 2.589,
+      "mard_0_bps": 18.348,
+      "power_ratio": 6.631569768437919,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-08-24 13:10:11",
+      "date": "2026-08-24",
+      "offset_min": -25,
+      "mard_best_bps": 1.779,
+      "mard_0_bps": 16.537,
+      "power_ratio": 11.356096673030958,
+      "powered": true,
+      "n": 1162
+    },
+    {
+      "available_at": "2026-08-24 13:40:15",
+      "date": "2026-08-24",
+      "offset_min": -25,
+      "mard_best_bps": 2.368,
+      "mard_0_bps": 13.75,
+      "power_ratio": 8.681958437813128,
+      "powered": true,
+      "n": 1163
+    },
+    {
+      "available_at": "2026-08-24 14:11:41",
+      "date": "2026-08-24",
+      "offset_min": -26,
+      "mard_best_bps": 2.451,
+      "mard_0_bps": 15.056,
+      "power_ratio": 7.352731062240326,
+      "powered": true,
+      "n": 1162
+    },
+    {
+      "available_at": "2026-08-24 14:41:01",
+      "date": "2026-08-24",
+      "offset_min": -25,
+      "mard_best_bps": 2.705,
+      "mard_0_bps": 14.684,
+      "power_ratio": 6.664036580431914,
+      "powered": true,
+      "n": 1165
+    },
+    {
+      "available_at": "2026-08-25 09:30:23",
+      "date": "2026-08-25",
+      "offset_min": -26,
+      "mard_best_bps": 5.703,
+      "mard_0_bps": 29.522,
+      "power_ratio": 7.364953143843297,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-08-25 09:58:14",
+      "date": "2026-08-25",
+      "offset_min": -23,
+      "mard_best_bps": 3.981,
+      "mard_0_bps": 21.306,
+      "power_ratio": 9.363376430244053,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-08-25 10:26:31",
+      "date": "2026-08-25",
+      "offset_min": -24,
+      "mard_best_bps": 3.487,
+      "mard_0_bps": 19.356,
+      "power_ratio": 8.116369638870289,
+      "powered": true,
+      "n": 1162
+    },
+    {
+      "available_at": "2026-08-25 10:55:32",
+      "date": "2026-08-25",
+      "offset_min": -24,
+      "mard_best_bps": 2.374,
+      "mard_0_bps": 20.237,
+      "power_ratio": 10.734761200789594,
+      "powered": true,
+      "n": 1160
+    },
+    {
+      "available_at": "2026-08-25 11:23:28",
+      "date": "2026-08-25",
+      "offset_min": -24,
+      "mard_best_bps": 2.326,
+      "mard_0_bps": 16.764,
+      "power_ratio": 11.197610090185979,
+      "powered": true,
+      "n": 1160
+    },
+    {
+      "available_at": "2026-08-25 11:51:25",
+      "date": "2026-08-25",
+      "offset_min": -24,
+      "mard_best_bps": 1.856,
+      "mard_0_bps": 13.688,
+      "power_ratio": 10.483654778323594,
+      "powered": true,
+      "n": 1162
+    },
+    {
+      "available_at": "2026-08-25 12:19:58",
+      "date": "2026-08-25",
+      "offset_min": -23,
+      "mard_best_bps": 2.082,
+      "mard_0_bps": 13.864,
+      "power_ratio": 8.558533057411278,
+      "powered": true,
+      "n": 1159
+    },
+    {
+      "available_at": "2026-08-25 12:47:50",
+      "date": "2026-08-25",
+      "offset_min": -23,
+      "mard_best_bps": 1.843,
+      "mard_0_bps": 15.856,
+      "power_ratio": 9.483467183829942,
+      "powered": true,
+      "n": 1162
+    },
+    {
+      "available_at": "2026-08-25 13:15:54",
+      "date": "2026-08-25",
+      "offset_min": -23,
+      "mard_best_bps": 2.145,
+      "mard_0_bps": 14.478,
+      "power_ratio": 10.084188893467802,
+      "powered": true,
+      "n": 1162
+    },
+    {
+      "available_at": "2026-08-25 13:44:57",
+      "date": "2026-08-25",
+      "offset_min": -23,
+      "mard_best_bps": 1.556,
+      "mard_0_bps": 13.773,
+      "power_ratio": 11.664599478868483,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-08-25 14:12:51",
+      "date": "2026-08-25",
+      "offset_min": -22,
+      "mard_best_bps": 2.481,
+      "mard_0_bps": 15.935,
+      "power_ratio": 10.095197818419978,
+      "powered": true,
+      "n": 1162
+    },
+    {
+      "available_at": "2026-08-25 14:40:42",
+      "date": "2026-08-25",
+      "offset_min": -23,
+      "mard_best_bps": 2.259,
+      "mard_0_bps": 16.294,
+      "power_ratio": 9.194941070176682,
+      "powered": true,
+      "n": 1162
+    },
+    {
+      "available_at": "2026-08-26 09:30:01",
+      "date": "2026-08-26",
+      "offset_min": -28,
+      "mard_best_bps": 5.29,
+      "mard_0_bps": 34.484,
+      "power_ratio": 8.241377878178307,
+      "powered": true,
+      "n": 1162
+    },
+    {
+      "available_at": "2026-08-26 09:59:38",
+      "date": "2026-08-26",
+      "offset_min": -26,
+      "mard_best_bps": 4.121,
+      "mard_0_bps": 23.448,
+      "power_ratio": 8.68109309044771,
+      "powered": true,
+      "n": 1163
+    },
+    {
+      "available_at": "2026-08-26 10:26:16",
+      "date": "2026-08-26",
+      "offset_min": -22,
+      "mard_best_bps": 2.956,
+      "mard_0_bps": 16.94,
+      "power_ratio": 9.294669233696268,
+      "powered": true,
+      "n": 1162
+    },
+    {
+      "available_at": "2026-08-26 10:55:24",
+      "date": "2026-08-26",
+      "offset_min": -25,
+      "mard_best_bps": 2.722,
+      "mard_0_bps": 19.22,
+      "power_ratio": 8.458654796391823,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-08-26 11:25:46",
+      "date": "2026-08-26",
+      "offset_min": -26,
+      "mard_best_bps": 2.935,
+      "mard_0_bps": 14.691,
+      "power_ratio": 7.002471048523724,
+      "powered": true,
+      "n": 1163
+    },
+    {
+      "available_at": "2026-08-26 11:57:37",
+      "date": "2026-08-26",
+      "offset_min": -27,
+      "mard_best_bps": 1.988,
+      "mard_0_bps": 13.86,
+      "power_ratio": 8.631116960105143,
+      "powered": true,
+      "n": 1159
+    },
+    {
+      "available_at": "2026-08-26 12:25:49",
+      "date": "2026-08-26",
+      "offset_min": -24,
+      "mard_best_bps": 1.924,
+      "mard_0_bps": 12.06,
+      "power_ratio": 8.696290320435889,
+      "powered": true,
+      "n": 1159
+    },
+    {
+      "available_at": "2026-08-26 12:54:40",
+      "date": "2026-08-26",
+      "offset_min": -23,
+      "mard_best_bps": 1.799,
+      "mard_0_bps": 12.364,
+      "power_ratio": 9.44805143841859,
+      "powered": true,
+      "n": 1158
+    },
+    {
+      "available_at": "2026-08-26 13:23:37",
+      "date": "2026-08-26",
+      "offset_min": -24,
+      "mard_best_bps": 1.888,
+      "mard_0_bps": 13.126,
+      "power_ratio": 8.359478992854847,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-08-26 13:54:39",
+      "date": "2026-08-26",
+      "offset_min": -26,
+      "mard_best_bps": 1.817,
+      "mard_0_bps": 13.812,
+      "power_ratio": 8.35440262756271,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-08-26 14:23:13",
+      "date": "2026-08-26",
+      "offset_min": -24,
+      "mard_best_bps": 2.525,
+      "mard_0_bps": 12.975,
+      "power_ratio": 6.212814866091077,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-08-27 09:12:13",
+      "date": "2026-08-27",
+      "offset_min": -25,
+      "mard_best_bps": 7.539,
+      "mard_0_bps": 42.668,
+      "power_ratio": 7.075809329746428,
+      "powered": true,
+      "n": 1163
+    },
+    {
+      "available_at": "2026-08-27 09:41:39",
+      "date": "2026-08-27",
+      "offset_min": -25,
+      "mard_best_bps": 4.739,
+      "mard_0_bps": 30.653,
+      "power_ratio": 10.128966858459039,
+      "powered": true,
+      "n": 1164
+    },
+    {
+      "available_at": "2026-08-27 10:11:09",
+      "date": "2026-08-27",
+      "offset_min": -26,
+      "mard_best_bps": 4.572,
+      "mard_0_bps": 24.21,
+      "power_ratio": 8.195603769717636,
+      "powered": true,
+      "n": 1160
+    },
+    {
+      "available_at": "2026-08-27 10:39:43",
+      "date": "2026-08-27",
+      "offset_min": -24,
+      "mard_best_bps": 2.852,
+      "mard_0_bps": 21.496,
+      "power_ratio": 10.034034802655222,
+      "powered": true,
+      "n": 1162
+    },
+    {
+      "available_at": "2026-08-27 11:07:58",
+      "date": "2026-08-27",
+      "offset_min": -24,
+      "mard_best_bps": 2.919,
+      "mard_0_bps": 20.067,
+      "power_ratio": 9.981836537777479,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-08-27 11:36:18",
+      "date": "2026-08-27",
+      "offset_min": -24,
+      "mard_best_bps": 1.93,
+      "mard_0_bps": 15.161,
+      "power_ratio": 11.657033959577511,
+      "powered": true,
+      "n": 1163
+    },
+    {
+      "available_at": "2026-08-27 12:04:41",
+      "date": "2026-08-27",
+      "offset_min": -23,
+      "mard_best_bps": 2.012,
+      "mard_0_bps": 14.194,
+      "power_ratio": 11.822258548163632,
+      "powered": true,
+      "n": 1158
+    },
+    {
+      "available_at": "2026-08-27 12:34:02",
+      "date": "2026-08-27",
+      "offset_min": -24,
+      "mard_best_bps": 2.034,
+      "mard_0_bps": 14.283,
+      "power_ratio": 8.982190397049912,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-08-27 13:03:12",
+      "date": "2026-08-27",
+      "offset_min": -23,
+      "mard_best_bps": 2.009,
+      "mard_0_bps": 19.198,
+      "power_ratio": 9.123890485903711,
+      "powered": true,
+      "n": 1158
+    },
+    {
+      "available_at": "2026-08-27 13:32:17",
+      "date": "2026-08-27",
+      "offset_min": -24,
+      "mard_best_bps": 2.23,
+      "mard_0_bps": 14.259,
+      "power_ratio": 10.410030117316264,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-08-27 14:01:12",
+      "date": "2026-08-27",
+      "offset_min": -23,
+      "mard_best_bps": 1.834,
+      "mard_0_bps": 14.013,
+      "power_ratio": 8.576712153106643,
+      "powered": true,
+      "n": 1163
+    },
+    {
+      "available_at": "2026-08-27 14:32:07",
+      "date": "2026-08-27",
+      "offset_min": -27,
+      "mard_best_bps": 2.287,
+      "mard_0_bps": 15.396,
+      "power_ratio": 7.0632441983648695,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-08-28 09:00:26",
+      "date": "2026-08-28",
+      "offset_min": -26,
+      "mard_best_bps": 10.317,
+      "mard_0_bps": 42.609,
+      "power_ratio": 6.879237808722304,
+      "powered": true,
+      "n": 1162
+    },
+    {
+      "available_at": "2026-08-28 09:28:22",
+      "date": "2026-08-28",
+      "offset_min": -23,
+      "mard_best_bps": 7.237,
+      "mard_0_bps": 33.374,
+      "power_ratio": 5.9791617534546955,
+      "powered": true,
+      "n": 1164
+    },
+    {
+      "available_at": "2026-08-28 09:56:14",
+      "date": "2026-08-28",
+      "offset_min": -23,
+      "mard_best_bps": 6.085,
+      "mard_0_bps": 25.637,
+      "power_ratio": 7.054396119921077,
+      "powered": true,
+      "n": 1163
+    },
+    {
+      "available_at": "2026-08-28 10:24:15",
+      "date": "2026-08-28",
+      "offset_min": -24,
+      "mard_best_bps": 3.83,
+      "mard_0_bps": 20.004,
+      "power_ratio": 8.249716178401199,
+      "powered": true,
+      "n": 1164
+    },
+    {
+      "available_at": "2026-08-28 10:52:36",
+      "date": "2026-08-28",
+      "offset_min": -24,
+      "mard_best_bps": 3.109,
+      "mard_0_bps": 32.72,
+      "power_ratio": 7.512767088282782,
+      "powered": true,
+      "n": 1164
+    },
+    {
+      "available_at": "2026-08-28 11:20:58",
+      "date": "2026-08-28",
+      "offset_min": -23,
+      "mard_best_bps": 3.247,
+      "mard_0_bps": 20.0,
+      "power_ratio": 9.660764977166217,
+      "powered": true,
+      "n": 1162
+    },
+    {
+      "available_at": "2026-08-28 11:49:46",
+      "date": "2026-08-28",
+      "offset_min": -23,
+      "mard_best_bps": 3.102,
+      "mard_0_bps": 17.32,
+      "power_ratio": 7.847536449661962,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-08-28 12:20:58",
+      "date": "2026-08-28",
+      "offset_min": -25,
+      "mard_best_bps": 2.918,
+      "mard_0_bps": 15.886,
+      "power_ratio": 7.333416546051573,
+      "powered": true,
+      "n": 1162
+    },
+    {
+      "available_at": "2026-08-28 12:50:57",
+      "date": "2026-08-28",
+      "offset_min": -25,
+      "mard_best_bps": 1.845,
+      "mard_0_bps": 12.684,
+      "power_ratio": 9.653157047465514,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-08-28 13:22:09",
+      "date": "2026-08-28",
+      "offset_min": -27,
+      "mard_best_bps": 2.152,
+      "mard_0_bps": 13.836,
+      "power_ratio": 6.640141438408079,
+      "powered": true,
+      "n": 1159
+    },
+    {
+      "available_at": "2026-08-28 13:50:48",
+      "date": "2026-08-28",
+      "offset_min": -23,
+      "mard_best_bps": 2.085,
+      "mard_0_bps": 14.214,
+      "power_ratio": 7.797857920073015,
+      "powered": true,
+      "n": 1159
+    },
+    {
+      "available_at": "2026-08-28 14:19:13",
+      "date": "2026-08-28",
+      "offset_min": -24,
+      "mard_best_bps": 2.054,
+      "mard_0_bps": 16.841,
+      "power_ratio": 7.24089955997883,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-08-28 14:47:31",
+      "date": "2026-08-28",
+      "offset_min": -24,
+      "mard_best_bps": 2.692,
+      "mard_0_bps": 18.881,
+      "power_ratio": 7.0564894363690875,
+      "powered": true,
+      "n": 1162
+    },
+    {
+      "available_at": "2026-09-01 10:30:40",
+      "date": "2026-09-01",
+      "offset_min": -60,
+      "mard_best_bps": 90.257,
+      "mard_0_bps": 120.082,
+      "power_ratio": 1.0,
+      "powered": false,
+      "n": 1163
+    },
+    {
+      "available_at": "2026-09-01 10:59:15",
+      "date": "2026-09-01",
+      "offset_min": -25,
+      "mard_best_bps": 3.028,
+      "mard_0_bps": 21.498,
+      "power_ratio": 7.811813162993992,
+      "powered": true,
+      "n": 1160
+    },
+    {
+      "available_at": "2026-09-01 11:27:38",
+      "date": "2026-09-01",
+      "offset_min": -24,
+      "mard_best_bps": 2.815,
+      "mard_0_bps": 35.691,
+      "power_ratio": 8.998345694134693,
+      "powered": true,
+      "n": 1159
+    },
+    {
+      "available_at": "2026-09-01 11:56:14",
+      "date": "2026-09-01",
+      "offset_min": -25,
+      "mard_best_bps": 2.69,
+      "mard_0_bps": 20.34,
+      "power_ratio": 10.642360930852126,
+      "powered": true,
+      "n": 1160
+    },
+    {
+      "available_at": "2026-09-01 12:24:49",
+      "date": "2026-09-01",
+      "offset_min": -24,
+      "mard_best_bps": 2.488,
+      "mard_0_bps": 15.079,
+      "power_ratio": 9.102515545824897,
+      "powered": true,
+      "n": 1158
+    },
+    {
+      "available_at": "2026-09-01 12:53:54",
+      "date": "2026-09-01",
+      "offset_min": -24,
+      "mard_best_bps": 2.827,
+      "mard_0_bps": 15.667,
+      "power_ratio": 6.737679653179947,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-09-01 13:22:59",
+      "date": "2026-09-01",
+      "offset_min": -25,
+      "mard_best_bps": 2.107,
+      "mard_0_bps": 15.737,
+      "power_ratio": 8.81123285420159,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-09-01 13:51:24",
+      "date": "2026-09-01",
+      "offset_min": -24,
+      "mard_best_bps": 2.821,
+      "mard_0_bps": 19.135,
+      "power_ratio": 7.306664500243426,
+      "powered": true,
+      "n": 1159
+    },
+    {
+      "available_at": "2026-09-01 14:19:44",
+      "date": "2026-09-01",
+      "offset_min": -24,
+      "mard_best_bps": 2.665,
+      "mard_0_bps": 18.432,
+      "power_ratio": 8.698479318600425,
+      "powered": true,
+      "n": 1162
+    },
+    {
+      "available_at": "2026-09-01 14:48:35",
+      "date": "2026-09-01",
+      "offset_min": -25,
+      "mard_best_bps": 2.553,
+      "mard_0_bps": 17.143,
+      "power_ratio": 8.548413198034398,
+      "powered": true,
+      "n": 1162
+    },
+    {
+      "available_at": "2026-09-02 09:13:04",
+      "date": "2026-09-02",
+      "offset_min": -29,
+      "mard_best_bps": 8.985,
+      "mard_0_bps": 61.725,
+      "power_ratio": 8.867209958443498,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-09-02 09:46:58",
+      "date": "2026-09-02",
+      "offset_min": -29,
+      "mard_best_bps": 5.812,
+      "mard_0_bps": 40.164,
+      "power_ratio": 9.41445947952729,
+      "powered": true,
+      "n": 1162
+    },
+    {
+      "available_at": "2026-09-02 10:19:31",
+      "date": "2026-09-02",
+      "offset_min": -27,
+      "mard_best_bps": 3.712,
+      "mard_0_bps": 31.069,
+      "power_ratio": 12.140566735400826,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-09-02 10:52:07",
+      "date": "2026-09-02",
+      "offset_min": -28,
+      "mard_best_bps": 2.998,
+      "mard_0_bps": 26.895,
+      "power_ratio": 11.385668642357654,
+      "powered": true,
+      "n": 1160
+    },
+    {
+      "available_at": "2026-09-02 11:24:18",
+      "date": "2026-09-02",
+      "offset_min": -28,
+      "mard_best_bps": 2.955,
+      "mard_0_bps": 22.592,
+      "power_ratio": 9.240974623932736,
+      "powered": true,
+      "n": 1160
+    },
+    {
+      "available_at": "2026-09-02 11:56:36",
+      "date": "2026-09-02",
+      "offset_min": -28,
+      "mard_best_bps": 2.587,
+      "mard_0_bps": 18.281,
+      "power_ratio": 9.418799554671844,
+      "powered": true,
+      "n": 1158
+    },
+    {
+      "available_at": "2026-09-02 13:04:59",
+      "date": "2026-09-02",
+      "offset_min": -28,
+      "mard_best_bps": 2.138,
+      "mard_0_bps": 20.963,
+      "power_ratio": 9.549040097800711,
+      "powered": true,
+      "n": 1160
+    },
+    {
+      "available_at": "2026-09-02 13:37:48",
+      "date": "2026-09-02",
+      "offset_min": -29,
+      "mard_best_bps": 2.561,
+      "mard_0_bps": 17.903,
+      "power_ratio": 8.06958754599999,
+      "powered": true,
+      "n": 1160
+    },
+    {
+      "available_at": "2026-09-02 14:10:46",
+      "date": "2026-09-02",
+      "offset_min": -28,
+      "mard_best_bps": 2.08,
+      "mard_0_bps": 21.002,
+      "power_ratio": 9.328808660778252,
+      "powered": true,
+      "n": 1159
+    },
+    {
+      "available_at": "2026-09-02 14:43:44",
+      "date": "2026-09-02",
+      "offset_min": -28,
+      "mard_best_bps": 2.537,
+      "mard_0_bps": 23.057,
+      "power_ratio": 9.357800230767875,
+      "powered": true,
+      "n": 1160
+    },
+    {
+      "available_at": "2026-09-03 09:35:00",
+      "date": "2026-09-03",
+      "offset_min": -35,
+      "mard_best_bps": 6.507,
+      "mard_0_bps": 48.883,
+      "power_ratio": 9.886903259179448,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-09-03 10:09:17",
+      "date": "2026-09-03",
+      "offset_min": -29,
+      "mard_best_bps": 4.119,
+      "mard_0_bps": 37.076,
+      "power_ratio": 11.35321962280263,
+      "powered": true,
+      "n": 1159
+    },
+    {
+      "available_at": "2026-09-03 10:41:28",
+      "date": "2026-09-03",
+      "offset_min": -27,
+      "mard_best_bps": 3.782,
+      "mard_0_bps": 26.452,
+      "power_ratio": 9.907231967706448,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-09-03 11:11:00",
+      "date": "2026-09-03",
+      "offset_min": -26,
+      "mard_best_bps": 2.918,
+      "mard_0_bps": 21.789,
+      "power_ratio": 10.022839587690914,
+      "powered": true,
+      "n": 1158
+    },
+    {
+      "available_at": "2026-09-03 11:40:52",
+      "date": "2026-09-03",
+      "offset_min": -25,
+      "mard_best_bps": 2.132,
+      "mard_0_bps": 19.071,
+      "power_ratio": 11.113538148032253,
+      "powered": true,
+      "n": 1160
+    },
+    {
+      "available_at": "2026-09-03 12:09:44",
+      "date": "2026-09-03",
+      "offset_min": -24,
+      "mard_best_bps": 2.168,
+      "mard_0_bps": 16.617,
+      "power_ratio": 9.79694359090564,
+      "powered": true,
+      "n": 1158
+    },
+    {
+      "available_at": "2026-09-03 12:40:47",
+      "date": "2026-09-03",
+      "offset_min": -26,
+      "mard_best_bps": 1.926,
+      "mard_0_bps": 17.47,
+      "power_ratio": 9.85406083416752,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-09-03 13:09:32",
+      "date": "2026-09-03",
+      "offset_min": -24,
+      "mard_best_bps": 1.823,
+      "mard_0_bps": 15.03,
+      "power_ratio": 10.55008572989455,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-09-03 13:39:28",
+      "date": "2026-09-03",
+      "offset_min": -25,
+      "mard_best_bps": 2.205,
+      "mard_0_bps": 14.009,
+      "power_ratio": 9.069538961807574,
+      "powered": true,
+      "n": 1160
+    },
+    {
+      "available_at": "2026-09-03 14:09:13",
+      "date": "2026-09-03",
+      "offset_min": -26,
+      "mard_best_bps": 2.058,
+      "mard_0_bps": 15.38,
+      "power_ratio": 8.484123241190906,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-09-03 14:39:16",
+      "date": "2026-09-03",
+      "offset_min": -26,
+      "mard_best_bps": 2.663,
+      "mard_0_bps": 18.444,
+      "power_ratio": 7.552291934129052,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-09-04 09:05:13",
+      "date": "2026-09-04",
+      "offset_min": -28,
+      "mard_best_bps": 10.952,
+      "mard_0_bps": 41.784,
+      "power_ratio": 5.656072244745166,
+      "powered": true,
+      "n": 1162
+    },
+    {
+      "available_at": "2026-09-04 09:34:49",
+      "date": "2026-09-04",
+      "offset_min": -25,
+      "mard_best_bps": 5.261,
+      "mard_0_bps": 35.587,
+      "power_ratio": 8.529708488650746,
+      "powered": true,
+      "n": 1158
+    },
+    {
+      "available_at": "2026-09-04 10:03:32",
+      "date": "2026-09-04",
+      "offset_min": -24,
+      "mard_best_bps": 3.646,
+      "mard_0_bps": 21.231,
+      "power_ratio": 9.167405695748332,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-09-04 10:32:59",
+      "date": "2026-09-04",
+      "offset_min": -24,
+      "mard_best_bps": 2.963,
+      "mard_0_bps": 18.749,
+      "power_ratio": 8.172339693260511,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-09-04 11:01:18",
+      "date": "2026-09-04",
+      "offset_min": -24,
+      "mard_best_bps": 2.289,
+      "mard_0_bps": 17.628,
+      "power_ratio": 11.058457634131944,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-09-04 11:29:38",
+      "date": "2026-09-04",
+      "offset_min": -24,
+      "mard_best_bps": 2.341,
+      "mard_0_bps": 14.244,
+      "power_ratio": 8.820997698395722,
+      "powered": true,
+      "n": 1159
+    },
+    {
+      "available_at": "2026-09-04 11:57:59",
+      "date": "2026-09-04",
+      "offset_min": -23,
+      "mard_best_bps": 1.77,
+      "mard_0_bps": 14.772,
+      "power_ratio": 9.212621469935556,
+      "powered": true,
+      "n": 1160
+    },
+    {
+      "available_at": "2026-09-04 12:26:33",
+      "date": "2026-09-04",
+      "offset_min": -24,
+      "mard_best_bps": 1.972,
+      "mard_0_bps": 14.843,
+      "power_ratio": 9.70942181869471,
+      "powered": true,
+      "n": 1160
+    },
+    {
+      "available_at": "2026-09-04 12:54:58",
+      "date": "2026-09-04",
+      "offset_min": -23,
+      "mard_best_bps": 2.226,
+      "mard_0_bps": 15.03,
+      "power_ratio": 9.30602689246984,
+      "powered": true,
+      "n": 1159
+    },
+    {
+      "available_at": "2026-09-04 13:25:50",
+      "date": "2026-09-04",
+      "offset_min": -27,
+      "mard_best_bps": 2.079,
+      "mard_0_bps": 14.033,
+      "power_ratio": 8.778771391158491,
+      "powered": true,
+      "n": 1160
+    },
+    {
+      "available_at": "2026-09-04 13:54:10",
+      "date": "2026-09-04",
+      "offset_min": -24,
+      "mard_best_bps": 1.711,
+      "mard_0_bps": 11.133,
+      "power_ratio": 9.541926840151651,
+      "powered": true,
+      "n": 1160
+    },
+    {
+      "available_at": "2026-09-04 14:22:29",
+      "date": "2026-09-04",
+      "offset_min": -24,
+      "mard_best_bps": 2.023,
+      "mard_0_bps": 15.154,
+      "power_ratio": 6.8507297414332315,
+      "powered": true,
+      "n": 1157
+    },
+    {
+      "available_at": "2026-09-04 14:50:57",
+      "date": "2026-09-04",
+      "offset_min": -23,
+      "mard_best_bps": 1.926,
+      "mard_0_bps": 18.777,
+      "power_ratio": 9.309354623826987,
+      "powered": true,
+      "n": 1159
+    },
+    {
+      "available_at": "2026-09-08 09:30:37",
+      "date": "2026-09-08",
+      "offset_min": -28,
+      "mard_best_bps": 6.656,
+      "mard_0_bps": 35.272,
+      "power_ratio": 8.103180462130195,
+      "powered": true,
+      "n": 1160
+    },
+    {
+      "available_at": "2026-09-08 10:04:36",
+      "date": "2026-09-08",
+      "offset_min": -29,
+      "mard_best_bps": 4.496,
+      "mard_0_bps": 30.301,
+      "power_ratio": 8.105615238064937,
+      "powered": true,
+      "n": 1160
+    },
+    {
+      "available_at": "2026-09-08 10:34:37",
+      "date": "2026-09-08",
+      "offset_min": -26,
+      "mard_best_bps": 3.324,
+      "mard_0_bps": 25.613,
+      "power_ratio": 9.187419243830542,
+      "powered": true,
+      "n": 1162
+    },
+    {
+      "available_at": "2026-09-08 11:06:11",
+      "date": "2026-09-08",
+      "offset_min": -28,
+      "mard_best_bps": 3.011,
+      "mard_0_bps": 20.84,
+      "power_ratio": 9.276455480243234,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-09-08 11:38:40",
+      "date": "2026-09-08",
+      "offset_min": -27,
+      "mard_best_bps": 2.899,
+      "mard_0_bps": 20.11,
+      "power_ratio": 8.46863982730122,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-09-08 12:12:17",
+      "date": "2026-09-08",
+      "offset_min": -30,
+      "mard_best_bps": 2.297,
+      "mard_0_bps": 20.142,
+      "power_ratio": 9.162742496802254,
+      "powered": true,
+      "n": 1159
+    },
+    {
+      "available_at": "2026-09-08 12:43:47",
+      "date": "2026-09-08",
+      "offset_min": -26,
+      "mard_best_bps": 2.076,
+      "mard_0_bps": 16.824,
+      "power_ratio": 10.062342257555287,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-09-08 13:15:08",
+      "date": "2026-09-08",
+      "offset_min": -27,
+      "mard_best_bps": 2.152,
+      "mard_0_bps": 17.288,
+      "power_ratio": 8.842673614977059,
+      "powered": true,
+      "n": 1160
+    },
+    {
+      "available_at": "2026-09-08 13:46:08",
+      "date": "2026-09-08",
+      "offset_min": -27,
+      "mard_best_bps": 2.223,
+      "mard_0_bps": 14.841,
+      "power_ratio": 9.20733282671569,
+      "powered": true,
+      "n": 1160
+    },
+    {
+      "available_at": "2026-09-08 14:16:04",
+      "date": "2026-09-08",
+      "offset_min": -26,
+      "mard_best_bps": 3.776,
+      "mard_0_bps": 18.097,
+      "power_ratio": 6.868125044670679,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-09-08 14:46:14",
+      "date": "2026-09-08",
+      "offset_min": -25,
+      "mard_best_bps": 2.522,
+      "mard_0_bps": 18.559,
+      "power_ratio": 8.504343062634257,
+      "powered": true,
+      "n": 1162
+    },
+    {
+      "available_at": "2026-09-09 10:45:41",
+      "date": "2026-09-09",
+      "offset_min": -76,
+      "mard_best_bps": 86.122,
+      "mard_0_bps": 117.895,
+      "power_ratio": 1.145055486515491,
+      "powered": false,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-09-09 11:17:21",
+      "date": "2026-09-09",
+      "offset_min": -28,
+      "mard_best_bps": 2.999,
+      "mard_0_bps": 21.866,
+      "power_ratio": 7.470081364275486,
+      "powered": true,
+      "n": 1160
+    },
+    {
+      "available_at": "2026-09-09 11:45:38",
+      "date": "2026-09-09",
+      "offset_min": -24,
+      "mard_best_bps": 2.157,
+      "mard_0_bps": 20.292,
+      "power_ratio": 10.825120382356124,
+      "powered": true,
+      "n": 1158
+    },
+    {
+      "available_at": "2026-09-09 12:13:53",
+      "date": "2026-09-09",
+      "offset_min": -24,
+      "mard_best_bps": 2.214,
+      "mard_0_bps": 15.072,
+      "power_ratio": 9.168395602700809,
+      "powered": true,
+      "n": 1159
+    },
+    {
+      "available_at": "2026-09-09 12:43:34",
+      "date": "2026-09-09",
+      "offset_min": -25,
+      "mard_best_bps": 1.813,
+      "mard_0_bps": 16.404,
+      "power_ratio": 9.87246768455573,
+      "powered": true,
+      "n": 1160
+    },
+    {
+      "available_at": "2026-09-09 13:13:19",
+      "date": "2026-09-09",
+      "offset_min": -26,
+      "mard_best_bps": 2.03,
+      "mard_0_bps": 16.253,
+      "power_ratio": 9.213703649847458,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-09-09 13:42:02",
+      "date": "2026-09-09",
+      "offset_min": -25,
+      "mard_best_bps": 2.108,
+      "mard_0_bps": 14.478,
+      "power_ratio": 8.911705512873622,
+      "powered": true,
+      "n": 1160
+    },
+    {
+      "available_at": "2026-09-09 14:10:19",
+      "date": "2026-09-09",
+      "offset_min": -23,
+      "mard_best_bps": 2.153,
+      "mard_0_bps": 15.109,
+      "power_ratio": 8.588595362758243,
+      "powered": true,
+      "n": 1160
+    },
+    {
+      "available_at": "2026-09-09 14:38:41",
+      "date": "2026-09-09",
+      "offset_min": -23,
+      "mard_best_bps": 2.507,
+      "mard_0_bps": 17.802,
+      "power_ratio": 8.12222470680406,
+      "powered": true,
+      "n": 1160
+    },
+    {
+      "available_at": "2026-09-10 09:04:53",
+      "date": "2026-09-10",
+      "offset_min": -29,
+      "mard_best_bps": 11.462,
+      "mard_0_bps": 52.012,
+      "power_ratio": 6.084862578241807,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-09-10 09:39:51",
+      "date": "2026-09-10",
+      "offset_min": -30,
+      "mard_best_bps": 6.807,
+      "mard_0_bps": 40.417,
+      "power_ratio": 6.891605970416161,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-09-10 10:13:30",
+      "date": "2026-09-10",
+      "offset_min": -30,
+      "mard_best_bps": 4.949,
+      "mard_0_bps": 27.609,
+      "power_ratio": 7.438213814870413,
+      "powered": true,
+      "n": 1160
+    },
+    {
+      "available_at": "2026-09-10 10:47:38",
+      "date": "2026-09-10",
+      "offset_min": -29,
+      "mard_best_bps": 3.438,
+      "mard_0_bps": 23.637,
+      "power_ratio": 7.6549302405722495,
+      "powered": true,
+      "n": 1160
+    },
+    {
+      "available_at": "2026-09-10 11:22:10",
+      "date": "2026-09-10",
+      "offset_min": -30,
+      "mard_best_bps": 2.965,
+      "mard_0_bps": 21.177,
+      "power_ratio": 7.420154532172506,
+      "powered": true,
+      "n": 1160
+    },
+    {
+      "available_at": "2026-09-10 11:55:45",
+      "date": "2026-09-10",
+      "offset_min": -28,
+      "mard_best_bps": 2.314,
+      "mard_0_bps": 16.093,
+      "power_ratio": 9.216229742394441,
+      "powered": true,
+      "n": 1158
+    },
+    {
+      "available_at": "2026-09-10 12:29:08",
+      "date": "2026-09-10",
+      "offset_min": -29,
+      "mard_best_bps": 2.199,
+      "mard_0_bps": 20.901,
+      "power_ratio": 7.85418636767822,
+      "powered": true,
+      "n": 1160
+    },
+    {
+      "available_at": "2026-09-10 13:02:39",
+      "date": "2026-09-10",
+      "offset_min": -29,
+      "mard_best_bps": 2.415,
+      "mard_0_bps": 15.911,
+      "power_ratio": 9.010505648324987,
+      "powered": true,
+      "n": 1160
+    },
+    {
+      "available_at": "2026-09-10 13:36:11",
+      "date": "2026-09-10",
+      "offset_min": -29,
+      "mard_best_bps": 2.42,
+      "mard_0_bps": 15.458,
+      "power_ratio": 6.971161455612071,
+      "powered": true,
+      "n": 1158
+    },
+    {
+      "available_at": "2026-09-10 14:09:31",
+      "date": "2026-09-10",
+      "offset_min": -29,
+      "mard_best_bps": 2.111,
+      "mard_0_bps": 16.063,
+      "power_ratio": 7.4141847590156,
+      "powered": true,
+      "n": 1161
+    },
+    {
+      "available_at": "2026-09-10 14:42:57",
+      "date": "2026-09-10",
+      "offset_min": -28,
+      "mard_best_bps": 2.468,
+      "mard_0_bps": 18.668,
+      "power_ratio": 6.972997904847469,
+      "powered": true,
+      "n": 1160
+    }
+  ],
+  "pre_registered": {
+    "fine_grid_min": [
+      -90,
+      90,
+      1
+    ],
+    "tz_cells_min": [
+      0,
+      60,
+      -60,
+      120,
+      -120,
+      300,
+      -300,
+      360,
+      -360
+    ],
+    "bar_tolerance_min": 10,
+    "session_window_ct": [
+      [
+        8,
+        40
+      ],
+      [
+        14,
+        50
+      ]
+    ],
+    "min_symbols_per_cell": 50,
+    "power_ratio": 3.0,
+    "precision_bps": 25.0,
+    "pass_offset_min": 1.0,
+    "comparison_price": "close of the last bar with OPEN time <= available_at + h",
+    "prices": "RAW (auto_adjust=False), regular session only (prepost=False)",
+    "verdict_order": [
+      "NO_DATA (<3 powered dates)",
+      "STOP_TIMEZONE",
+      "STOP_AMBIGUOUS",
+      "PASS (CI within +-1 min)",
+      "LAG_MEASURED"
+    ]
+  }
+}
