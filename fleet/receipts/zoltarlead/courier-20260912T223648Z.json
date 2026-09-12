@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "kind": "courier",
+  "node_id": "zoltarlead",
+  "agent_id": "zoltarlead/courier",
+  "run_at": "2026-09-12T17:36:48-05:00",
+  "stamp": "20260912T223648Z",
+  "branch": "fleet/dispatch",
+  "worktree": "C:\\Shared\\ClaudeWork\\zoltar-ranks.courier-wt",
+  "outcome": "error",
+  "failed_step": "1.fetch",
+  "steps": [
+    {
+      "step": "1.fetch",
+      "cmd": "git fetch --prune origin",
+      "rc": 128,
+      "stdout": "",
+      "stderr": "fatal: unable to access 'https://github.com/zoltarfinancial/zoltar-ranks.git/': Could not resolve host: github.com"
+    }
+  ],
+  "carried": null,
+  "committed": null,
+  "pushed_sha": null,
+  "needs_andrew": null,
+  "_note": "Written by a scheduled task that runs git and fleet_sync.py only. No model.",
+  "stderr": "fatal: unable to access 'https://github.com/zoltarfinancial/zoltar-ranks.git/': Could not resolve host: github.com"
+}
