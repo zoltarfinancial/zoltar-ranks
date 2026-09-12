@@ -7,7 +7,7 @@
   "stamp": "20260912T030225Z",
   "branch": "fleet/dispatch",
   "worktree": "C:\\Shared\\ClaudeWork\\zoltar-ranks.courier-wt",
-  "outcome": "committing",
+  "outcome": "ok",
   "failed_step": null,
   "steps": [
     {
@@ -30,6 +30,34 @@
       "rc": 0,
       "stdout": "",
       "stderr": "warning: in the working copy of 'data/fleet/heartbeat/zoltarlead.json', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'fleet/receipts/zoltarlead/000005-20260911T210230.json', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'fleet/receipts/zoltarlead/000005-20260911T211227.json', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'fleet/receipts/zoltarlead/000005-20260911T212227.json', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'fleet/receipts/zoltarlead/000005-20260911T213227.json', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'fleet/receipts/zoltarlead/000005-20260911T214227.json', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'fleet/receipts/zoltarlead/000005-20260911T215227.json', CRLF will be replaced by LF the next time Git touches it"
+    },
+    {
+      "step": "3.add-receipt",
+      "cmd": "git add -- fleet/receipts/zoltarlead",
+      "rc": 0,
+      "stdout": "",
+      "stderr": "warning: in the working copy of 'fleet/receipts/zoltarlead/000005-20260911T210230.json', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'fleet/receipts/zoltarlead/000005-20260911T211227.json', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'fleet/receipts/zoltarlead/000005-20260911T212227.json', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'fleet/receipts/zoltarlead/000005-20260911T213227.json', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'fleet/receipts/zoltarlead/000005-20260911T214227.json', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'fleet/receipts/zoltarlead/000005-20260911T215227.json', CRLF will be replaced by LF the next time Git touches it"
+    },
+    {
+      "step": "4.commit",
+      "cmd": "git -c user.name=ZoltarLead courier commit -m courier(zoltarlead): 1 dispatch path(s)\n\nLanded by the ZoltarLead courier, a scheduled task that runs git and\nscripts/fleet_sync.py only -- no model. Order t-20260908-courier-zoltarlead.\n",
+      "rc": 0,
+      "stdout": "[fleet/dispatch f9c959e] courier(zoltarlead): 1 dispatch path(s)\n 9 files changed, 380 insertions(+), 5 deletions(-)\n create mode 100644 fleet/receipts/zoltarlead/000005-20260911T210230.json\n create mode 100644 fleet/receipts/zoltarlead/000005-20260911T211227.json\n create mode 100644 fleet/receipts/zoltarlead/000005-20260911T212227.json\n create mode 100644 fleet/receipts/zoltarlead/000005-20260911T213227.json\n create mode 100644 fleet/receipts/zoltarlead/000005-20260911T214227.json\n create mode 100644 fleet/receipts/zoltarlead/000005-20260911T215227.json\n create mode 100644 fleet/receipts/zoltarlead/courier-20260912T030225Z.json",
+      "stderr": ""
+    },
+    {
+      "step": "5.push",
+      "cmd": "git push origin HEAD:refs/heads/fleet/dispatch",
+      "rc": 0,
+      "stdout": "",
+      "stderr": "To https://github.com/zoltarfinancial/zoltar-ranks.git\n   84f9ba5..f9c959e  HEAD -> fleet/dispatch"
+    },
+    {
+      "step": "6.fleet_sync",
+      "cmd": "C:\\Shared\\ClaudeWork\\zoltar-ranks\\.venv\\Scripts\\python.exe C:\\Shared\\ClaudeWork\\zoltar-ranks\\scripts\\fleet_sync.py",
+      "rc": 0,
+      "stdout": "zoltarlead/claude-code  lamport=5  verified=True\n    git       ok                msgs_read=4\n    onedrive  ok                msgs_read=4\n    db        absent-by-design  msgs_read=null  (no Artifact tool in Claude Code; only a cowork brain reaches the db)\n  ingested 0  repaired 0  gaps 0\n  receipt  C:\\Shared\\ClaudeWork\\zoltar-ranks\\fleet\\receipts\\zoltarlead\\000005-20260911T220230.json",
+      "stderr": ""
     }
   ],
   "carried": {
@@ -49,8 +77,8 @@
     "conflicts": [],
     "missing_sources": []
   },
-  "committed": null,
-  "pushed_sha": null,
+  "committed": "f9c959e6a1ed4558935e29fc8616113aaeef0f83",
+  "pushed_sha": "f9c959e6a1ed4558935e29fc8616113aaeef0f83",
   "needs_andrew": null,
   "_note": "Written by a scheduled task that runs git and fleet_sync.py only. No model.",
   "base": "origin/fleet/dispatch",
