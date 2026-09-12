@@ -1,0 +1,72 @@
+{
+  "cycle_id": "c-0017",
+  "opened_at": "2026-09-11T20:25:30-05:00",
+  "opened_by": "cowork",
+  "by": {
+    "agent_id": "zoltarlead/cowork",
+    "node_id": "zoltarlead",
+    "hostname": "zoltarlead",
+    "hostname_source": "get_device_info.deviceName vs fleet/identity.json attested_hostnames (case-insensitive match)",
+    "lane": "cowork",
+    "verified": true,
+    "at": "2026-09-11T20:25:30-05:00",
+    "reachable": {
+      "files": "ok",
+      "db": "ok",
+      "device_shell": "unavailable this fire"
+    }
+  },
+  "quiet": false,
+  "written_without_review_py": true,
+  "_note": "Written by the cowork lane, which has no shell on this device and cannot run dashboard/review.py open-cycle. The id is assigned by hand as the successor to c-0016 and the file is left uncommitted for the courier. Kinds used here are work_order, decision, risk and finding only - no kind: note (see t-20260910-cycle-kind-invalid). This cycle was opened on a LIVE turn, not a scheduled fire: Andrew relayed a worker result at 20:22 CDT, which ended the ten-fire quiet run.",
+  "state_snapshot": {
+    "read_at": "2026-09-11T20:25:30-05:00",
+    "board": {
+      "tasks": 34,
+      "events": 86,
+      "max_lamport": 111,
+      "bus": 43,
+      "fleet_live": 5,
+      "policy_level": 1,
+      "away_mode": false,
+      "age": "MOVED, by this cycle. Three events appended (109-111) and one task created. The 33/83/108 that stood through ten consecutive quiet fires is superseded.",
+      "status_method": "re-derived from all 83 pre-existing events ordered by lamport, tie-break at; policy L1 auto-approval applied to classes probe/research/docs only and never to a question or decision"
+    },
+    "git": {
+      "origin/main": "1a05afa, unmoved since 2026-09-11T06:42:26Z",
+      "origin/fleet/dispatch": "5794083, fetched 2026-09-12T01:02:30Z",
+      "origin/research/c-0002.1-mechanism": "f3b555a45d5d4b9085467edae056058c2b38e99e, fetched 2026-09-12T01:15:47Z - NEW THIS CYCLE, read by me from the ref file, not from a receipt",
+      "note": "The findings branch is pushed and unmerged. Its CONTENTS were not read by this lane: the work was done in worktree C:\\\\Shared\\\\ClaudeWork\\\\zoltar-ranks.mech-wt, outside this session's connected folder, and the branch is not checked out in the readable clone."
+    },
+    "build_status": {
+      "generated_at": "2026-09-11T18:00:20-05:00",
+      "gate": "amber",
+      "headline": "Running, but not yet trustworthy - 5 blocker gate(s) never run or stale.",
+      "changed_since_c-0016": "NOTHING IN THE BUILD. Same gate, same headline, same B1/B2/B3, all unchanged since 2026-09-02. Everything that moved moved in git and on the board."
+    },
+    "fleet": {
+      "zoltarlead": "beat on time 18:01:01 CDT, probe rc 0; courier healthy, 23:02:25Z run 02b60ab -> 580988a",
+      "zoltarone": "silent 97.2 h against an hourly beat",
+      "zoltargenesis/zoltarstar/zoltartwo": "no heartbeat file has ever existed"
+    }
+  },
+  "assessment": "The ten-fire quiet run ended on a relayed answer, and the answer is more interesting for what it could not find than for what it found. Asked how much wall-clock passes between a run reading prices and stamping available_at, the code could not say - because on the rank-producing path, nothing in any reachable repository reads a price at all. That excludes the four comfortable explanations for the -25 minute anchor (harvest cadence, push lag, timezone conversion, rule 3 latency) and leaves the one bias the archive does have, least() over three upstream stamps, pushing available_at EARLIER - which can only understate the gap. So -25 minutes is now better read as a floor than as a point estimate, and that is the direction that makes the 09-16 expiry expensive. The larger finding is structural and is not about c-0002.1 at all: if the producing program is under no version control this fleet can see, then no provenance question of this shape can ever be closed by reading code - only by measuring against windows that expire. That is a standing ceiling on the method, and it is now c-0017.1 rather than a line in a branch nobody merged. Against the end goal, the build has not moved in ten days; what has moved is our confidence about where the honest number will have to come from.",
+  "items": [
+    {
+      "id": "c-0017.1",
+      "kind": "question",
+      "for": "andrew",
+      "priority": "next",
+      "title": "Where does the program that produces daily_ranks/*_PROD_*.pkl actually live?",
+      "why": "The mechanism check reports that nothing in any repository or working copy reachable from ZoltarLead reads a price on the path that produces a rank, and that available_at is a derived least() of three stamps upstream wrote. If that holds, the program that decides what a rank means and when it became knowable is under no version control this fleet can see. That bears directly on charter criterion 1 (BASELINE_HONEST and its gap to BASELINE_ASIS) and on non-negotiable 3 (decisions key off available_at): we are inferring the provenance of available_at from its consumers because its producer cannot be read. It also caps the method - every future question of this shape must be answered by measurement against an expiring window rather than by reading code. Andrew is the only party who can answer it, and it needs no machine.",
+      "acceptance": "Andrew replies with one of: (a) a path or host where the producing code lives - a follow-up work order then inventories it and this closes; (b) 'it exists but is not under version control' - the follow-up is getting it into one; or (c) 'it is gone / it is a black box' - the brain records the ceiling explicitly in charter.json as a standing limit and stops proposing code-reading answers to provenance questions. Any of the three closes this; no reply leaves it open.",
+      "depends_on": [],
+      "estimate": "one line from Andrew",
+      "refs": [
+        "data/review/charter.json",
+        "FINDINGS-c-0002.1-mechanism.md @ f3b555a (unmerged branch research/c-0002.1-mechanism)"
+      ],
+      "board_task": "t-20260911-producer-pipeline-unreachable"
+    }
+  ]
+}
