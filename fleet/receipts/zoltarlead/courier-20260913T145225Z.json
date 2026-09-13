@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "kind": "courier",
+  "node_id": "zoltarlead",
+  "agent_id": "zoltarlead/courier",
+  "run_at": "2026-09-13T09:52:25-05:00",
+  "stamp": "20260913T145225Z",
+  "branch": "fleet/dispatch",
+  "worktree": "C:\\Shared\\ClaudeWork\\zoltar-ranks.courier-wt",
+  "outcome": "committing",
+  "failed_step": null,
+  "steps": [
+    {
+      "step": "1.fetch",
+      "cmd": "git fetch --prune origin",
+      "rc": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "step": "2.reset-to-remote",
+      "cmd": "git reset --hard origin/fleet/dispatch",
+      "rc": 0,
+      "stdout": "HEAD is now at 2fda41e courier(zoltarlead): 1 dispatch path(s)",
+      "stderr": ""
+    },
+    {
+      "step": "3.add",
+      "cmd": "git add -- orders fleet/msgs fleet/receipts data/fleet/heartbeat data/review",
+      "rc": 0,
+      "stdout": "",
+      "stderr": "warning: in the working copy of 'fleet/receipts/zoltarlead/000005-20260913T090230.json', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'fleet/receipts/zoltarlead/000005-20260913T091227.json', CRLF will be replaced by LF the next time Git touches it"
+    }
+  ],
+  "carried": {
+    "added": [
+      "fleet/receipts/zoltarlead/000005-20260913T090230.json",
+      "fleet/receipts/zoltarlead/000005-20260913T091227.json",
+      "fleet/receipts/zoltarlead/courier-20260913T142225Z.json",
+      "fleet/receipts/zoltarlead/courier-20260913T143225Z.json",
+      "fleet/receipts/zoltarlead/courier-20260913T144225Z.json"
+    ],
+    "updated_one_writer": [
+      "fleet/receipts/zoltarlead/courier-20260913T140225Z.json"
+    ],
+    "unioned": [],
+    "conflicts": [],
+    "missing_sources": []
+  },
+  "committed": null,
+  "pushed_sha": null,
+  "needs_andrew": null,
+  "_note": "Written by a scheduled task that runs git and fleet_sync.py only. No model.",
+  "base": "origin/fleet/dispatch",
+  "base_sha": "2fda41e8f16a32a1d4e2edf00d110b4955d7bb63",
+  "staged": [
+    "fleet/receipts/zoltarlead/000005-20260913T090230.json",
+    "fleet/receipts/zoltarlead/000005-20260913T091227.json",
+    "fleet/receipts/zoltarlead/courier-20260913T140225Z.json",
+    "fleet/receipts/zoltarlead/courier-20260913T142225Z.json",
+    "fleet/receipts/zoltarlead/courier-20260913T143225Z.json",
+    "fleet/receipts/zoltarlead/courier-20260913T144225Z.json"
+  ],
+  "commit_worthy": [
+    "fleet/receipts/zoltarlead/courier-20260913T142225Z.json",
+    "fleet/receipts/zoltarlead/courier-20260913T143225Z.json",
+    "fleet/receipts/zoltarlead/courier-20260913T144225Z.json"
+  ]
+}
