@@ -1,0 +1,103 @@
+{
+  "cycle_id": "c-0019",
+  "opened_at": "2026-09-15T09:16:10-05:00",
+  "opened_by": "cowork",
+  "by": {
+    "agent_id": "zoltarlead/cowork",
+    "node_id": "zoltarlead",
+    "hostname": "zoltarlead",
+    "hostname_source": "get_device_info.deviceName read live this fire vs fleet/identity.json attested_hostnames ['ZOLTARLEAD','ZoltarLead'] -- case-insensitive match",
+    "lane": "cowork",
+    "verified": true,
+    "at": "2026-09-15T09:16:10-05:00",
+    "reachable": {
+      "files": "ok",
+      "db": "ok",
+      "device_shell": "unavailable this fire"
+    }
+  },
+  "quiet": false,
+  "written_without_review_py": true,
+  "_note": "Written by the cowork lane, which has no shell on this device and cannot run dashboard/review.py open-cycle. The id is assigned by hand as the successor to c-0018 and the file is left uncommitted for the courier. Kinds used: finding, work_order -- both in review-protocol.md's allowed set; kind: note is not used and no depends_on names a task id (the defect t-20260910-cycle-kind-invalid covers). Board mapping, stated because the ids differ: c-0019.2 is the cycle mirror of board task t-20260915-preserve-intraday-cache (origin db, created this fire, e-000115-crtcache), following the precedent set by c-0017.1 / t-20260911-producer-pipeline-unreachable. c-0019.1 has no board task -- it is a finding about this brain's own process and its corrective action was taken inside this fire.",
+  "state_snapshot": {
+    "read_at": "2026-09-15T09:16:10-05:00",
+    "fire": "Scheduled hourly fire, 1.00 h after the 08:12 CDT one. NOT quiet, and the mechanical quiet test would have called it quiet: no new inbox event, no new commit on main, no gate or job change, nothing crossed into done_unverified or blocked. What makes it non-quiet is a finding this fire made about the board's own premise, not a change in machine state.",
+    "board": {
+      "tasks": "34 on read, 35 after this fire (t-20260915-preserve-intraday-cache)",
+      "events": "88 on read, 90 after this fire (e-000114-clkcorr, e-000115-crtcache)",
+      "max_lamport_on_read": 113,
+      "bus": "44 on read; nothing inbound addressed to zoltarlead/cowork or to all since the last fire",
+      "fleet_live": 5,
+      "policy_level": 1,
+      "away_mode": false,
+      "age": "UNCHANGED since the 08:12 CDT fire. Newest event before this one was this brain's own e-000113-clk072 (07:13 CDT). No task created or edited by anyone, no bus message, nothing from Andrew.",
+      "status_method": "re-derived this fire from all 88 events ordered by lamport, tie-break at; L1 auto-approval applied to classes probe/research/docs only and never to a question or decision"
+    },
+    "git": {
+      "origin/main": "1a05afa, ref file untouched since 2026-09-11T06:42:26Z (4.31 d)",
+      "origin/fleet/dispatch": "dba0533, per the 2026-09-15T14:02:25Z courier receipt (0.23 h) and FETCH_HEAD; base 78a4557, push rc 0",
+      "origin/research/c-0002.1-mechanism": "f3b555a, unmerged, contents still unread by this lane"
+    },
+    "build_status": {
+      "generated_at": "2026-09-15T09:00:25-05:00",
+      "age_hours": 0.26,
+      "gate": "amber",
+      "headline": "Running, but not yet trustworthy - 5 blocker gate(s) never run or stale.",
+      "changed_since_c-0018": "NOTHING. Same gate, same headline, same B1/B2/B3, each unchanged since 2026-09-02."
+    },
+    "review_state": {
+      "generated_at": "2026-09-15T09:00:25-05:00",
+      "note": "items 40, raised 12, unmet_dependencies 6 (c-0007.1, c-0008.2, c-0008.4, c-0010.2, c-0010.4, c-0016.2), current_cycle c-0018 before this file. Nothing done_unverified, nothing blocked. The protocol heartbeat block still reads late because dashboard/review.py cannot be run from this lane -- standing, unchanged."
+    },
+    "inbox": {
+      "file_mtime": "2026-09-11T06:31:19Z",
+      "age_days": 4.32,
+      "new_events": 0
+    },
+    "fleet": {
+      "zoltarlead": "worker beat on time 09:01:01 CDT (0.25 h), outcome ok, probe rc 0, branch fleet/courier-zoltarlead @ a13380c dirty. Courier ran clean six times since the last fire; newest 14:02:25Z ok, 78a4557 -> dba0533, carried this node's heartbeat and six fleet_sync receipts, no order file, so no commit event is owed.",
+      "zoltarone": "silent 184.2 h (7.68 d) against an hourly beat. Standing, long since notified, not re-notified.",
+      "zoltargenesis/zoltarstar/zoltartwo": "no heartbeat file has ever existed; last_heartbeat_at stays null"
+    },
+    "the_cache": {
+      "path": "data/cache/prices/yfinance/intraday_1m/",
+      "verified_this_fire": "directory listed and all three JSON sidecars read: 2026-08-19_2026-08-27 (2,480,547 rows, 1,167 symbols, 6 sessions), 2026-08-27_2026-09-04 (2,474,665, 1,165, 6), 2026-09-04_2026-09-11 (1,653,931, 1,163, 4). Total 6,609,143 bars, 16 sessions, 2026-08-19..2026-09-10, unavailable [] on all three. Parquet files 37,788,305 + 37,777,191 + 25,483,674 = 101,049,170 bytes, mtimes 2026-09-10.",
+      "tracked_by_git": "no -- .gitignore line 9 is data/* and the only re-inclusions are data/build/manifest.yaml, data/review/** and data/fleet/**"
+    }
+  },
+  "assessment": "The only thing that changed this fire is that I checked a premise I had been repeating, and it was wrong. For two fires and two pushes I told Andrew that tonight at midnight is the last moment the c-0002.1 measurement is possible. It is not: the 6.61M one-minute bars it needs were fetched and written to disk on 2026-09-10, the worker's own ORDER_RESULT says in as many words that the measurement no longer depends on the yfinance window, I relayed that correctly on the bus on 09-11 -- and then every fire since re-read the stale entry in goal/current.deadlines and manufactured the urgency again. That is the more important finding than the deadline itself: a fresh-session brain trusts a structured goal doc over a four-day-old bus post, so a fact that lives only in prose does not survive, and a stale field in goal/current will be laundered into new pushes indefinitely. The deadline is corrected, and the correction is on the item rather than buried in a cycle. Against the end goal, nothing else moved: gate amber on the same three blockers since 09-02, main still 1a05afa, ZoltarOne silent an eighth day, and c-0007.1 remains unanswered and now unhurried. What replaces the false clock is a real and narrower exposure -- 101 MB of irreplaceable bars in one untracked working-tree directory on one machine, with yfinance's window closing behind them around 09-17 -- which is a custody problem and now has a task.",
+  "items": [
+    {
+      "id": "c-0019.1",
+      "kind": "finding",
+      "for": "cowork",
+      "priority": "next",
+      "title": "The brain re-manufactured an expired deadline for four days because goal/current.deadlines outranked its own bus post",
+      "why": "c-0002.1's dependence on the yfinance 1-minute window ended on 2026-09-10 when the bars were persisted to disk, and the worker said so in its ORDER_RESULT. I posted that correctly on the bus on 09-11 (m-20260911-0719) and then contradicted it the same evening in e-000110, again in e-000112, again in e-000113, in cycle c-0018's assessment, and in two pushes to Andrew. Every one of those was written by a fresh session that read goal/current.deadlines -- a structured, authoritative-looking field -- and never read a four-day-old bus message. This is the failure mode the charter names in another costume: a declaration outliving the evidence that contradicted it. It matters beyond this one date because the fix is structural, not an apology: anything that a later fire must not re-assert has to be written into the structured docs the next fire is guaranteed to read, and a fire that carries a deadline into a push should re-derive it from evidence rather than inherit it. It cost Andrew two notifications of false urgency on a decision that is genuinely his and genuinely open.",
+      "acceptance": "goal/current.deadlines no longer carries the 2026-09-16 entry and its replacement states the correction and the evidence (done this fire; goal/current v1 -> v2). A note on c-0007.1 states the correction on the item itself rather than only in a cycle (done this fire; e-000114-clkcorr). Checkable by anyone later: no cycle, bus post, event or push written after 2026-09-15T09:16 CDT asserts that the c-0002.1 measurement expires on 2026-09-16, and any future deadline a fire pushes on names the file or receipt it was re-derived from in the same write.",
+      "depends_on": [],
+      "refs": [
+        "e-000114-clkcorr",
+        "m-20260911-0719-trunk-moved-and-the-anchor-landed",
+        "fleet/bridge/outbox/20260910-2213-zoltarlead-c-0002.1.md",
+        "c-0007.1"
+      ]
+    },
+    {
+      "id": "c-0019.2",
+      "kind": "work_order",
+      "for": "claude-code",
+      "priority": "next",
+      "title": "Copy and checksum data/cache/prices/yfinance/intraday_1m/ to a second location Andrew names",
+      "why": "These 101 MB are the entire input to the only research result this board has carried end to end, and to charter criterion 1. Verified present and intact this fire: 6,609,143 bars, 1,167 symbols, 16 sessions from 2026-08-19 to 2026-09-10, the same counts the c-0002.1 result reports. data/* is gitignored with only manifest.yaml, data/review/** and data/fleet/** re-included, so the directory is tracked by nothing and mirrored nowhere -- one copy, one disk, one machine. Around 2026-09-17 yfinance's rolling ~28-day window stops serving those dates, at which point an ordinary tidy-up or a disk failure is no longer a re-fetch but the permanent end of the measurement. This is the exposure the 09-16 panic should have been about. It is minutes of work and requires no judgement except where the copy lives, which is Andrew's and is deliberately left blank in the order.",
+      "acceptance": "ORDER_RESULT.md gives, with each command and its raw output: sha256 and byte size of all six files (three .parquet, three .json) written into data/results/intraday_1m_manifest.json; the six files copied to the destination Andrew names on approval -- separate media or off-machine, not another folder on the same disk -- with the path recorded; sha256 re-computed at the destination matching pair by pair; and row counts re-read from the copied sidecars summing to 6,609,143 across 1,167 symbols and 16 sessions. Nothing in the source directory is moved, renamed, deleted or rewritten. If no destination has been named, report that and stop rather than choosing one.",
+      "depends_on": [],
+      "estimate": "30m",
+      "refs": [
+        "t-20260915-preserve-intraday-cache",
+        "data/cache/prices/yfinance/intraday_1m/",
+        "e-000115-crtcache"
+      ]
+    }
+  ]
+}
