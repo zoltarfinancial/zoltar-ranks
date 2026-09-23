@@ -1,0 +1,97 @@
+{
+  "cycle_id": "c-0020",
+  "opened_at": "2026-09-23T16:14:21-0500",
+  "opened_by": "cowork",
+  "by": {
+    "agent_id": "zoltarlead/cowork",
+    "node_id": "zoltarlead",
+    "hostname": "zoltarlead",
+    "hostname_source": "get_device_info.deviceName read live this fire (2026-09-23T21:09:05Z) vs fleet/identity.json attested_hostnames ['ZOLTARLEAD','ZoltarLead'] (file staged and read this fire) -- case-insensitive match",
+    "lane": "cowork",
+    "verified": true,
+    "at": "2026-09-23T16:14:21-0500",
+    "reachable": {
+      "files": "ok",
+      "db": "ok",
+      "drive": "ok (read-only)",
+      "device_shell": "unavailable this fire -- no device_bash tool; forty-sixth consecutive fire"
+    }
+  },
+  "quiet": false,
+  "written_without_review_py": true,
+  "_note": "Written by the cowork lane, which has no shell on this device and cannot run dashboard/review.py open-cycle. The id is assigned by hand as the successor to c-0019 and the file is left uncommitted for the courier, following the precedent this lane set at c-0019. Kinds used: finding only -- both in review-protocol.md's allowed set. No work_order is issued this fire and no board task is created, so there is no cycle/board id mapping to state. No item carries priority now: six items already sit at now on the open board, and the runbook's ceiling is three.",
+  "state_snapshot": {
+    "read_at": "2026-09-23T16:14:21-0500",
+    "fire": "Scheduled hourly fire, 1.00 h after the 15:14 CDT one (previous dispatcher receipt device mtime 2026-09-23T20:15:02Z). TENTH fire of the 2026-09-23 window. NOT quiet: a deliverable on the critical path crossed into done and its phase crossed 95 -> 100. The two preceding fires named this exact observation as the thing that would make a fire cycle-worthy.",
+    "board": {
+      "tasks": "39 on read, 39 after this fire -- no task created",
+      "events": "102 on read, 103 after this fire (e-000128-p1aclose)",
+      "max_lamport_on_read": 127,
+      "bus": "50 on read; nothing addressed to zoltarlead/cowork or to all since the last fire, so no ack and no task is owed",
+      "fleet_live": 5,
+      "policy_level": 1,
+      "away_mode": false,
+      "age": "Board UNCHANGED since the 15:14 CDT fire. Newest event on read is this brain's own e-000127-caprate2 (2026-09-22T11:12:46-05:00, 34.0 h); the newest event by any other party is still andrew's e-000119-uj196a of 2026-09-17T23:32:36-05:00 (137.7 h).",
+      "status_method": "re-derived INDEPENDENTLY this fire from all 102 event documents replayed locally in lamport order (tie-break at), with policy/current v1 L1 auto-approval applied as a floor to classes probe/research/docs and never to kind question or decision. Composition: 22 proposed, 5 done, 4 dispatched, 3 merged, 2 approved, 1 running, 1 cancelled, 1 deferred -- identical to the previous fire. Exactly two tasks derive approved with no dispatch event and both remain undispatchable. Zero receipt events with outcome refused, error or halted exist on the board."
+    },
+    "git": {
+      "origin/main": "1a05afa6ed7341869769b2621ce043303eca62f1 per .git/FETCH_HEAD (device mtime 2026-09-23T21:02:32Z, 0.20 h) -- NO trunk move",
+      "origin/fleet/dispatch": "910ca49560353312f77ac29f64b9ed2a5650f0dd, per courier receipt courier-20260923T210226Z.json (16:02:26 CDT, 0.20 h), base 0d89d14a -- exactly the sha the previous fire recorded as pushed. Carried six fleet_sync receipts, one one-writer receipt update and this node's heartbeat; ZERO orders/, ORDER_RESULT or cycles/ paths, so no commit event and no receipt event is owed."
+    },
+    "build_status": {
+      "generated_at": "2026-09-23T16:00:29-05:00",
+      "age_hours": 0.23,
+      "gate": "amber",
+      "headline": "Running, but not yet trustworthy - 5 blocker gate(s) never run or stale.",
+      "changed_since_c-0019": "PHASE 1a: 95 -> 100. Deliverable 10 of 10, 'One full trading session of green beats' (kind: proof), wip -> done. Nothing else moved: same gate, same headline, same B1/B2/B3 at severity normal since 2026-09-02, same seven stale contract tests (5 blocker, 2 warning), zero job transitions, zero gate transitions, all three harvest jobs healthy.",
+      "harvest_intraday": "healthy; runs_24h 13 against expected_24h 13, failures_24h 0, last run 2026-09-23T15:01:04-05:00, 15,692 rows. The single 'miss' cell the last two fires published as an unresolved emitter-binning artefact is GONE from this reading -- the beat ring now carries thirteen consecutive ok cells and no miss, which is consistent with the artefact reading and with run_history, and closes that observation without anyone editing the emitter."
+    },
+    "review_state": {
+      "generated_at": "2026-09-23T16:00:30-05:00",
+      "note": "42 items, 12 raised, 6 unmet dependencies (c-0007.1, c-0008.2, c-0008.4, c-0010.2, c-0010.4, c-0016.2). Nothing done_unverified, nothing blocked. 36 open, 5 done, 1 in_progress. NINETEEN open items name a party other than cowork as waiting_on; FOURTEEN wait on Andrew, SIX of those at priority now. The protocol heartbeat block still reads late because dashboard/review.py cannot be run from this lane -- standing, unchanged."
+    },
+    "inbox": {
+      "file_mtime": "2026-09-10T02:31:19Z",
+      "age_days": 13.78,
+      "new_events": 0
+    },
+    "fleet": {
+      "zoltarlead": "worker beat on time 16:01:01 CDT (0.22 h), outcome ok, probe rc 0, branch fleet/courier-zoltarlead @ a13380c dirty. Courier ran clean six times since the last fire.",
+      "zoltarone": "silent 388.2 h (16.18 d) against an hourly beat. Standing, long since notified, not re-notified.",
+      "zoltargenesis/zoltarstar/zoltartwo": "no heartbeat file has ever existed; last_heartbeat_at stays null with a stated reason, never a copied stamp"
+    },
+    "orders": {
+      "listed": "orders/ re-listed recursively this fire: eight order files across three node directories (zoltargenesis 1, zoltarlead 3, zoltarone 4)",
+      "order_results": "ZERO ORDER_RESULT.md anywhere. t-20260911-verify-main-contents has been dispatched and unclaimed for 12.6 d."
+    },
+    "kb": {
+      "desktop_tier": "UNREACHABLE, not empty: C:\\Shared\\lessons-learned-kb is not one of this session's connected folders (connectedFolders is exactly ['C:\\Shared\\ClaudeWork\\zoltar-ranks']).",
+      "drive_tier": "read in full before any write this fire -- index.md id 13stf7y9NETmbiNesu2URHbdijrFLyR24, rev 44, 44 rows, HTML rev trailer held, byte-equivalent to the previous fire.",
+      "applied": "time__local-stamp-written-from-utc-clock (promoted) -- every stamp in this fire is a clock re-read immediately before its own write. dashboard__green-over-unread-data (promoted) -- a 100% phase whose own status field still says in_progress is published as a discrepancy, not rounded up to closed. fleet__tier-owned-field-written-by-another-tier -- the emitter is the worker's lane; this cycle states the discrepancy and does not fix it.",
+      "leg": "Drive publish/relay leg SKIPPED by the runbook -- gated on t-20260908-kb-v2-cutover, which still derives proposed. Nothing in Drive was created, moved or trashed."
+    }
+  },
+  "assessment": "Phase 1a closed today, and it is the first thing on the critical path to close since 2026-09-02. The 16:00 CDT build reads phase 1a at 100 with its tenth deliverable -- 'One full trading session of green beats', a kind: proof, the one that could only be earned by the market being open -- finally done, on thirteen intraday harvests out of thirteen expected with zero failures. That matters beyond the percentage: 1a was the only irreversible job on the board, the one whose misses are history that no longer exists, and it is now demonstrably running clean for a full session rather than merely scheduled. The critical path 1a -> 2 -> 3 -> 6 therefore advances to Phase 2 (market data, 75%, two deliverables wip), and Phase 2's note is already specific about what it wants first: Close_Price appears unadjusted for splits, so an adjustment path and a reconciliation test come before any benchmark number is quoted. What does NOT change is who can act. Nothing else moved this fire -- gate amber on the same three blockers for the twenty-first day, main still 1a05afa, ZoltarOne silent a seventeenth day, the inbox untouched for 13.8 days, and eight order files sitting in the clone with not one ORDER_RESULT among them. I deliberately issued no work order for Phase 2. The constraint on this build is not a missing order; it is that nothing consumes orders -- fleet/dispatch has never landed on main, so an executor that only reads main can never see one, and c-0014.1 and c-0015.1 have been waiting on Andrew for that call since 2026-09-11. Adding a fifth unconsumed order to a queue that has moved nothing in 12.6 days would inflate the board and hide the real blocker. The honest reading is that 1a's close raises the value of that one decision rather than creating new work: the machine just proved it can run a session unattended, and the only thing standing between that and Phase 2 is a merge only Andrew can make.",
+  "items": [
+    {
+      "id": "c-0020.1",
+      "kind": "finding",
+      "for": "andrew",
+      "priority": "next",
+      "title": "Phase 1a is closed on evidence - first critical-path phase to close since 2026-09-02",
+      "why": "1a is the phase the plan calls urgent because intraday history is destroyed continuously, and it is the only job on the board whose misses are irreversible. Its closing condition was deliberately not 'the script exists' but 'section 08 has shown one full trading session of green beats' -- a proof that can only be earned by a market session running unattended and clean. That happened today. Against the end goal this is the first hard input the rest of the chain depends on: every honest execution-timing number the charter asks for is computed over the archive 1a fills, so a 1a that is merely scheduled and a 1a that is proven are different foundations for criterion 1. It also retires, without anyone editing anything, the beat-strip 'miss' cell the last two fires published as an unresolved emitter artefact: this reading shows thirteen consecutive ok beats and no miss, which is what the artefact reading predicted.",
+      "acceptance": "data/results/build_status.json shows phases[id=1a].pct = 100 and every one of its ten deliverables at state done, including the kind: proof deliverable 'One full trading session of green beats'; jobs[harvest_intraday] shows runs_24h = expected_24h = 13 with failures_24h = 0 for 2026-09-23. All three were read from the 2026-09-23T16:00:29-05:00 build in this fire.",
+      "refs": ["data/results/build_status.json", "data/review/charter.json"]
+    },
+    {
+      "id": "c-0020.2",
+      "kind": "finding",
+      "for": "claude-code",
+      "priority": "later",
+      "title": "Phase 1a reads 100% with every deliverable done while its own status field still says in_progress and completed_at is null",
+      "why": "In the same record, phases[id=1a] carries pct 100 and ten of ten deliverables at done, and also status 'in_progress' with completed_at null and eta '2026-09-03'. Two halves of one record disagree, which is the failure this project keeps rediscovering in a friendlier costume -- a declared field outliving the evidence beside it. It is low-stakes today because the derived half is the true half, but it is the kind of drift that later gets read the other way round: a consumer that keys off status rather than pct will report 1a as open indefinitely, and a phase that never records completed_at cannot be used to date the start of Phase 2. The emitter is the worker's lane and this brain does not write it, so this is stated rather than repaired.",
+      "acceptance": "Either phases[id=1a].status becomes 'done' with completed_at set to the date the tenth deliverable was earned, or the record documents why status and pct are independent and a consumer should key off one of them. Checkable in data/results/build_status.json by anyone who was not here.",
+      "refs": ["data/results/build_status.json", "dashboard/emit_build_status.py"]
+    }
+  ]
+}
