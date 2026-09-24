@@ -1,0 +1,83 @@
+{
+  "cycle_id": "c-0021",
+  "opened_at": "2026-09-24T07:16:49-0500",
+  "opened_by": "cowork",
+  "by": {
+    "agent_id": "zoltarlead/cowork",
+    "node_id": "zoltarlead",
+    "hostname": "zoltarlead",
+    "hostname_source": "get_device_info.deviceName read live this fire (2026-09-24T12:09:55Z) vs fleet/identity.json attested_hostnames ['ZOLTARLEAD','ZoltarLead'] (file staged and read this fire) -- case-insensitive match",
+    "lane": "cowork",
+    "verified": true,
+    "at": "2026-09-24T07:16:49-0500",
+    "reachable": {
+      "files": "ok",
+      "db": "ok",
+      "drive": "ok (read-only)",
+      "device_shell": "unavailable this fire -- no device_bash tool; forty-ninth consecutive fire"
+    }
+  },
+  "quiet": false,
+  "written_without_review_py": true,
+  "_note": "Written by the cowork lane, which has no shell on this device and cannot run dashboard/review.py open-cycle. The id is assigned by hand as the successor to c-0020 and the file is left uncommitted for the courier, following the precedent this lane set at c-0019 and c-0020. Kinds used: finding only. One board task was created this fire (t-20260924-1a-proof-not-latched) and is folded in as c-0021.1 by reference rather than by duplicate id, matching the c-0020 precedent. No work_order is issued, so there is no cycle-item-to-order mapping to state. c-0021.1 carries priority now because it retracts a claim this lane published to the whole fleet; c-0021.2 carries next because the decision behind it is unchanged and only its clock moved.",
+  "state_snapshot": {
+    "read_at": "2026-09-24T07:16:49-0500",
+    "fire": "Scheduled fire, 13.00 h after the 18:17 CDT one (previous dispatcher receipt device mtime 2026-09-23T23:19:09Z). FIRST fire of the 2026-09-24 UTC window; the gap is the overnight break in the 12-23 UTC cron, not a missed fire. NOT quiet: a deliverable on the critical path crossed OUT of done and its phase crossed 100 -> 90, which is the mirror image of the transition that made c-0020 cycle-worthy seventeen hours ago.",
+    "board": {
+      "tasks": "39 on read, 40 after this fire (t-20260924-1a-proof-not-latched)",
+      "events": "105 on read, 107 after this fire (e-000131-1aproof, e-000132-caplast)",
+      "max_lamport_on_read": 130,
+      "bus": "51 on read, 52 after this fire; nothing addressed to zoltarlead/cowork or to all since the last fire, so no ack and no task is owed. The post this fire is a correction of this lane's own m-20260923-1615, not a reply.",
+      "fleet_live": 5,
+      "policy_level": 1,
+      "away_mode": false,
+      "age": "Newest event on read is this brain's own e-000130-courierreceiptrule (2026-09-23T18:15:44-05:00, 13.0 h). Newest event by any other party is still andrew's e-000119-uj196a (2026-09-17T23:32:36-05:00, 152.7 h). Zero board events, zero tasks and zero bus messages by any party other than this brain since 2026-09-18.",
+      "status_method": "Re-derived INDEPENDENTLY this fire: all 105 event documents pulled and replayed locally in strict lamport order (tie-break at) against all 39 task documents, with policy/current v1 L1 auto-approval applied as a FLOOR to classes probe/research/docs and never to kind question or decision. Derived composition: 14 proposed, 8 open, 5 done, 4 dispatched, 3 merged, 2 approved, 1 running, 1 cancelled, 1 deferred. No task changed derived state this fire. EXACTLY TWO tasks derive approved with no dispatch event -- the same two for a TWENTIETH consecutive fire. Zero receipt events with outcome refused, error or halted exist on the board."
+    },
+    "build_status": "generated 2026-09-24T07:00:36-05:00 (0.27 h). gate amber, headline 'Running, but not yet trustworthy - 5 blocker gate(s) never run or stale.' unchanged. THREE JOBS HEALTHY, ZERO FAILURES: harvest_intraday 13/13 (last run 2026-09-23T15:01:04-05:00), harvest_premarket 4/4 (last run 2026-09-24T07:00:36-05:00), harvest_evening 13/12 (last run 2026-09-23T21:30:30-05:00, leading beat cell 'miss' -- the known emitter-binning artefact, not re-litigated). Blockers B1/B2/B3 severity normal since 2026-09-02. 7 contract tests still stale at 2026-09-02T16:43:33-05:00. CHANGED: phases[id=1a] pct 100 -> 90, tenth deliverable 'One full trading session of green beats' (kind: proof) done -> todo. Phase 1a status field still reads in_progress with completed_at null, unchanged (the status/pct disagreement filed as c-0020.2 is now moot in one direction -- this morning the two halves agree, and they agree on NOT closed).",
+    "review_state": "device mtime 2026-09-24T12:00:37Z (0.27 h). current_cycle c-0020 on read.",
+    "inbox": "data/review/inbox.jsonl device mtime 2026-09-10T02:31:19Z = 346.8 h, UNCHANGED -- zero new inbox events.",
+    "git": ".git/refs/remotes/origin/main = 1a05afa6ed7341869769b2621ce043303eca62f1, ref file device mtime 2026-09-11T00:02:26Z (13.5 d) -- trunk unmoved. .git/FETCH_HEAD device mtime 2026-09-24T12:02:34Z (0.15 h), so the courier is current, not late; it names origin/fleet/dispatch 2e79c05. Zero new commits on trunk. No git command was run this fire and no sha is claimed that was not read from a staged ref file.",
+    "heartbeats": "zoltarlead 2026-09-24T07:01:02-05:00 (0.27 h, ok, branch fleet/courier-zoltarlead, head a13380c, dirty, probe rc 0). zoltarone 2026-09-07T17:00:01-05:00 (398.3 h, a seventeenth day). zoltargenesis / zoltarstar / zoltartwo: NO heartbeat file exists -- last_heartbeat_at stays null with a stated reason, never a copied stamp.",
+    "receipts": "fleet/receipts/zoltarlead/ non-recursive = 2000 entries, truncated true: 1,961 fleet_sync (000005-*) + 33 courier + 6 legacy. Visible courier frontier walked back to courier-20260911T230225Z.json. Twenty-third sample; see c-0021.2.",
+    "orders": "Eight order files in the clone across orders/zoltarlead, orders/zoltarone and orders/zoltargenesis; ZERO ORDER_RESULT.md anywhere. orders/zoltarlead/t-20260911-verify-main-contents.md dispatched and unclaimed 13.6 d."
+  },
+  "assessment": "This fire retracts what the last one published. Seventeen hours ago this lane told the whole fleet that Phase 1a had closed on evidence -- the first critical-path phase to close since 2026-09-02 -- and wrote an acceptance a stranger could check. The acceptance fails this morning: pct 90, and the proof deliverable back at todo. Nothing broke; the emitter derives that deliverable from a rolling 24-beat strip that is empty at 07:00 CDT, so Phase 1a reads 100 every afternoon and 90 every morning of every trading day, and has presumably done so all along. What was published was not a close but one end of a daily oscillation, sampled once. Against the end goal the damage is precise: charter criterion 1 rests on the archive 1a fills, and a phase whose pct is a function of the hour you sample it cannot be a foundation for anything -- it is a clock wearing a gate's clothes. The evidence itself survives intact and is not retracted; thirteen clean intraday beats on 2026-09-23 happened and are in run_history.jsonl. Only the word closed is withdrawn, on the same channel that carried it. The second item is the receipts listing, and it is the same bug in a different costume: a partial measurement wearing the shape of a complete one. Thirty-three courier receipts remain visible, falling 5.86/h, so a listing carries none by roughly 17:45Z today -- inside this cron window, within the next four to six fires. At that moment the path by which a sha reaches this board loses its enumerator, and a brain that cannot see a courier receipt writes exactly the receipt it writes on a genuinely quiet morning. Both items are Andrew's and both were pushed in one notification. Everything else is unchanged and has been for two weeks: trunk unmoved 13.5 days, gate amber on the same three blockers since 2026-09-02, eight order files and zero results, the dispatch lane unattended rather than slow. The board did not stall this fire; it was read wrong last fire, and the correction is the work.",
+  "items": [
+    {
+      "id": "c-0021.1",
+      "kind": "finding",
+      "for": "andrew",
+      "priority": "now",
+      "title": "Phase 1a did not close -- its proof deliverable does not latch, and this lane published the afternoon half of a daily oscillation as a close",
+      "why": "c-0020.1 and bus notice m-20260923-1615-phase-1a-closed told five nodes that the only irreversible phase on the critical path had closed on evidence. The 2026-09-24T07:00:36-05:00 build reads phases[id=1a] pct 90 with the tenth deliverable at todo, so c-0020.1's own acceptance fails. The cause was read from the writer rather than inferred from the artefact: dashboard/emit_build_status.py proof_state() returns 'todo' when the job's rolling 24-cell beat strip holds no non-'na' entry, and at 07:00 CDT harvest_intraday's strip is all 'na' because the session has not started. So a kind: proof deliverable answers 'is this happening now', never 'has this ever happened', and 1a oscillates 100 <-> 90 daily with nothing latching. This matters to the end goal twice over. The claim: every honest execution-timing number the charter wants is computed over the archive 1a fills, and a phase that closes and reopens on a clock is not a foundation for criterion 1. The protocol: two brains sampling build_status four hours apart will publish opposite states of the critical path, both correctly, and neither will look wrong -- which is the same failure shape as the truncated receipts listing in c-0021.2, and the second time in three days this fleet has been misled by a partial measurement that did not announce itself.",
+      "acceptance": "A kind: proof deliverable latches: once a completed trading day has satisfied it, its state stays done and does not revert because the current rolling window is empty. Either the emitter records the satisfying day in a durable artefact (data/results/run_history.jsonl or a sibling ledger) and returns done when any past day qualified, or the phase spec carries an explicit earned_on field the emitter honours. Verified by reading data/results/build_status.json at 07:00 CDT on a trading day and finding phases[id=1a].pct = 100 with the proof deliverable at done, matching the same file read at 16:00 CDT the day before; and by a stated rule in the emitter naming which of 'is happening now' and 'has ever happened' each kind: proof deliverable means. No deliverable state is hand-edited and no beat strip is widened to hide the oscillation. Board task t-20260924-1a-proof-not-latched carries the same acceptance and is where the work is tracked.",
+      "refs": [
+        "t-20260924-1a-proof-not-latched",
+        "e-000131-1aproof",
+        "m-20260924-1216-1a-did-not-close",
+        "c-0020.1",
+        "e-000128-p1aclose",
+        "m-20260923-1615-phase-1a-closed",
+        "dashboard/emit_build_status.py",
+        "data/results/build_status.json"
+      ]
+    },
+    {
+      "id": "c-0021.2",
+      "kind": "finding",
+      "for": "andrew",
+      "priority": "next",
+      "title": "The receipts listing goes fully blind today, around 17:45Z -- 33 courier receipts left, falling 5.86/h",
+      "why": "Twenty-third same-path, same-method sample of fleet/receipts/zoltarlead/ at 2026-09-24T12:11Z: 2000 entries, truncated true, 1,961 fleet_sync + 33 courier + 6 legacy. Against the 2026-09-23T23:12Z sample (1,885 + 109 + 6) that is 76 courier entries displaced in 12.98 h = 5.86/h, just under the 6.00/h thirty-hour baseline, so the baseline holds. Thirty-three left is 5.6 h of headroom, which puts total listing blindness at roughly 2026-09-24T17:45Z -- today, inside this cron window, within four to six fires of this one. The decision in front of Andrew has not moved a word since 2026-09-22: relocate into fleet/receipts/<node>/<YYYYMM>/, moving not pruning, because receipts are append-only evidence. What moved is the clock on the mitigation. After the crossing, exact-path staging is not a fallback for reading the newest receipt -- it is the only way to see any courier receipt at all, and since e-000130 established from source that the courier writes a receipt only for a run that commits or fails, absence in a probed slot carries no information at all. Runbook section 4, the only path by which a sha ever reaches this board, loses its enumerator, and the failure will present as quiet.",
+      "acceptance": "fleet/receipts/zoltarlead/ lists under 2,000 entries at the top level and stays there as the courier runs, verified by a device_list_dir returning truncated:false with a two-figure entry count, and by the next fire reading the newest courier receipt by path without a full listing. No history is deleted. Tracked on board task t-20260922-receipts-dir-hits-listing-cap, unchanged since 2026-09-22; this item dates it rather than restating it.",
+      "refs": [
+        "t-20260922-receipts-dir-hits-listing-cap",
+        "e-000132-caplast",
+        "e-000126-caprate",
+        "e-000127-caprate2",
+        "e-000130-courierreceiptrule"
+      ]
+    }
+  ]
+}
