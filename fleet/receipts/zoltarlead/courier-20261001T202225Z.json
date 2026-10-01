@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "kind": "courier",
+  "node_id": "zoltarlead",
+  "agent_id": "zoltarlead/courier",
+  "run_at": "2026-10-01T15:22:25-05:00",
+  "stamp": "20261001T202225Z",
+  "branch": "fleet/dispatch",
+  "worktree": "C:\\Shared\\ClaudeWork\\zoltar-ranks.courier-wt",
+  "outcome": "committing",
+  "failed_step": null,
+  "steps": [
+    {
+      "step": "1.fetch",
+      "cmd": "git fetch --prune origin",
+      "rc": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "step": "2.reset-to-remote",
+      "cmd": "git reset --hard origin/fleet/dispatch",
+      "rc": 0,
+      "stdout": "HEAD is now at eb021b6 courier(zoltarlead): 1 dispatch path(s)",
+      "stderr": ""
+    },
+    {
+      "step": "3.add",
+      "cmd": "git add -- orders fleet/msgs fleet/receipts data/fleet/heartbeat data/review",
+      "rc": 0,
+      "stdout": "",
+      "stderr": "warning: in the working copy of 'fleet/receipts/zoltarlead/000005-20261001T150233.json', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'fleet/receipts/zoltarlead/000005-20261001T151230.json', CRLF will be replaced by LF the next time Git touches it"
+    }
+  ],
+  "carried": {
+    "added": [
+      "fleet/receipts/zoltarlead/000005-20261001T150233.json",
+      "fleet/receipts/zoltarlead/000005-20261001T151230.json",
+      "data/review/cycles/c-0022.json"
+    ],
+    "updated_one_writer": [
+      "fleet/receipts/zoltarlead/courier-20261001T200225Z.json"
+    ],
+    "unioned": [],
+    "conflicts": [],
+    "missing_sources": []
+  },
+  "committed": null,
+  "pushed_sha": null,
+  "needs_andrew": null,
+  "_note": "Written by a scheduled task that runs git and fleet_sync.py only. No model.",
+  "base": "origin/fleet/dispatch",
+  "base_sha": "eb021b6496b94a21070581c12170911f05796534",
+  "staged": [
+    "data/review/cycles/c-0022.json",
+    "fleet/receipts/zoltarlead/000005-20261001T150233.json",
+    "fleet/receipts/zoltarlead/000005-20261001T151230.json",
+    "fleet/receipts/zoltarlead/courier-20261001T200225Z.json"
+  ],
+  "commit_worthy": [
+    "data/review/cycles/c-0022.json"
+  ]
+}

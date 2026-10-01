@@ -1,0 +1,92 @@
+{
+ "cycle_id": "c-0022",
+ "opened_at": "2026-10-01T15:15:56-0500",
+ "opened_by": "cowork",
+ "by": {
+  "agent_id": "zoltarlead/cowork",
+  "node_id": "zoltarlead",
+  "hostname": "zoltarlead",
+  "hostname_source": "get_device_info.deviceName 'zoltarlead' read live this fire (2026-10-01T20:09:17Z) vs fleet/identity.json attested_hostnames ['ZOLTARLEAD','ZoltarLead'] (5,180 B, staged and read this fire) -- case-insensitive match",
+  "lane": "cowork",
+  "verified": true,
+  "at": "2026-10-01T15:15:56-0500",
+  "_stamp_note": "Clock re-read (TZ=America/Chicago) immediately before THIS write to the device; not reused from any earlier reading this fire.",
+  "reachable": {
+   "files": "ok",
+   "db": "ok",
+   "drive": "ok (read-only; rules.md rev 16 read IN FULL at id 1Jyb-AklCoExlY1uKq40sRZ3ivdDbIfqT before any write, 6 promoted rules)",
+   "device_shell": "unavailable -- no device_bash tool in this session (re-probed: a ToolSearch for a device shell returned computer_* and get_device_info only). THIS NO LONGER BLOCKS A CYCLE -- see c-0022.2.",
+   "kb_git_clone": "unreachable -- C:\\Shared\\lessons-learned-kb is not a connected folder this session (connectedFolders holds only C:\\Shared\\ClaudeWork\\zoltar-ranks); the Drive tier was used and the substitution is stated, not silent."
+  }
+ },
+ "quiet": false,
+ "written_without_review_py": true,
+ "_note": "Written by the cowork lane, which has no shell on this device and cannot RUN dashboard/review.py open-cycle. The id is assigned by hand as the successor to c-0021, following the precedent this lane set at c-0019, c-0020 and c-0021, and the file is left uncommitted for the courier. Kinds used: finding only (review.py KINDS allows work_order/question/decision/risk/finding; 'for' is restricted to cowork/claude-code/andrew, so node assignees are named in the text, not in the field). No work_order is issued this cycle -- the executor leg has no live carrier -- so there is no cycle-item-to-order mapping to state. The three board tasks created since c-0021 (t-20260925-beats-binned-on-generated-at, t-20260929-expected-24h-fencepost, t-20260930-window-mask-keys-on-left-edge) are folded in BY REFERENCE under c-0022.1 rather than by duplicate id, matching the c-0020 and c-0021 precedent. KB rule applied: rules.md rev 16 row 6, 'a deferral that repeats is a decision' -- see c-0022.2.",
+ "state_snapshot": {
+  "read_at": "2026-10-01T20:09:17Z..20:14:00Z",
+  "build_status.json": "generated_at 2026-10-01T15:01:19-05:00 (0.21 h). Gate AMBER, unchanged headline: 'Running, but not yet trustworthy - 5 blocker gate(s) never run or stale.' All 7 contract tests stale at 2026-09-02T16:43:33-05:00. Phases: 1=100, 1a=95 (kind:proof wip), 2=75, 3=50, 4=0, 5=0, 6=0, 7=67, 8=100. Jobs all 'healthy', failures_24h 0: harvest_intraday runs_24h 14 / expected 13, harvest_premarket 4/4, harvest_evening 13/12. Blockers B1 normal (claude-code), B2 closed, B3 normal (andrew).",
+  "review_state.json": "generated_at 2026-10-01T15:01:19-05:00 (0.21 h). 46 items, 6 unmet dependencies (c-0007.1, c-0008.2, c-0008.4, c-0010.2, c-0010.4, c-0016.2), 12 raised, 12 cycles, newest c-0021 (2026-09-24T07:16:49-05:00). Unchanged in every counter since 2026-09-24.",
+  "inbox.jsonl": "69,572 B, untouched since 2026-09-11T06:31:19Z -- 493.7 h. Zero new events.",
+  "charter.json": "2,489 B, unchanged since 2026-07-01 stamp on file (mtime 2026-05-02 epoch reading 1788378922609 = 2026-05-02? recorded as unchanged against the previous fire's reading).",
+  "board": "tasks 43 (all read); events 182 docs, max lamport 208 (e-000208, 2026-10-01T14:13:45-05:00, this lane's own from the 19:09Z fire); policy/current L1 v1 (auto-approves probe/research/docs only); goal/current v2, one deadline entry 2026-09-17 already past -- nothing inside 3 days; bus newest m-20261001-1217 lamport 206, this lane's own; fleet_live 5 cards. NOTHING on the board was written by anyone but this lane since 2026-09-18.",
+  "derived_statuses": "4 approved, 22 proposed, 4 dispatched, 4 done, 3 merged, 2 running, 2 answered, 1 cancelled, 1 deferred -- identical to the 19:09Z fire. Derived from the 182 events ordered by lamport, not carried over.",
+  "trunk": "origin/main = 1a05afa6ed7341869769b2621ce043303eca62f1, ref file mtime 2026-09-11T06:42:26Z -- 20.6 d unmoved. Waiting branches unchanged: fleet/rejoin-zoltarlead 9115058, fleet/join-zoltargenesis 5dad247.",
+  "courier": ".git/FETCH_HEAD 2,026 B, mtime 2026-10-01T20:02:33Z (0.19 h). origin/fleet/dispatch = eb021b6, against e88d1ed one fire ago and c3c6a74 two fires ago -- the branch has now advanced on three consecutive hourly readings. Courier leg healthy; write-to-pushed measured at under 86 s at e-000208.",
+  "heartbeats": "data/fleet/heartbeat/ re-listed live: zoltarlead.json 2026-10-01T15:01:01-05:00 (0.22 h, branch fleet/courier-zoltarlead, a13380c, dirty, probe rc 0); zoltarone.json 2026-09-07T17:00:01-05:00 (574.3 h). NO heartbeat file for zoltarstar, zoltartwo or zoltargenesis.",
+  "orders": "8 files across orders/zoltargenesis/ zoltarlead/ zoltarone/, newest 2026-09-11T06:17:33Z (487.9 h). ZERO ORDER_RESULT.md anywhere in the clone. fleet/bridge/outbox/ 3 files, newest 2026-09-11T03:14Z (497.0 h). fleet/msgs/ 4 files, newest 2026-09-10T22:02Z (502.2 h). No executor receipt has ever arrived.",
+  "receipts": "fleet/receipts/zoltarlead/ frontier still unknown-with-reason for the courier-* tier: a recursive listing of fleet/ returns exactly 2,000 entries truncated:true, newest VISIBLE name 000005-20260924T100232.json, and courier-* names sort after every 000005-* name so the cap drops exactly the receipts section 4 reads. Liveness is covered by three other instruments; DISCOVERY is not."
+ },
+ "assessment": "The thing that moved this fire is not the build; it is a constraint this lane has been wrong about for twenty-seven fires. Every receipt since 2026-09-24 has recorded 'no review cycle written -- open-cycle is the only id assigner and it needs a shell,' and that is false on this lane's own evidence: dashboard/review.py cmd_open_cycle only assigns an id, stamps opened_at/opened_by, refuses to overwrite, and then runs check and emit -- and c-0019, c-0020 and c-0021 were each written BY HAND by this lane, carrying written_without_review_py: true. The shell was never needed to write a cycle; it is needed to VALIDATE one and to re-emit review_state. That is the identical error class as the last fire's emitter discovery, one rung further in: rules.md rev 16 row 6 says a deferral that repeats is a decision, and this one repeated twenty-seven times while the counter-evidence sat three files away in the directory being listed. So this cycle exists, and it carries the seven days of board findings -- e-000131 through e-000208 and three new tasks -- that were accruing outside any cycle. Against the end goal, the substance is unchanged and it is one decision wide. The binning investigation that consumed twenty-five fires is finished and collapsed: the emitter's windows() builds its cell grid backwards from generated_at with no flooring, which manufactures false misses, deletes real runs, and holds phase 1a's kind:proof deliverable at wip at EVERY anchor second of EVERY day -- so phase 1a, the head of critical path 1a->2->3->6, cannot close arithmetically until the grid is floored. On the floored grid, against the same records, it reads done from 15:01 on both 2026-09-29 and 2026-09-30. Parts (ii) and (iii) of the three-part ask are withdrawn and dissolved respectively; expected_24h is a hard constant and never oscillated. The machine state is otherwise exactly where it has been for three weeks: trunk unmoved at 1a05afa for 20.6 days, all seven contract tests unwitnessed since 2026-09-02, the courier leg healthy and now measured on three consecutive beats, the executor leg dead with zero ORDER_RESULT.md ever produced, and four approved tasks that cannot be dispatched because the only carrier reads orders from main. Andrew owns both of the two things that would move it: floor the grid, and land fleet/dispatch on main.",
+ "items": [
+  {
+   "id": "c-0022.1",
+   "kind": "finding",
+   "for": "andrew",
+   "priority": "now",
+   "title": "The binning ask is one decision, not three: floor the cell grid in windows(), and phase 1a closes",
+   "why": "Phase 1a is the head of critical path 1a->2->3->6 and it has read in_progress 95 with its kind:proof deliverable at wip every day. The cause is now settled in source, not inferred: dashboard/emit_build_status.py windows() builds 24 cells backwards from generated_at with no flooring to the schedule cadence, beats_for masks on a cell's LEFT edge only, and proof_state holds the kind:proof deliverable at wip whenever any in-schedule cell publishes a miss. The t0-anchored grid therefore makes that deliverable unsatisfiable at every anchor second of every trading day. Flooring the grid gives one run per cell, zero false misses, no deleted runs, and the deliverable reads done from 15:01 on both 2026-09-29 and 2026-09-30 against the same run_history records. This folds in the three board tasks created since c-0021 -- t-20260925-beats-binned-on-generated-at, t-20260929-expected-24h-fencepost, t-20260930-window-mask-keys-on-left-edge -- plus t-20260924-1a-proof-not-latched from c-0021.1; all four are ONE defect with one fix. Two sub-claims are formally withdrawn: the interval convention is left-closed/right-open (this lane published the opposite twice), and expected_24h is a hard constant (13/4/12), so the 'fencepost oscillation' filed across four builds was entirely in runs_24h. harvest_evening's 13/12 is permanent by construction and is not an outage signal. The reason this is Andrew's and not this lane's, even though dashboard/ is this lane: the file is invoked by scripts/daily.py and the post-commit hook every thirty minutes, this session can neither run it nor run pytest to prove a write, and flipping phase 1a to closed is the charter's call, not the brain's.",
+   "acceptance": "Andrew says floor it or does not. If floored: windows() anchors cells on the schedule cadence rather than on generated_at, the next build publishes zero misses on all three jobs with no run deleted from any strip, and phases[1a].deliverables[kind:proof] reads done on an afternoon build. Evidence: e-000202 through e-000205 (source read verbatim), e-000199, e-000203, and bus m-20261001-1217.",
+   "ref": "t-20260925-beats-binned-on-generated-at"
+  },
+  {
+   "id": "c-0022.2",
+   "kind": "finding",
+   "for": "cowork",
+   "priority": "now",
+   "title": "Twenty-seven fires of 'no cycle, the shell blocks it' was a deferral this lane had already disproved three times",
+   "why": "Every dispatcher receipt since 2026-09-24 has carried, under errors, 'No review cycle written -- open-cycle is the only writer that assigns a cycle id and it needs a shell this session does not have', and treated section 2's mirroring obligation as unmeetable. Re-measured this fire rather than restated: dashboard/review.py was staged and cmd_open_cycle read in full -- it takes cycle_id from the document if present, defaults opened_at/opened_by, numbers unnumbered items, refuses to overwrite an existing file, writes it, then calls check() and cmd_emit(). Only the last two need a runtime. And this lane has ALREADY written three cycles by hand -- c-0019, c-0020 and c-0021, each carrying written_without_review_py: true -- so the precedent is this lane's own, in the same directory it has been listing every fire. The cost of the error is that 78 board events (e-000131..e-000208) and three tasks accrued outside any cycle for seven days, which is precisely the state the review protocol exists to prevent. This is the second consecutive fire to find a false blocking constraint of the same shape (last fire: the emitter was readable all along), and the generalisable form is already in rules.md rev 16 row 6: a deferral that repeats is a decision, and when re-measuring, vary the dimension you assumed was irrelevant. The dimension assumed irrelevant here was WHO assigns the id.",
+   "acceptance": "This file exists at data/review/cycles/c-0022.json. Every future fire that is not quiet writes its cycle by hand with written_without_review_py: true, and no receipt lists cycle-writing under errors again; the remaining honest gap is narrower and must be stated as such -- check() and emit cannot be RUN from a no-shell session, so a hand-written cycle is unvalidated until a session with a shell runs 'python dashboard/emit_build_status.py --check'.",
+   "ref": "c-0021"
+  },
+  {
+   "id": "c-0022.3",
+   "kind": "finding",
+   "for": "andrew",
+   "priority": "next",
+   "title": "The courier leg is proven and measured; the executor leg has never delivered once, and four approved tasks are parked behind it",
+   "why": "The two halves of the dispatch path now have opposite evidence, and only one of them needs Andrew. Courier: origin/fleet/dispatch has advanced on three consecutive hourly readings (c3c6a74 -> e88d1ed -> eb021b6), and write-to-pushed is measured at under 86 s using .git/FETCH_HEAD as an instrument that needs no receipt (e-000208). Executor: zero ORDER_RESULT.md exists anywhere in the clone, fleet/bridge/outbox has had nothing new for 497 h, and orders/zoltarlead/t-20260911-verify-main-contents.md has sat dispatched and unclaimed for 20.4 d. The cause is structural and known: run-order.ps1 pulls --ff-only origin main and reads the working tree, so an order on fleet/dispatch is invisible to it. Consequence for this fire: t-20260918-git-push-size-check is auto-approved by L1 and has no dispatch event, and writing its order file would move it out of the approved queue onto a carrier that has delivered nothing in three weeks -- so it is held deliberately, for the fourth consecutive fire, and that hold is stated rather than silent. Same for t-20260908-join-zoltarstar (approved, dependency merged, but no node other than this one has a heartbeat under 3 h).",
+   "acceptance": "t-20260910-land-dispatch-on-main is answered. Then: origin/main carries orders/, an executor on zoltarone or zoltargenesis materialises orders/<node>/<id>.md from origin/fleet/dispatch, and the first ORDER_RESULT.md in this project's history appears with a receipt this lane can mirror as a receipt event. t-20260910-cycle-kind-invalid is the rider on that decision and must be answered with it.",
+   "ref": "t-20260910-land-dispatch-on-main"
+  },
+  {
+   "id": "c-0022.4",
+   "kind": "finding",
+   "for": "andrew",
+   "priority": "next",
+   "title": "Courier-receipt DISCOVERY is still blind, and the fix is a fixed-name pointer on the write side, not a migration",
+   "why": "fleet/receipts/zoltarlead/ is flat and past the 2,000-entry listing cap; courier-* names sort after every 000005-* fleet_sync name, so the entries the cap drops are exactly the receipts runbook section 4 reads. This is narrower than it was when t-20260922-receipts-dir-hits-listing-cap was filed: courier LIVENESS now has three independent instruments (FETCH_HEAD remote-sha deltas, the heartbeat file's own mtime, and the branch advance), so the fleet is not blind to whether the courier ran. What remains blind is naming the specific receipt for a specific landed order, which is what a commit event needs to carry a sha honestly. That is why no commit event has been posted from a branch advance, including this fire's. The cheapest fix is not the month-folder migration originally proposed: have the courier also write fleet/receipts/zoltarlead/latest-courier.json at a FIXED name on every run, success or failure. One path, no migration, 2,000 existing files untouched, and it is readable by exact path so the listing cap cannot hide it.",
+   "acceptance": "Either the fixed-name pointer lands and a later fire reads a courier receipt by exact path and posts its first commit event with a sha it actually read, or Andrew picks the month-folder shape instead and says so. Until then every receipt must keep recording the receipt frontier as unknown-with-reason rather than as quiet.",
+   "ref": "t-20260922-receipts-dir-hits-listing-cap"
+  },
+  {
+   "id": "c-0022.5",
+   "kind": "finding",
+   "for": "andrew",
+   "priority": "later",
+   "title": "Every dispatcher receipt this lane has ever written exists only in the working tree",
+   "why": "data/fleet/dispatcher-receipt.json is not in the courier's add list (dispatcher-runbook 4b commits orders/, fleet/msgs/, fleet/receipts/, data/fleet/heartbeat/, data/review/), so over a hundred dispatcher receipts -- the fleet's only record of what each brain fire read, held and wrote -- have never reached git. It is filed as t-20260915-courier-omits-dispatcher-ledger and was re-confirmed by measurement last fire from the opposite direction: this lane wrote a receipt at 13:18:44-0500 and the branch did not move for it. Low priority only because the receipts are reconstructable from the board; it is listed so that an auditor reading git does not mistake their absence for fires that did not happen. Note that this cycle file itself IS in the courier's add list, so c-0022 will reach git even though the receipt describing it will not.",
+   "acceptance": "data/fleet/ (or at minimum data/fleet/dispatcher-receipt.json) is added to the courier's add list, and a later fire reads its own previous receipt out of a committed tree rather than out of the working directory.",
+   "ref": "t-20260915-courier-omits-dispatcher-ledger"
+  }
+ ]
+}
