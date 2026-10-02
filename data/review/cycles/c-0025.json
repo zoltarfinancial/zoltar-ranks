@@ -1,0 +1,74 @@
+{
+  "cycle_id": "c-0025",
+  "opened_at": "2026-10-02T15:17:35-0500",
+  "opened_by": "cowork",
+  "quiet": false,
+  "written_without_review_py": true,
+  "_note": "Written by the cowork lane, which has no shell on this device and cannot RUN dashboard/review.py open-cycle; the id is assigned by hand as the successor to c-0024, following the precedent set at c-0014. Left UNCOMMITTED for the courier, per dispatcher-runbook section 8.",
+  "by": {
+    "agent_id": "zoltarlead/cowork",
+    "node_id": "zoltarlead",
+    "hostname": "zoltarlead",
+    "hostname_source": "get_device_info.deviceName 'zoltarlead' read live this fire (2026-10-02T20:09:45Z, re-read 20:17:35Z) vs fleet/identity.json attested_hostnames ['ZOLTARLEAD','ZoltarLead'] (5,180 B, staged and read this fire) - case-insensitive match",
+    "lane": "cowork",
+    "verified": true,
+    "node_id_verified": true,
+    "at": "2026-10-02T15:17:35-0500",
+    "_stamp_note": "Clock re-read (device UTC 2026-10-02T20:17:35.703Z converted with zoneinfo to America/Chicago, not an offset appended to UTC digits - rules.md rev 16 row 1) immediately before this write. The board batch that follows carries its own, later reading.",
+    "reachable": {
+      "files": "ok",
+      "db": "ok",
+      "device_shell": "unavailable - 127th consecutive fire, re-probed not restated (ToolSearch for a device bash tool returned only the computer-use and staging tools; the loaded and deferred tool lists were read, not assumed). Scope unchanged: it blocks RUNNING review.py check and emit --check, never the WRITING of a cycle, an event, a task or a card.",
+      "drive": "ok - rules.md read IN FULL at id 1Jyb-AklCoExlY1uKq40sRZ3ivdDbIfqT before any write; rev 16, header stamped 2026-09-30T06:21:42-0500, 6 promoted rules. TWENTY-THIRD consecutive full read.",
+      "kb_git_clone": "unreachable - C:\\\\Shared\\\\lessons-learned-kb is not a connected folder this session (connectedFolders holds only C:\\\\Shared\\\\ClaudeWork\\\\zoltar-ranks); device_list_dir returned a names-only skeleton (archive, 'Claude outputs', lessons). Re-probed live this fire. The Drive tier was used and the substitution is stated, not silent."
+    }
+  },
+  "state_snapshot": {
+    "read_at": "2026-10-02T20:09:45Z..20:17:35Z",
+    "build_status.json": "21,718 B, generated_at 2026-10-02T15:01:19-05:00, 0.27 h at read. NINTH build of the day. Gate AMBER, unchanged headline: 'Running, but not yet trustworthy - 5 blocker gate(s) never run or stale.' Phases 1=100, 1a=95, 2=75, 3=50, 4=0, 5=0, 6=0, 7=67, 8=100 - 1a HELD at 95 for a fourth build, proof deliverable wip. All three jobs status 'healthy', failures_24h 0. harvest_intraday runs_24h 13 / expected_24h 13 (the over-count CLEARED this build, 14/13 -> 13/13), rows_added_last 15,785 - a THIRD consecutive non-zero and the largest yet on the irreversible job - last_duration_s 75.3, beats 12 na / 10 ok / 2 MISS (was 14 na / 7 ok / 3 miss). harvest_premarket 4/4, rows_added_last 0, beats 20 na / 2 ok / 2 miss, byte-identical to the previous two builds. harvest_evening 13/12, rows_added_last 0, beats 24 na AND NOTHING ELSE for a SIXTH build, last_run_at 2026-10-01T21:30:38-05:00. Blockers B1/B2/B3 unmoved since 2026-09-02; all 7 contract tests still stale at 2026-09-02T16:43:33-05:00.",
+    "run_history.jsonl": "384,003 B, 901 records (897 at the previous fire), 0.27 h. Staged and PARSED first-hand this fire, not carried. 292 intraday / 284 evening / 237 weekend / 88 premarket; ZERO failures in any mode. Today's 13 intraday runs read in full with their row counts and their offsets past the nominal slot.",
+    "review_state.json": "229,360 B, 0.27 h.",
+    "inbox.jsonl": "69,572 B, 517.77 h - NO new inbox event since 2026-09-11. The git-side review log remains frozen; all reaction traffic is on the board.",
+    "charter.json": "2,489 B, 720.37 h.",
+    "origin/main": "1a05afa6ed7341869769b2621ce043303eca62f1, read from the REF FILE ITSELF (.git/refs/remotes/origin/main, 41 B, staged this fire), mtime 517.59 h. UNMOVED for 21.6 days.",
+    "origin/fleet/dispatch": "ab535789fcbc906fa63a7b5be837a1eeb5860edb per .git/FETCH_HEAD (2,026 B, staged and read live, 0.25 h) - a FIFTEENTH consecutive ADVANCING reading, was 1aecf64. The courier leg is alive on this and on the FETCH_HEAD age; it is still an indirect measurement and is labelled as one.",
+    "heartbeats": "data/fleet/heartbeat/ re-listed live: zoltarlead.json (903 B, at 2026-10-02T15:01:02-05:00, outcome ok, probe rc=0, 0.28 h) and zoltarone.json (470 B, at 2026-09-07T17:00:01-05:00, 598.29 h recomputed from its OWN producer stamp, never from device mtime) ONLY. zoltargenesis, zoltarstar and zoltartwo have NO heartbeat file at all.",
+    "orders": "re-listed live: 8 files across zoltargenesis/ (1), zoltarlead/ (3), zoltarone/ (4 incl. README). Newest is orders/zoltarlead/t-20260911-verify-main-contents.md at 512.0 h.",
+    "fleet/bridge/outbox": "re-listed live: 3 files, newest 521.04 h. fleet/msgs: 4 files, newest 526.25 h. fleet/receipts/: holds zoltarlead/ ONLY.",
+    "board": "44 tasks (unchanged), 199 events with max lamport 232, bus max lamport 233, 5 fleet_live cards at versions 215/142/44/38/41 - each exactly one above what this lane wrote last fire, so NOBODY ELSE HAS TOUCHED THE BOARD at any point. policy/current re-read live: level 1, unchanged since 2026-09-08, L1 auto-approves probe/research/docs only.",
+    "board-mirror.json": "343.96 h, untouched - nothing was owed an event this fire either."
+  },
+  "assessment": "A claim this lane posted an hour ago is too strong, and this build is what measured it. c-0024.1 and e-000231 said harvest_intraday's three false misses were owed by exactly the three runs that harvested zero rows, one for one. The ninth build has FIVE zero-yield runs in its window and publishes only TWO misses, so the identity is false. The direction survives and is now measured precisely: every published miss is still a cell VACATED by a zero-yield run, because those runs finish 37-38 s past their slot while the cell edges sit 72-79 s past it, so each bins backward into its predecessor's cell and leaves its own empty. What the previous reading missed is that a vacancy only becomes a published miss if the FOLLOWING run also falls short of the edge and backfills it. That is the whole of the 3 -> 2 change: the anchor advanced 7 seconds (72 s past the slot at the 14:01:12 build, 79 s at 15:01:19) and pulled the 11:31:19 run - whose own offset is 79 s, landing EXACTLY on the edge - out of its own cell and into the vacancy left by 12:00:38, converting a red cell to green with not one row of run history changed. Both strips reproduce cell by cell from emit_build_status.py's own windows() and beats_for(), re-read from source this fire; the ninth matches all 24 cells exactly. So the measured sensitivity of this board's only trustworthiness signal is SEVEN SECONDS OF BUILD CLOCK PER PUBLISHED MISS, which is a sharper statement of the defect than the yield coupling was, and it still does not widen the ask: clause (a), flooring the cell grid to the schedule, removes the anchor dependence and the run-duration dependence together. Nothing else moved. Trunk is 1a05afa for 21.6 days and the executor leg is dead behind it, so dispatch was held for a sixteenth fire on re-measured evidence. One number improved on its own: intraday's over-count cleared to 13/13 and its yield is non-zero for a third consecutive build at 15,785 rows.",
+  "items": [
+    {
+      "id": "c-0025.1",
+      "kind": "finding",
+      "for": "andrew",
+      "priority": "next",
+      "title": "Correcting c-0024.1: the false misses are NOT one-for-one with the zero-yield runs - five vacancies produced two misses, and the strip's sensitivity is seven seconds of build clock per red cell",
+      "why": "Because c-0024.1 and e-000231 are an hour old, are on your board, and state an identity that this build refutes - and the refutation makes the defect easier to act on, not harder. The corrected mechanism: cells in windows() are anchored on generated_at, so this build's edges sit 79 s past each half hour (72 s at the previous build). The five zero-yield runs today finish 37-38 s past their slots and therefore bin BACKWARD into their predecessors' cells, vacating their own; the eight productive runs finish 72-91 s past theirs and sit either side of the edge depending on the second. A vacancy publishes 'miss' only if the next run does not also fall short and backfill it. At 72 s three vacancies went unbackfilled (3 misses); at 79 s the 11:31:19 run - offset exactly 79 s, ON the edge - was pulled back into the 12:00 vacancy and one red cell became green. Same 13 runs, same log, two verdicts one hour apart. This is the same single defect you are already holding, stated at its true sensitivity.",
+      "acceptance": "Verified by re-running dashboard/emit_build_status.py after clause (a) lands and checking that harvest_intraday's beat strip is invariant to the build's sub-minute offset: emit at two generated_at values 7 s apart over an unchanged data/results/run_history.jsonl and require byte-identical beats arrays in data/results/build_status.json. Today's pair is the regression case - 2026-10-02T14:01:12-05:00 must not publish 3 misses while 2026-10-02T15:01:19-05:00 publishes 2 over the same 13 runs. Must be verified by RUNNING emit, not by reading the diff; this lane has no shell and cannot discharge it.",
+      "ref": "c-0024.1"
+    },
+    {
+      "id": "c-0025.2",
+      "kind": "finding",
+      "for": "cowork",
+      "priority": "later",
+      "title": "This fire's first reading was that the yield mechanism had been falsified outright, and it was wrong - the killed version is recorded because the predecessor had pre-committed to exactly that test",
+      "why": "The 19:09Z receipt left its successor a falsifiable test: 'a productive run publishing miss, or a zero-row run publishing ok - either breaks the mechanism.' Read off the counts alone, the ninth build appears to satisfy both, and this lane's first conclusion was that e-000231 was dead. Computing each run's offset past its nominal slot falsified that conclusion before anything was written: the two misses are the 10:00 and 12:00 cells, both vacated by zero-yield runs exactly as e-000231 says, and every zero-yield run sits in an 'ok' cell precisely BECAUSE it collided backward out of its own. The predecessor's test was the right shape but was specified on the wrong observable - cell OCCUPANCY, not published colour. Recording it so the pre-commitment practice is not credited with a check it would have failed.",
+      "acceptance": "A later fire reading this item can reconstruct the discrimination from data/results/run_history.jsonl alone: today's intraday offsets past slot are 91, 87, 38, 82, 37, 79, 38, 87, 73, 37, 72, 37, 78 s for rows 37566, 19261, 0, 14721, 0, 15325, 0, 15326, 7626, 0, 7771, 0, 15785. Any future claim that couples published colour to yield must be stated against occupancy and must survive both of today's anchors.",
+      "ref": "c-0024.2"
+    }
+  ],
+  "carried_forward_by_reference": [
+    "c-0022.1 / c-0023.1 - THE ONE 'now' ask, four clauses in dashboard/emit_build_status.py, class build, which L1 does not auto-approve. Unchanged in scope this fire and strengthened in evidence by c-0025.1. NO fifth clause is proposed and the board still carries exactly one 'now' ask (heartbeat-runbook failure-mode 4). The cycles are immutable, so this repair of c-0024.1 lives here and on the board task rather than editing c-0024 (review-protocol invariant 1, failure-mode 5).",
+    "t-20260925-beats-binned-on-generated-at - the task c-0025.1 corrects. Its mechanism is now measured at a sensitivity of 7 s of build clock per published miss.",
+    "t-20260930-window-mask-keys-on-left-edge - in_schedule() keys the na mask on the cell's LEFT edge, confirmed verbatim in source again this fire (line 239 family, 'start <= dt.hour + dt.minute / 60 < end' tested on `start`). It is why the 08:31-09:01 cell renders na rather than miss, which is the one cell my reproduction had to get right to match all 24.",
+    "t-20261002-yield-not-in-health - unchanged, class build, priority next, residual behind t-20260911-producer-pipeline-unreachable. NOT folded again: c-0025.1 narrows the GRID family's justification, it does not touch this task's own gap.",
+    "t-20260910-land-dispatch-on-main - still the single thing unblocking the whole executor leg. Trunk 1a05afa, 517.59 h unmoved. Dispatch of t-20260918-git-push-size-check held for a SIXTEENTH consecutive fire on re-measured evidence (rules.md rev 16 row 6), not restatement.",
+    "t-20260908-join-zoltarstar - approved at lamport 71, dependency merged, but NO CARRIER: no node but zoltarlead has a heartbeat under 3 h.",
+    "t-20260922-receipts-dir-hits-listing-cap / c-0022.4 - fleet/receipts/zoltarlead/ returns 2,000 entries truncated:true and name-ordered, so the courier-receipt frontier stays UNKNOWN-WITH-REASON and no cycle from c-0014 onward can be confirmed landed.",
+    "c-0024 (18,346 B, 1.99 h) is still UNCOMMITTED in the working tree alongside this file; the courier lands both."
+  ]
+}
